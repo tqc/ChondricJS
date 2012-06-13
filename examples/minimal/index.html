@@ -1,1 +1,93 @@
-TODO: Sample app
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+		<title>Chondric Example App</title>
+
+		<link rel="stylesheet"  href="../../lib/jquery.mobile-1.1.0.css" />
+		<link rel="stylesheet"  href="../../built/chondric.css" />
+		<link rel="stylesheet"  href="app.css" />
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<link rel="apple-touch-icon" href="images/icon72.png" />
+
+		<script src="../../lib/jquery-1.7.1.js" type="text/javascript"></script>
+		<script src="../../built/chondric.js" type="text/javascript"></script>
+		<script src="../../lib/jquery.mobile-1.1.0.js" type="text/javascript"></script>
+
+
+		<script src="app.js" type="text/javascript"></script>
+		<script src="db.js" type="text/javascript"></script>
+		<script src="indexPage.js" type="text/javascript"></script>
+		<script src="otherPage.js" type="text/javascript"></script>
+    
+
+	</head>
+	<body class="bglight">
+		<div data-role="page" id="indexPage" data-dom-cache="true">
+
+
+<div data-role="header" data-theme="a">
+<ul class="ui-btn-left">
+
+		</ul>
+
+	<h1>Example App</h1>
+<ul class="ui-btn-right">
+	
+	</ul>
+
+	</div>
+		<div data-role="content" class="bglight">
+
+	<div class="pagevariation" id="modelError">
+		<div class="message">
+			<h1>Error Populating View</h1>
+			<p data-role="autopopulate" data-property="error"></p>
+		</div>		
+				<ul class="options">
+			<li>
+				<a id="btnRetryAfterError"> Retry </a>
+			</li>
+		</ul>
+	</div>
+	<div class="pagevariation" id="noItemsExist">
+		<div class="message">
+			<p>
+				There are no items available.
+			</p>
+
+		<ul class="options">
+			<li>
+				<a id="btnNewItem"> Create a new item </a>
+			</li>
+		</ul>
+
+		</div>
+	</div>
+	
+	<div class="pagevariation" id="itemList">
+
+		<ul id="itemList">
+			<li class="item" data-role="viewTemplate"  data-prepopulate >
+				<span class="title" data-role="autopopulate" data-property="itemName">Title</span>
+			</li>
+		</ul>
+
+	</div>
+
+
+</div>
+
+
+
+		</div>
+		
+		<a data-transition="slide" data-direction="reverse" class="swipenav right">Left</a>
+		<a data-transition="slide" class="swipenav left">Right</a>
+		<a data-transition="slideup" class="swipenav up">Up</a>
+		<a data-transition="slidedown" class="swipenav down">Down</a>		
+	</body>
+</html>

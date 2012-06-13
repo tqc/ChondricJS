@@ -1,4 +1,4 @@
-function VersionedDatabase(db, updatefunctions, tables) {
+Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 
     this.sqlerror = function(t, err) {
         if (err && err.message) console.error(err.message);

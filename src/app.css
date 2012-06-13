@@ -116,6 +116,37 @@ ul.emptylist>li[data-role="viewEmpty"] {
 
 
 
+/* Page Variations */
+
+.pagevariation {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+.pagevariation.active {
+    display: block;
+}
+
+
+.ui-page {
+    text-shadow:none;
+}
+
+.ui-mobile, .ui-mobile .ui-page {
+min-height: 100%;
+}
+
+.ui-header ~ .ui-content {
+    position:absolute;
+    top:40px;
+    left:0;
+    right:0;
+    bottom:0;
+}
+
 
 
 

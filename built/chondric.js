@@ -1,10 +1,12 @@
 
+// jqm autoinit doesn't work for dynamic pages
 $(document).bind("mobileinit", function() {
     $.mobile.autoInitializePage = false;
-
 });
 
-function BaseApp(options) {
+Chondric = {};
+
+Chondric.App = function(options) {
     var app = this;
     this.ready = false;
     this.autohidesplashscreen = false;
@@ -19,6 +21,7 @@ function BaseApp(options) {
 
     var settings = {
         name: "Base App",
+        mightBePhoneGap: true,
         scriptGroups: [],
         contexts: {},
         enableScroll: true,
@@ -314,7 +317,7 @@ function BaseApp(options) {
                 })
             };
 
-        if (document.location.protocol == "file:") {
+        if (settings.mightBePhoneGap && document.location.protocol == "file:") {
             // file protocol indicates phonegap
             app.isPhonegap = true;
             document.addEventListener("deviceready", function() {
@@ -332,7 +335,7 @@ function BaseApp(options) {
     return this;
 }
 
-function BasePage(options) {
+Chondric.Page = function(options) {
     var page = this;
 
     var settings = {
@@ -586,7 +589,7 @@ function BasePage(options) {
     return this;
 }
 
-var QuickView = function(container, options) {
+Chondric.QuickView = function(container, options) {
         var view = this;
         var settings = {
             change: function(val) {},
@@ -827,7 +830,7 @@ var QuickView = function(container, options) {
                 };
             })(jQuery);
 
-function VersionedDatabase(db, updatefunctions, tables) {
+Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 
     this.sqlerror = function(t, err) {
         if (err && err.message) console.error(err.message);
