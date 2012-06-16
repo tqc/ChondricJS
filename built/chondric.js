@@ -682,7 +682,7 @@ Chondric.QuickView = function(container, options) {
             // get value;
         } else {
             // set value
-            if (value == field.currentValue) {
+            if ((field.hasChanged && !field.hasChanged(field.currentValue, value)) || (!field.hasChanged && value == field.currentValue)) {
                 console.log("unchanged " + fieldname);
                 return;
             }
