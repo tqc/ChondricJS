@@ -47,7 +47,7 @@
                         if (settings.selectionMode == "single") {
                             // TODO: these selectors don't support subviews
                             // ">[data-role=view]" is apparently not valid with on.
-                            container.on("vclick", "[data-role=view]", function() {
+                            container.on("vclick", "."+settings.itemClass, function() {
                                 var btn = $(this);
                                 $(">.active", container).removeClass("active");
                                 btn.addClass("active");
@@ -55,7 +55,7 @@
                             });
 
                         } else if (settings.selectionMode == "multiple") {
-                            container.on("vclick", "[data-role=view]", function() {
+                            container.on("vclick", "."+settings.itemClass, function() {
                                 $(this).toggleClass("active");
                                 container.trigger("change");
                             });

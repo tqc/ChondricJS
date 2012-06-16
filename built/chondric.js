@@ -603,11 +603,9 @@ Chondric.QuickView = function(container, options) {
             if (field.get) {
                 // custom getter
                 newVal = field.get(field.element)
-            } 
-            else if (field.fieldType == "checkbox") {
+            } else if (field.fieldType == "checkbox") {
                 newVal = field.element.is(":checked");
-            }
-            else if (field.fieldType == "listValueSingle") {
+            } else if (field.fieldType == "listValueSingle") {
                 newVal = $(">.active", field.element).attr("data-id");
             } else {
                 newVal = field.element.val();
@@ -616,7 +614,7 @@ Chondric.QuickView = function(container, options) {
         if (newVal != field.currentValue) {
             field.currentValue = newVal;
             if (field.change) {
-                field.change(field.currentValue);
+                field.change.apply(field, [field.currentValue]);
             }
         }
 
@@ -625,7 +623,7 @@ Chondric.QuickView = function(container, options) {
     this.initField = function(fieldname) {
         var field = settings.fields[fieldname];
         if (!field) {
-            console.log("field not found");
+            console.error("field " +fieldname+ " not found");
             return;
         }
 
@@ -636,11 +634,12 @@ Chondric.QuickView = function(container, options) {
 
         if (field.selector && field.element == undefined) {
             field.element = $(field.selector, container);
-            console.log("init " + field.element.attr("id"));
-            field.element.bind("change keyup", function() {
-                view.onControlValueChanged(field);
-            });
-
+            if (field.fieldType != "list") {
+                console.log("init " + field.element.attr("id"));
+                field.element.bind("change keyup", function() {
+                    view.onControlValueChanged(field);
+                });
+            }
         }
     }
 
@@ -655,7 +654,7 @@ Chondric.QuickView = function(container, options) {
     this.prop = function(fieldname, value, shouldTriggerChange) {
         var field = settings.fields[fieldname];
         if (!field) {
-            console.log("field not found");
+            console.error("field " +fieldname+ " not found");
             return;
         }
         // init field if not already set up
@@ -698,12 +697,15 @@ Chondric.QuickView = function(container, options) {
                 console.log("standard set " + fieldname);
                 if (field.fieldType == "checkbox") {
                     field.element.attr("checked", field.currentValue = value).checkboxradio('refresh');
-                } else  if (field.fieldType == "listValueSingle") {
+                } else if (field.fieldType == "listValueSingle") {
                     $(">.active", field.element).removeClass("active");
-                    $(">[data-id="+(field.currentValue = value)+"]", field.element).addClass("active");
+                    $(">[data-id=" + (field.currentValue = value) + "]", field.element).addClass("active");
 
                 } else {
                     field.element.val(field.currentValue = value);
+                }
+                if (field.fieldType == "slider") {
+                    field.element.slider("refresh");
                 }
             }
             console.log("changed " + fieldname);
@@ -724,7 +726,7 @@ Chondric.QuickView = function(container, options) {
         } else {
             var field = settings.fields[fieldname];
             if (!field) {
-                console.log("field not found");
+            console.error("field " +fieldname+ " not found");
                 return;
             }
             delete field.currentValue;
@@ -783,7 +785,7 @@ Chondric.QuickView = function(container, options) {
                         if (settings.selectionMode == "single") {
                             // TODO: these selectors don't support subviews
                             // ">[data-role=view]" is apparently not valid with on.
-                            container.on("vclick", "[data-role=view]", function() {
+                            container.on("vclick", "."+settings.itemClass, function() {
                                 var btn = $(this);
                                 $(">.active", container).removeClass("active");
                                 btn.addClass("active");
@@ -791,7 +793,7 @@ Chondric.QuickView = function(container, options) {
                             });
 
                         } else if (settings.selectionMode == "multiple") {
-                            container.on("vclick", "[data-role=view]", function() {
+                            container.on("vclick", "."+settings.itemClass, function() {
                                 $(this).toggleClass("active");
                                 container.trigger("change");
                             });
