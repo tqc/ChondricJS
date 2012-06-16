@@ -44,8 +44,17 @@ Chondric.QuickView = function(container, options) {
 
         if (field.selector && field.element == undefined) {
             field.element = $(field.selector, container);
-            if (field.fieldType != "list") {
                 console.log("init " + field.element.attr("id"));
+            if (field.fieldType == "radiogroup") {
+                $(field.selector+ " input", container).live("change", function() {
+                    view.onControlValueChanged(field);
+                });
+
+            }
+            else if (field.fieldType == "list") {
+
+            }
+            else  {
                 field.element.bind("change keyup", function() {
                     view.onControlValueChanged(field);
                 });
@@ -121,7 +130,7 @@ Chondric.QuickView = function(container, options) {
             console.log("changed " + fieldname);
             if (shouldTriggerChange && field.change) {
                 console.log("calling change " + fieldname);
-                field.change(field.currentValue);
+                field.change.apply(field, [field.currentValue]);
             }
 
         }
