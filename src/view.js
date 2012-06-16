@@ -13,10 +13,13 @@ Chondric.QuickView = function(container, options) {
             if (field.get) {
                 // custom getter
                 newVal = field.get(field.element)
-            }
+            } 
             else if (field.fieldType == "checkbox") {
-                        newVal =  field.element.is(":checked");
-                    } else {                      
+                newVal = field.element.is(":checked");
+            }
+            else if (field.fieldType == "listValueSingle") {
+                newVal = $(">.active", field.element).attr("data-id");
+            } else {
                 newVal = field.element.val();
             }
         }
@@ -80,6 +83,8 @@ Chondric.QuickView = function(container, options) {
                     console.log("standard get " + fieldname);
                     if (field.fieldType == "checkbox") {
                         return field.element.is(":checked");
+                    } else if (field.fieldType == "listValueSingle") {
+                        return $(">.active", field.element).attr("data-id");
                     } else {
                         return field.currentValue = field.element.val();
                     }
@@ -103,6 +108,10 @@ Chondric.QuickView = function(container, options) {
                 console.log("standard set " + fieldname);
                 if (field.fieldType == "checkbox") {
                     field.element.attr("checked", field.currentValue = value).checkboxradio('refresh');
+                } else  if (field.fieldType == "listValueSingle") {
+                    $(">.active", field.element).removeClass("active");
+                    $(">[data-id="+(field.currentValue = value)+"]", field.element).addClass("active");
+
                 } else {
                     field.element.val(field.currentValue = value);
                 }
