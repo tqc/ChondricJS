@@ -155,9 +155,8 @@ Chondric.App = function(options) {
         callback();
     }
 
-    function isScriptless(pageid) {
-        // TODO: use a better rule here
-        return pageid.indexOf("help") == 0
+    function isScriptless(pagediv) {
+        return $(pagediv).attr("data-scriptless") != undefined;
     }
 
     function PageCreated(event) {
@@ -166,7 +165,7 @@ Chondric.App = function(options) {
         console.log("created page " + pageid);
         $(pagediv).attr("style", "")
 
-        if (isScriptless(pageid)) {
+        if (isScriptless(pagediv)) {
 
             // TODO: allow this on scripted dialogs with data-autoclose attribute
             // scriptless dialogs can be closed by clicking outside
@@ -223,7 +222,7 @@ Chondric.App = function(options) {
 
         $(pagediv).attr("style", "")
 
-        if (isScriptless(pageid)) return;
+        if (isScriptless(pagediv)) return;
 
         if (app.Pages[pageid]) {
             app.Pages[pageid].updateView(pagediv, null, true, false);
@@ -245,7 +244,7 @@ Chondric.App = function(options) {
 
         $(pagediv).attr("style", "")
 
-        if (isScriptless(pageid)) return;
+        if (isScriptless(pagediv)) return;
 
         if (app.Pages[pageid]) {
             app.Pages[pageid].updateView(pagediv, null, false, false);
