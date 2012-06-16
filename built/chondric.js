@@ -742,6 +742,7 @@ Chondric.QuickView = function(container, options) {
 
                             // property of the data object that can be used as a unique identifier
                             dataId: "dataId",
+                            selectionMode: "none",
 
                             // function for populating a subview
                             itemMapper: function(subView, itemData) {
@@ -770,6 +771,21 @@ Chondric.QuickView = function(container, options) {
                             settings.populatedProperties[propName] = true;
                         });
 
+
+                        if (settings.selectionMode == "single") {
+                            container.on("vclick", "[data-role=view]", function() {
+                                var btn = $(this);
+                                $(">.active", container).removeClass("active");
+                                btn.addClass("active");
+                                container.trigger("change");
+                            });
+
+                        } else if (settings.selectionMode == "multiple") {
+                            container.on("vclick", "[data-role=view]", function() {
+                                $(this).toggleClass("active");
+                                container.trigger("change");
+                            });
+                        }
 
                         container.data("listSyncSettings", settings);
                     }
@@ -844,6 +860,7 @@ Chondric.QuickView = function(container, options) {
                             if (!itemHasChanged(previousData, newValues)) return;
 
                             subView.data("populatedValues", newValues);
+                            subView.data("originalItem", itemdata);
 
                             // data has changed - populate the subview
                             $("[data-role='autopopulate']", subView).each(function() {
