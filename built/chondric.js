@@ -604,7 +604,10 @@ Chondric.QuickView = function(container, options) {
             if (field.get) {
                 // custom getter
                 newVal = field.get(field.element)
-            } else {
+            }
+            else if (field.fieldType == "checkbox") {
+                        newVal =  field.element.is(":checked");
+                    } else {                      
                 newVal = field.element.val();
             }
         }
@@ -624,11 +627,14 @@ Chondric.QuickView = function(container, options) {
             return;
         }
 
+        if (!field.fieldType) field.fieldType = "textbox";
+
         if (field.init) field.init();
+
 
         if (field.selector && field.element == undefined) {
             field.element = $(field.selector, container);
-            console.log("init "+field.element.attr("id"));
+            console.log("init " + field.element.attr("id"));
             field.element.bind("change keyup", function() {
                 view.onControlValueChanged(field);
             });
@@ -663,8 +669,11 @@ Chondric.QuickView = function(container, options) {
                     return field.currentValue = field.get(field.element)
                 } else {
                     console.log("standard get " + fieldname);
-
-                    return field.currentValue = field.element.val();
+                    if (field.fieldType == "checkbox") {
+                        return field.element.is(":checked");
+                    } else {
+                        return field.currentValue = field.element.val();
+                    }
                 }
             } else {
                 console.log("get from cache " + fieldname);
@@ -683,7 +692,11 @@ Chondric.QuickView = function(container, options) {
                 field.currentValue = field.set(field.element, field.currentValue = value)
             } else {
                 console.log("standard set " + fieldname);
-                field.element.val(field.currentValue = value);
+                if (field.fieldType == "checkbox") {
+                    field.element.attr("checked", field.currentValue = value).checkboxradio('refresh');
+                } else {
+                    field.element.val(field.currentValue = value);
+                }
             }
             console.log("changed " + fieldname);
             if (shouldTriggerChange && field.change) {
