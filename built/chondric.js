@@ -762,6 +762,8 @@ Chondric.QuickView = function(container, options) {
                             // property of the data object that can be used as a unique identifier
                             dataId: "dataId",
                             selectionMode: "none",
+                            sortList:true,
+
 
                             // function for populating a subview
                             itemMapper: function(subView, itemData) {
@@ -808,6 +810,9 @@ Chondric.QuickView = function(container, options) {
                             });
                         }
 
+                        // list items which have already been displayed so can be reused
+                        settings.renderedElements = {};
+
                         container.data("listSyncSettings", settings);
                     }
 
@@ -817,27 +822,48 @@ Chondric.QuickView = function(container, options) {
                         container.data("listSyncSettings", settings);
                     }
 
+                    // normalize the input data. we always want an array for ordering and a map with 
+                    // key matching data id for easy updating of individual items.
+                    var orderedKeys = [];
+                    var data = {};
 
-                    // map data id to list elements to reduce dom queries
+                    if (rawdata instanceof Array) {
+                        for (var i = 0; i < rawdata.length; i++) {
+                            var o = rawdata[i];
+                            var k = o[settings.dataId];
+                            orderedKeys.push(k);
+                            data[k] = o;
+                        }
+                    } else {
+                        for (n in rawdata) {
+                            var o = rawdata[n];
+                            var k = o[settings.dataId];
+                            orderedKeys.push(k);
+                            data[k] = o;
+                        }
+                    }
+
+                    if (orderedKeys.length == 0) {
+                        container.addClass("emptylist");
+                        for (var k in settings.renderedElements) {
+                            settings.renderedElements[k].remove();
+                           }
+                           settings.renderedElements = {};
+                           return;
+                    } else {
+                        container.removeClass("emptylist");
+                    }
+
+
+                    // list elements for the current iteration - includes previously rendered and new elements
+                    // will be copied as settings.renderedElements later.
                     var listItemElements = {};
 
 
 
-                    // get the data in the right form - rawdata may be array or map
-                    var data = [];
-                    if (rawdata instanceof Array) {
-                        data = rawdata;
-                    } else {
-                        for (n in rawdata) {
-                            data.push(rawdata[n]);
-                        }
-                    }
-
-                    if (data.length == 0) {
-                        container.addClass("emptylist");
-                    } else {
-                        container.removeClass("emptylist");
-                    }
+/************************************/
+/* Local functions */
+/************************************/
 
                     var itemHasChanged = function(previousData, newData) {
                             if (!previousData) return true;
@@ -870,7 +896,7 @@ Chondric.QuickView = function(container, options) {
                                 subView.attr("data-role", "view");
                                 subView.attr("data-id", dataId);
 
-                                subView.insertBefore(settings.templateElement);
+                                subView.appendTo(container);
                                 listItemElements[dataId] = subView;
                             }
 
@@ -909,25 +935,59 @@ Chondric.QuickView = function(container, options) {
 
                             return subView;
                         }
+/************************************/
+/* End local functions */
+/************************************/
 
 
-                    var dataItemCount = 0;
 
-                    var subviewelements = [];
-                    for (var i = 0; i < data.length; i++) {
-                        subviewelements.push(getSubView(data[i]));
-                        dataItemCount++;
+
+                    // iterate over previously rendered items, see if any need removing
+
+                    for (var k in settings.renderedElements) {
+                        var el = settings.renderedElements[k];
+                        if (!data[k]) {
+                            // data no longer contains this item - remove it
+                            el.remove();
+                           } else {
+                            listItemElements[k] = el;
+                           }
+                        }
+
+                    // iterate over data, adding and updating elements as necessary
+
+                    for (var i = 0; i < orderedKeys.length; i++) {
+                        var el = getSubView(data[orderedKeys[i]]);
                     }
 
-                    // ensure that list items are in the correct order and deleted items have been removed
-                    // first, move all the valid items to the end of the list
-                    for (var i = 0; i < dataItemCount; i++) {
-                        subviewelements[i].appendTo(container);
-                    }
-                    // then remove any excess elements that are still at the start of the lsit
-                    var existingviewelements = $(">." + settings.itemClass + "[data-role='view']", container);
-                    for (var i = 0; i < existingviewelements.length - dataItemCount; i++) {
-                        $(existingviewelements[i]).remove();
+                    settings.renderedElements = listItemElements;
+
+                    if (settings.sortList) {
+                        var domElements = $("[data-role=view]", container);
+                        var domIndex = 0;
+                        var keyIndex = 0;
+
+                        var sortedKeys = {};
+                        while (keyIndex < sortedKeys.length && domIndex < domElements.length) {                             
+                             var expected = orderedKeys[keyIndex];
+                             var actual = $(domElements[domIndex]).attr("data-id");
+                             if (expected == actual) {
+                                domIndex++;
+                                keyIndex++;
+                                sortedKeys[actual] = true;
+                                continue;
+                             }
+                             if (sortedKeys[expected]) {
+                                keyIndex++;
+                                continue;
+                             }
+                             if (sortedKeys[actual]) {
+                                domIndex++;
+                                continue;
+                             }
+
+                             listItemElements[expected].insertBefore(domElements[domIndex]);
+                        }
                     }
 
 
