@@ -31,6 +31,17 @@ ul.emptylist>li[data-role="viewEmpty"] {
     background: transparent;
 }
 
+.ui-dialog-contain {
+ width: 60%;
+max-width: none;
+margin: 10% auto 15px auto;
+padding: 0;
+position: relative;
+height: 60%;
+max-height: none;
+
+}
+
 .sidebar {
     position: absolute;
     width: 400px;
@@ -147,6 +158,40 @@ min-height: 100%;
     bottom:0;
 }
 
+
+/* Toolbar */
+
+.ui-header ul.ui-btn-right {
+    padding:0;
+    margin: 0;
+    list-style:none;
+}
+
+.ui-header ul.ui-btn-right li {
+    display:inline;
+}
+
+.ui-header ul.ui-btn-left {
+    padding:0;
+    margin: 0;
+    list-style:none;
+}
+
+.ui-header ul.ui-btn-left li {
+    display:inline;
+}
+
+.ui-header .ui-btn {
+    border: none;
+background: transparent;
+-webkit-box-shadow: none !important;
+box-shadow: none !important;
+margin-top: 0.12em;
+}
+
+.ui-header .ui-btn-inner {
+    border: none;   
+}
 
 
 
@@ -323,3 +368,60 @@ min-height: 100%;
     font-family: Helvetica, Arial, sans-serif /*{global-font-family}*/;
     text-decoration: none;
 }
+
+
+
+
+
+/*
+ fix pop transition to work with transparent dialogs
+*/
+
+
+@-webkit-keyframes fadeup {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+@-moz-keyframes fadeup {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
+}
+@-webkit-keyframes fadedown {
+    from { opacity: 1; }
+    to { opacity: 0.5; }
+}
+@-moz-keyframes fadedown {
+    from { opacity: 1; }
+    to { opacity: 0.5; }
+}
+
+.pop.out {
+    -webkit-animation-name: fadedown;
+    -moz-animation-name: fadedown;
+    opacity: 0.5;
+    -webkit-animation-duration: 300ms;
+    -moz-animation-duration: 300ms;
+}
+.pop.in.reverse {
+    -webkit-animation-name: fadeup;
+    -moz-animation-name: fadeup;
+}
+
+
+/* Dialogs */
+
+.ui-dialog-background {
+    opacity: 0.5;
+    display: block !important;
+}
+.ui-dialog-background.pop.in {
+    opacity: 1;
+}
+.ui-dialog {
+    min-height: 100% !important;
+    background: transparent !important;
+}
+
+
+
+
