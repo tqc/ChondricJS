@@ -169,6 +169,9 @@ Chondric.App = function(options) {
 
             // TODO: allow this on scripted dialogs with data-autoclose attribute
             // scriptless dialogs can be closed by clicking outside
+
+            // TODO: should this be vclick?
+            
             if ($(pagediv).attr("data-role") == "dialog") {
                 $(pagediv).click(function() {
                     $('.ui-dialog').dialog('close');

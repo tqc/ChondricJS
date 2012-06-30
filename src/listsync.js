@@ -66,6 +66,17 @@
                         // list items which have already been displayed so can be reused
                         settings.renderedElements = {};
 
+
+                        // initialize with any preexisting list items
+    var children = container.children();
+    for (var i = 0; i < children.length; i++) {
+        var el = $(children[i]);
+        if (el.attr("data-role") == "view") {
+            settings.renderedElements[el.attr("data-id")] = el;
+        }
+            }
+
+
                         container.data("listSyncSettings", settings);
                     }
 

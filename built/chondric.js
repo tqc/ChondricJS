@@ -169,6 +169,9 @@ Chondric.App = function(options) {
 
             // TODO: allow this on scripted dialogs with data-autoclose attribute
             // scriptless dialogs can be closed by clicking outside
+
+            // TODO: should this be vclick?
+            
             if ($(pagediv).attr("data-role") == "dialog") {
                 $(pagediv).click(function() {
                     $('.ui-dialog').dialog('close');
@@ -812,6 +815,17 @@ Chondric.QuickView = function(container, options) {
 
                         // list items which have already been displayed so can be reused
                         settings.renderedElements = {};
+
+
+                        // initialize with any preexisting list items
+    var children = container.children();
+    for (var i = 0; i < children.length; i++) {
+        var el = $(children[i]);
+        if (el.attr("data-role") == "view") {
+            settings.renderedElements[el.attr("data-id")] = el;
+        }
+            }
+
 
                         container.data("listSyncSettings", settings);
                     }
