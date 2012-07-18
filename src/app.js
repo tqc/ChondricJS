@@ -171,7 +171,7 @@ Chondric.App = function(options) {
             // scriptless dialogs can be closed by clicking outside
 
             // TODO: should this be vclick?
-            
+
             if ($(pagediv).attr("data-role") == "dialog") {
                 $(pagediv).click(function() {
                     $('.ui-dialog').dialog('close');
@@ -263,6 +263,12 @@ Chondric.App = function(options) {
     function ButtonClick(event) {
         //alert("vclick");
         var link = $(this);
+
+        if (link.attr("data-animate-click") && app.animateClick)  {
+            app.animateClick(link);
+            
+        }
+
         var action = app.Actions[link.attr("data-action")];
         if (link.attr("data-prepopulate")) {
             app.prepopulate = JSON.parse(link.attr("data-prepopulate"));
