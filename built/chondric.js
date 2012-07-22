@@ -171,7 +171,7 @@ Chondric.App = function(options) {
             // scriptless dialogs can be closed by clicking outside
 
             // TODO: should this be vclick?
-            
+
             if ($(pagediv).attr("data-role") == "dialog") {
                 $(pagediv).click(function() {
                     $('.ui-dialog').dialog('close');
@@ -263,6 +263,12 @@ Chondric.App = function(options) {
     function ButtonClick(event) {
         //alert("vclick");
         var link = $(this);
+
+        if (link.attr("data-animate-click") && app.animateClick)  {
+            app.animateClick(link);
+            
+        }
+
         var action = app.Actions[link.attr("data-action")];
         if (link.attr("data-prepopulate")) {
             app.prepopulate = JSON.parse(link.attr("data-prepopulate"));
@@ -374,8 +380,10 @@ Chondric.Page = function(options) {
 
 
         // bind swipe events
-
+/*
         $(pagediv).bind("swipe", function(e, data) {
+            // TODO: work with separate swipeleft/swiperight events
+            if (!settings.directionalNavigation[data.direction] ) return true;
 
             $(".swipenav." + data.direction).click();
 
@@ -383,6 +391,29 @@ Chondric.Page = function(options) {
             // TODO: return true if no swipe event available
 
         })
+*/
+        $(pagediv).bind("swipeleft", function(e, data) {
+            // TODO: work with separate swipeleft/swiperight events
+            if (!settings.directionalNavigation.left) return true;
+
+            $(".swipenav.left").click();
+
+            return false;
+            // TODO: return true if no swipe event available
+
+        })
+
+        $(pagediv).bind("swiperight", function(e, data) {
+            // TODO: work with separate swipeleft/swiperight events
+            if (!settings.directionalNavigation.right) return true;
+
+            $(".swipenav.right").click();
+
+            return false;
+            // TODO: return true if no swipe event available
+
+        })
+
 
         // saving for dialogs
         if (settings.rules) {
@@ -539,7 +570,7 @@ Chondric.Page = function(options) {
             // skip items that are not immediate children of the subview - i.e. they have
             // no viewTemplate ancestor and the closest view ancestor is this subview
             var viewTemplateAncestor = $(this).closest("[data-role=viewTemplate]");
-            var viewAncestor = $(this).closest("[data-role=view],[data-role=page]");
+            var viewAncestor = $(this).closest("[data-role=view],[data-role=page],[data-role=dialog]");
             if (viewTemplateAncestor.length > 0) return;
             if (viewAncestor[0] != pagediv) return;
 
