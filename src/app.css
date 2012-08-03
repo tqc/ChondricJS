@@ -150,7 +150,7 @@ max-height: none;
 min-height: 100%;
 }
 
-.ui-header ~ .ui-content {
+.ui-page[data-role=page] .ui-header ~ .ui-content {
     position:absolute;
     top:40px;
     left:0;
