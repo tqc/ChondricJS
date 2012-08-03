@@ -125,7 +125,7 @@ Chondric.App = function(options) {
             $(".ui-dialog-background ").removeClass("ui-dialog-background ");
         });
 
-        $('[data-role="button"]').live('vclick', ButtonClick);
+        $('a[href]').live('vclick', ButtonClick);
 
         $('div[data-role="page"], div[data-role="dialog"]').live('pagebeforeshow', PageBeforeShow);
         $('div[data-role="page"], div[data-role="dialog"]').live('pageshow', PageShown);
@@ -266,7 +266,7 @@ Chondric.App = function(options) {
 
         if (link.attr("data-animate-click") && app.animateClick)  {
             app.animateClick(link);
-            
+
         }
 
         var action = app.Actions[link.attr("data-action")];
