@@ -227,12 +227,12 @@
                     settings.renderedElements = listItemElements;
 
                     if (settings.sortList) {
-                        var domElements = $("[data-role=view]", container);
+                        var domElements = $(">[data-role=view]", container);
                         var domIndex = 0;
                         var keyIndex = 0;
 
                         var sortedKeys = {};
-                        while (keyIndex < sortedKeys.length && domIndex < domElements.length) {                             
+                        while (keyIndex < orderedKeys.length && domIndex < domElements.length) {                             
                              var expected = orderedKeys[keyIndex];
                              var actual = $(domElements[domIndex]).attr("data-id");
                              if (expected == actual) {
@@ -246,11 +246,12 @@
                                 continue;
                              }
                              if (sortedKeys[actual]) {
-                                domIndex++;
+                                domIndex++;                            
                                 continue;
                              }
 
                              listItemElements[expected].insertBefore(domElements[domIndex]);
+                             domElements = $(">[data-role=view]", container);
                         }
                     }
 
