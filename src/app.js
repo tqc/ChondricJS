@@ -12,6 +12,7 @@ Chondric.App = function(options) {
     this.autohidesplashscreen = false;
     this.Pages = {};
     this.Actions = {};
+    app.platform = "web";
 
     function getByProp(arr, prop, val) {
         for (var i = 0; i < arr.length; i++) {
@@ -325,9 +326,14 @@ Chondric.App = function(options) {
                 })
             };
 
-        if (settings.mightBePhoneGap && document.location.protocol == "file:") {
+            if (window.WinJS) {
+                app.platform = "windows"
+                 $(initInternal);
+            }
+        else if (settings.mightBePhoneGap && document.location.protocol == "file:") {
             // file protocol indicates phonegap
             app.isPhonegap = true;
+            app.platform = "cordova";
             document.addEventListener("deviceready", function() {
                 console.log("appframework deviceready");
                 $(initInternal);
@@ -336,6 +342,8 @@ Chondric.App = function(options) {
             , false);
         } else {
             // no phonegap - web preview mode
+            app.platform = "web"
+
             $(initInternal);
         }
 

@@ -12,6 +12,7 @@ Chondric.App = function(options) {
     this.autohidesplashscreen = false;
     this.Pages = {};
     this.Actions = {};
+    app.platform = "web";
 
     function getByProp(arr, prop, val) {
         for (var i = 0; i < arr.length; i++) {
@@ -325,9 +326,14 @@ Chondric.App = function(options) {
                 })
             };
 
-        if (settings.mightBePhoneGap && document.location.protocol == "file:") {
+            if (window.WinJS) {
+                app.platform = "windows"
+                 $(initInternal);
+            }
+        else if (settings.mightBePhoneGap && document.location.protocol == "file:") {
             // file protocol indicates phonegap
             app.isPhonegap = true;
+            app.platform = "cordova";
             document.addEventListener("deviceready", function() {
                 console.log("appframework deviceready");
                 $(initInternal);
@@ -336,6 +342,8 @@ Chondric.App = function(options) {
             , false);
         } else {
             // no phonegap - web preview mode
+            app.platform = "web"
+
             $(initInternal);
         }
 
@@ -708,11 +716,11 @@ Chondric.QuickView = function(container, options) {
             if (field.currentValue === undefined) {
                 if (field.get) {
                     // custom getter
-                    console.log("custom get " + fieldname);
+              //      console.log("custom get " + fieldname);
 
                     return field.currentValue = field.get(field.element)
                 } else {
-                    console.log("standard get " + fieldname);
+               //     console.log("standard get " + fieldname);
                     if (field.fieldType == "checkbox") {
                         return field.element.is(":checked");
                     } else if (field.fieldType == "listValueSingle") {
@@ -722,22 +730,22 @@ Chondric.QuickView = function(container, options) {
                     }
                 }
             } else {
-                console.log("get from cache " + fieldname);
+            //    console.log("get from cache " + fieldname);
                 return field.currentValue;
             }
             // get value;
         } else {
             // set value
             if ((field.hasChanged && !field.hasChanged(field.currentValue, value)) || (!field.hasChanged && value == field.currentValue)) {
-                console.log("unchanged " + fieldname);
+        //        console.log("unchanged " + fieldname);
                 return;
             }
             if (field.set) {
                 // custom setter
-                console.log("custom set " + fieldname);
+          //      console.log("custom set " + fieldname);
                 field.currentValue = field.set(field.element, field.currentValue = value)
             } else {
-                console.log("standard set " + fieldname);
+     //           console.log("standard set " + fieldname);
                 if (field.fieldType == "checkbox") {
                     field.element.attr("checked", field.currentValue = value).checkboxradio('refresh');
                 } else if (field.fieldType == "listValueSingle") {
@@ -751,9 +759,9 @@ Chondric.QuickView = function(container, options) {
                     field.element.slider("refresh");
                 }
             }
-            console.log("changed " + fieldname);
+      //      console.log("changed " + fieldname);
             if (shouldTriggerChange && field.change) {
-                console.log("calling change " + fieldname);
+         //       console.log("calling change " + fieldname);
                 field.change.apply(field, [field.currentValue]);
             }
 
@@ -1008,7 +1016,7 @@ Chondric.QuickView = function(container, options) {
                     settings.renderedElements = listItemElements;
 
                     if (settings.sortList) {
-                        var domElements = $("[data-role=view]", container);
+                        var domElements = $(">[data-role=view]", container);
                         var domIndex = 0;
                         var keyIndex = 0;
 
@@ -1027,11 +1035,12 @@ Chondric.QuickView = function(container, options) {
                                 continue;
                              }
                              if (sortedKeys[actual]) {
-                                domIndex++;
+                                domIndex++;                            
                                 continue;
                              }
 
                              listItemElements[expected].insertBefore(domElements[domIndex]);
+                             domElements = $(">[data-role=view]", container);
                         }
                     }
 
