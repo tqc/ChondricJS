@@ -13,6 +13,7 @@ Chondric.App = function(options) {
     this.Pages = {};
     this.Actions = {};
     app.platform = "web";
+    app.isSimulator = false;
 
     function getByProp(arr, prop, val) {
         for (var i = 0; i < arr.length; i++) {
@@ -340,6 +341,8 @@ Chondric.App = function(options) {
             app.platform = "cordova";
             document.addEventListener("deviceready", function() {
                 console.log("appframework deviceready");
+                console.log(device.platform);
+                app.isSimulator = device.platform.indexOf("Simulator") > 0;
                 $(initInternal);
             }
 
