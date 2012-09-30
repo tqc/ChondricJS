@@ -32,10 +32,12 @@ Chondric.App = function(options) {
         },
         customInit: function(callback) {
             callback()
-        }
+        },
+        debugMode: false
     };
 
     $.extend(settings, options);
+    app.debugMode = settings.debugMode;
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
@@ -145,7 +147,9 @@ Chondric.App = function(options) {
     }
 
     function complete(callback) {
-
+        if (app.debugMode) {
+            $("body").addClass("debugmode");
+        }
         $("#startPage").attr("data-url", document.location.pathname.replace(/\/$/, "/index.html"));
         $.mobile.initializePage();
         $.event.special.swipe.durationThreshold = 200;

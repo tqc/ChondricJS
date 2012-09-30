@@ -423,5 +423,15 @@ margin-top: 0.12em;
 }
 
 
+/* Debug Mode */
+
+.debugonly {
+    display:none !important;
+}
+
+
+body.debugmode .debugonly {
+    display:block !important;
+}
 
 
