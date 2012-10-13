@@ -19,7 +19,7 @@ Chondric.Page = function(options) {
 
     this.getViewModel = function(callback, pagehidden, partialupdate) {
         var page = this;
-        settings.getViewModel(function(m) {
+        settings.getViewModel.call(page, function(m) {
             page.model = m;
             callback(m);
         }, pagehidden, partialupdate);

@@ -209,12 +209,12 @@ Chondric.App = function(options) {
         // ensure page script is loaded and call setup method of page
 
         if (app.Pages[pageid]) {
-            app.Pages[pageid].attachEvents(pagediv);
-            app.Pages[pageid].updateView(pagediv, null, true, true);
+            app.Pages[pageid].attachEvents.call(app.Pages[pageid], pagediv);
+            app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, true);
         } else {
             require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
-                app.Pages[pageid].attachEvents(pagediv);
-                app.Pages[pageid].updateView(pagediv, null, true, true);
+                app.Pages[pageid].attachEvents.call(app.Pages[pageid], pagediv);
+                app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, true);
             });
         }
 
@@ -234,10 +234,10 @@ Chondric.App = function(options) {
         if (isScriptless(pagediv)) return;
 
         if (app.Pages[pageid]) {
-            app.Pages[pageid].updateView(pagediv, null, true, false);
+            app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, false);
         } else {
             require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
-                app.Pages[pageid].updateView(pagediv, null, true, false);
+                app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, false);
             });
         }
     };
@@ -256,10 +256,10 @@ Chondric.App = function(options) {
         if (isScriptless(pagediv)) return;
 
         if (app.Pages[pageid]) {
-            app.Pages[pageid].updateView(pagediv, null, false, false);
+            app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, false, false);
         } else {
             require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
-                app.Pages[pageid].updateView(pagediv, null, false, false);
+                app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, false, false);
             });
         }
 
@@ -379,7 +379,7 @@ Chondric.Page = function(options) {
 
     this.getViewModel = function(callback, pagehidden, partialupdate) {
         var page = this;
-        settings.getViewModel(function(m) {
+        settings.getViewModel.call(page, function(m) {
             page.model = m;
             callback(m);
         }, pagehidden, partialupdate);
