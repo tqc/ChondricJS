@@ -147,7 +147,7 @@ max-height: none;
 }
 
 .ui-mobile, .ui-mobile .ui-page {
-min-height: 100%;
+min-height: 100% !important;
 }
 
 .ui-page[data-role=page] .ui-header ~ .ui-content {
