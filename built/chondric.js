@@ -1,7 +1,7 @@
-
 // jqm autoinit doesn't work for dynamic pages
 $(document).bind("mobileinit", function() {
     $.mobile.autoInitializePage = false;
+
 });
 
 Chondric = {};
@@ -16,8 +16,8 @@ Chondric.App = function(options) {
     app.isSimulator = false;
 
     function getByProp(arr, prop, val) {
-        for (var i = 0; i < arr.length; i++) {
-            if (arr[i][prop] == val) return arr[i];
+        for(var i = 0; i < arr.length; i++) {
+            if(arr[i][prop] == val) return arr[i];
         }
     }
 
@@ -42,7 +42,7 @@ Chondric.App = function(options) {
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
-        if (scriptGroupNum >= settings.scriptGroups.length) {
+        if(scriptGroupNum >= settings.scriptGroups.length) {
             return callback();
         }
         console.log("calling require");
@@ -55,7 +55,7 @@ Chondric.App = function(options) {
         console.log("getting database");
 
         app.db = settings.getDatabase();
-        if (!app.db) {
+        if(!app.db) {
             callback();
         } else {
             app.db.updateDatabase(function() {
@@ -71,26 +71,26 @@ Chondric.App = function(options) {
     app.contextValueStrings = {};
 
     // set up context functions
-    for (var cn0 in settings.contexts) {
+    for(var cn0 in settings.contexts) {
         function newscope(cn1) {
             var cn = cn1;
             var ctx = settings.contexts[cn];
             app.context[cn] = function(val, ctxcallback) {
                 // when called with no parameters, return the value
-                if (val === undefined && !ctxcallback) return app.contextValues[cn];
+                if(val === undefined && !ctxcallback) return app.contextValues[cn];
 
                 // if a string is provided, set the context
-                if (typeof(val) == "string") {
-                    if (!app.contextValueStrings[cn] || val != app.contextValueStrings[cn]) {
+                if(typeof(val) == "string") {
+                    if(!app.contextValueStrings[cn] || val != app.contextValueStrings[cn]) {
                         // value is changed
                         app.contextValueStrings[cn] = val;
-                        if (ctx.getValueFromString) {
+                        if(ctx.getValueFromString) {
                             app.contextValues[cn] = ctx.getValueFromString(val);
                         } else {
                             app.contextValues[cn] = val;
                         }
-                        if (ctx.childContexts) {
-                            for (var i = 0; i < ctx.childContexts.length; i++) {
+                        if(ctx.childContexts) {
+                            for(var i = 0; i < ctx.childContexts.length; i++) {
                                 app.context[ctx.childContexts[i]]("");
                             }
                         }
@@ -100,7 +100,7 @@ Chondric.App = function(options) {
                     localStorage["appcontext_" + settings.name] = JSON.stringify(app.contextValueStrings);
                 }
 
-                if (ctxcallback) ctxcallback(app.contextValues[cn])
+                if(ctxcallback) ctxcallback(app.contextValues[cn])
             }
         }
 
@@ -110,7 +110,7 @@ Chondric.App = function(options) {
     function attachEvents(callback) {
 
         // disable default scrolling
-        if (!settings.enableScroll) {
+        if(!settings.enableScroll) {
             $(function() {
                 $("body")[0].ontouchmove = function(event) {
                     event.preventDefault();
@@ -123,11 +123,14 @@ Chondric.App = function(options) {
 
         $('div[data-role="dialog"]').live('pagebeforeshow', function(e, ui) {
             ui.prevPage.addClass("ui-dialog-background ");
+            ui.prevPage.one("pageremove", function(e) {e.preventDefault();})
         });
 
         $('div[data-role="dialog"]').live('pagehide', function(e, ui) {
-            $(".ui-dialog-background ").removeClass("ui-dialog-background ");
+            $(".ui-dialog-background").removeClass("ui-dialog-background ");
         });
+
+
 
         $('a[href]').live('vclick', ButtonClick);
 
@@ -148,12 +151,11 @@ Chondric.App = function(options) {
     }
 
     function complete(callback) {
-        if (app.debugMode) {
+        if(app.debugMode) {
             $("body").addClass("debugmode");
         }
         $("#startPage").attr("data-url", document.location.pathname.replace(/\/$/, "/index.html"));
         $.mobile.initializePage();
-        $.event.special.swipe.durationThreshold = 200;
 
         app.autohidesplashscreen && navigator && navigator.splashscreen && navigator.splashscreen.hide();
 
@@ -168,17 +170,18 @@ Chondric.App = function(options) {
     function PageCreated(event) {
         var pageid = this.id;
         var pagediv = this;
-        console.log("created page " + pageid);
-        $(pagediv).attr("style", "")
 
-        if (isScriptless(pagediv)) {
+
+
+        console.log("created page " + pageid);
+    //    $(pagediv).attr("style", "")
+
+        if(isScriptless(pagediv)) {
 
             // TODO: allow this on scripted dialogs with data-autoclose attribute
             // scriptless dialogs can be closed by clicking outside
-
             // TODO: should this be vclick?
-
-            if ($(pagediv).attr("data-role") == "dialog") {
+            if($(pagediv).attr("data-role") == "dialog") {
                 $(pagediv).click(function() {
                     $('.ui-dialog').dialog('close');
                 });
@@ -192,7 +195,6 @@ Chondric.App = function(options) {
         }
 
         // TODO: this probably goes better elsewhere
-
         // converts a link with data-role help to a standard popup button
         $("[data-role='help']", pagediv).each(function() {
             // simple properties can be handled declaratively
@@ -207,8 +209,7 @@ Chondric.App = function(options) {
 
         });
         // ensure page script is loaded and call setup method of page
-
-        if (app.Pages[pageid]) {
+        if(app.Pages[pageid]) {
             app.Pages[pageid].attachEvents.call(app.Pages[pageid], pagediv);
             app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, true);
         } else {
@@ -229,11 +230,11 @@ Chondric.App = function(options) {
         console.log("data-url = " + $(pagediv).attr("data-url"));
 
 
-        $(pagediv).attr("style", "")
+      //  $(pagediv).attr("style", "")
 
-        if (isScriptless(pagediv)) return;
+        if(isScriptless(pagediv)) return;
 
-        if (app.Pages[pageid]) {
+        if(app.Pages[pageid]) {
             app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, false);
         } else {
             require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
@@ -251,11 +252,11 @@ Chondric.App = function(options) {
         console.log("data-url = " + $(pagediv).attr("data-url"));
 
 
-        $(pagediv).attr("style", "")
+  //      $(pagediv).attr("style", "")
 
-        if (isScriptless(pagediv)) return;
+        if(isScriptless(pagediv)) return;
 
-        if (app.Pages[pageid]) {
+        if(app.Pages[pageid]) {
             app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, false, false);
         } else {
             require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
@@ -270,25 +271,25 @@ Chondric.App = function(options) {
         //alert("vclick");
         var link = $(this);
 
-        if (link.attr("data-animate-click") && app.animateClick)  {
+        if(link.attr("data-animate-click") && app.animateClick) {
             app.animateClick(link);
 
         }
 
         var action = app.Actions[link.attr("data-action")];
-        if (link.attr("data-prepopulate")) {
+        if(link.attr("data-prepopulate")) {
             app.prepopulate = JSON.parse(link.attr("data-prepopulate"));
         }
-        for (var cn in settings.contexts) {
+        for(var cn in settings.contexts) {
 
             // TODO: need a way to handle custom context like file/version
-            if (link.attr("data-context-" + cn)) {
+            if(link.attr("data-context-" + cn)) {
                 app.context[cn](link.attr("data-context-" + cn));
             }
 
         }
 
-        if (action) {
+        if(action) {
             action.execute();
         } else {
             return true;
@@ -304,7 +305,7 @@ Chondric.App = function(options) {
         console.log("beginning app initialization");
         var initInternal = function() {
                 console.log("begin internal init");
-                //	alert("running init")
+                //  alert("running init")
                 loadScripts(0, function() {
                     console.log("loaded scripts");
 
@@ -322,7 +323,7 @@ Chondric.App = function(options) {
                                 settings.customInit.call(app, function() {
                                     // hide splash screen and show page
                                     complete(function() {
-                                        if (callback) callback();
+                                        if(callback) callback();
                                     })
                                 })
                             })
@@ -331,11 +332,10 @@ Chondric.App = function(options) {
                 })
             };
 
-            if (window.WinJS) {
-                app.platform = "windows"
-                 $(initInternal);
-            }
-        else if (settings.mightBePhoneGap && document.location.protocol == "file:") {
+        if(window.WinJS) {
+            app.platform = "windows"
+            $(initInternal);
+        } else if(settings.mightBePhoneGap && document.location.protocol == "file:") {
             // file protocol indicates phonegap
             app.isPhonegap = true;
             app.platform = "cordova";
@@ -356,7 +356,9 @@ Chondric.App = function(options) {
 
     }
     return this;
-}
+};
+
+
 
 Chondric.Page = function(options) {
     var page = this;
@@ -1069,19 +1071,22 @@ Chondric.QuickView = function(container, options) {
     };
     var sqlerror = this.sqlerror;
 
-    var getVersion = function(versionCallback) {
+        var getVersion = function(versionCallback) {
             console.log("checking version")
 
             db.transaction(function(tx) {
                 tx.executeSql("SELECT * FROM settings where key=?", ["dbVersion"], function(t, result) {
                     if (result.rows.length == 0) return versionCallback(0);
                     var row = result.rows[0] || result.rows.item(0)
-                    return versionCallback(parseFloat(row["val"]));
+                    window.setTimeout(function() {return versionCallback(parseFloat(row["val"]));}, 0);
                 }, function() {
                     // error - no db
-                    versionCallback(0);
+                    window.setTimeout(function() {versionCallback(0);}, 0);
                 });
-            });
+            }, function() {
+                    // error - no db
+                    window.setTimeout(function() {versionCallback(0);}, 0);
+                });
         }
 
     this.updateDatabase = function(callback) {
@@ -1092,20 +1097,25 @@ Chondric.QuickView = function(container, options) {
             console.log("Current database version is " + currentVersion)
 
             var existingversion = currentVersion;
+
+              var versionQueue = [];
+
+            for(vn in updatefunctions) {
+                var vv = parseFloat(vn);
+                if(existingversion < vv) {
+                    versionQueue.push(vn);
+                }
+            }
+ 
+            if (versionQueue.length == 0) return callback();
+
             db.transaction(function(tx) {
                 for (vn in updatefunctions) {
                     var vv = parseFloat(vn);
                     if (existingversion < vv) {
                         updatefunctions[vn](tx);
-                        if (existingversion == 0) {
-                            // new server - insert
-                            tx.executeSql('INSERT INTO settings (key, val) VALUES (?,?)', ["dbVersion", vv], function() {}, sqlerror);
-                        } else {
-                            // existing server - update
-                            tx.executeSql('UPDATE settings set val=? where key= ?', [vv, "dbVersion"], function() {}, sqlerror);
-                        }
+                        tx.executeSql('INSERT OR REPLACE INTO settings (key, val) VALUES (?, ?)', ["dbVersion", vv], function() {}, sqlerror);
                         existingversion = vv;
-
                     }
                 }
             }, sqlerror, function() {
@@ -1113,6 +1123,7 @@ Chondric.QuickView = function(container, options) {
             });
         });
     }
+
 
     this.dropDatabase = function(callback) {
         db.transaction(function(tx) {

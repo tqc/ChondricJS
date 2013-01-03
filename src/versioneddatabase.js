@@ -13,19 +13,22 @@ Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
     };
     var sqlerror = this.sqlerror;
 
-    var getVersion = function(versionCallback) {
+        var getVersion = function(versionCallback) {
             console.log("checking version")
 
             db.transaction(function(tx) {
                 tx.executeSql("SELECT * FROM settings where key=?", ["dbVersion"], function(t, result) {
                     if (result.rows.length == 0) return versionCallback(0);
                     var row = result.rows[0] || result.rows.item(0)
-                    return versionCallback(parseFloat(row["val"]));
+                    window.setTimeout(function() {return versionCallback(parseFloat(row["val"]));}, 0);
                 }, function() {
                     // error - no db
-                    versionCallback(0);
+                    window.setTimeout(function() {versionCallback(0);}, 0);
                 });
-            });
+            }, function() {
+                    // error - no db
+                    window.setTimeout(function() {versionCallback(0);}, 0);
+                });
         }
 
     this.updateDatabase = function(callback) {
@@ -36,20 +39,25 @@ Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
             console.log("Current database version is " + currentVersion)
 
             var existingversion = currentVersion;
+
+              var versionQueue = [];
+
+            for(vn in updatefunctions) {
+                var vv = parseFloat(vn);
+                if(existingversion < vv) {
+                    versionQueue.push(vn);
+                }
+            }
+ 
+            if (versionQueue.length == 0) return callback();
+
             db.transaction(function(tx) {
                 for (vn in updatefunctions) {
                     var vv = parseFloat(vn);
                     if (existingversion < vv) {
                         updatefunctions[vn](tx);
-                        if (existingversion == 0) {
-                            // new server - insert
-                            tx.executeSql('INSERT INTO settings (key, val) VALUES (?,?)', ["dbVersion", vv], function() {}, sqlerror);
-                        } else {
-                            // existing server - update
-                            tx.executeSql('UPDATE settings set val=? where key= ?', [vv, "dbVersion"], function() {}, sqlerror);
-                        }
+                        tx.executeSql('INSERT OR REPLACE INTO settings (key, val) VALUES (?, ?)', ["dbVersion", vv], function() {}, sqlerror);
                         existingversion = vv;
-
                     }
                 }
             }, sqlerror, function() {
@@ -57,6 +65,7 @@ Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
             });
         });
     }
+
 
     this.dropDatabase = function(callback) {
         db.transaction(function(tx) {
