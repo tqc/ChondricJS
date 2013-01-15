@@ -443,7 +443,7 @@ app.activeView = app.Views.appLoadPage;
 
 
             });
-            $(document).on("mousemove touchmove", ".page.active", function(e) {
+            $(document).on("mousemove touchmove", ".page", function(e) {
                 if(app.transitioning) return;
                 if(!swiping) return;
 
@@ -456,27 +456,15 @@ else {
                 dx = e.clientX - startX;
                 dy = e.clientY - startY;
             }
-                if (dy > 20 || dy < -20) {
-                    dx = 0;
-                                    activePage[0].style.webkitTransitionDuration = 0;
-                activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
-
-                }
-                else {
-
-
                 activePage[0].style.webkitTransitionDuration = 0;
                 activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
                 if(nextPage[0]) nextPage[0].style.webkitTransitionDuration = 0;
                 if(nextPage[0]) nextPage[0].style.webkitTransform = "translateX(" + (viewportWidth + 10 + dx) + "px)";
                 if(prevPage[0]) prevPage[0].style.webkitTransitionDuration = 0;
                 if(prevPage[0]) prevPage[0].style.webkitTransform = "translateX(" + (-viewportWidth - 10 + dx) + "px)";
-                return false;
-                
-                }
 
-             //   e.stopPropagation();
-//                return false;
+                e.stopPropagation();
+                return false;
 
             });
             $(document).on("mouseup touchend", ".page", function(e) {

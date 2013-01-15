@@ -1,3 +1,78 @@
+.viewport {
+    width: 320px;
+    height: 600px;
+    overflow:hidden;
+    border:1px solid black;
+    position:relative;
+    background-color: black;
+}
+
+.page {
+display: none;
+background-color: white;
+position: absolute;
+top:0;
+bottom:0;
+left:0;
+right:0;
+-webkit-transition: -webkit-transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+pointer-events:none;
+opacity:1;
+}
+
+.page.active {
+display: block;
+-webkit-transform: translateX(0) scale(1,1);
+opacity:1;
+pointer-events:all;
+z-index: 10;
+
+}
+
+.page.notransition {
+    -webkit-transition: none !important;
+}
+
+.page.prev {
+display: block;
+-webkit-transform: translateX(-103%);
+}
+
+.page.next {
+display: block;
+-webkit-transform: translateX(103%);
+}
+
+
+
+
+.page.behindfull {
+display: block;
+-webkit-transform: scale(1,1);
+opacity:0;
+z-index: 1;
+-webkit-transition: -webkit-transform 0.3s ease-in-out, opacity 0.9s ease-in-out;
+
+}
+
+.page.behindsmall {
+display: block;
+-webkit-transform: scale(0.1,0.1);
+opacity:0;
+z-index: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 * {
     -webkit-touch-callout: none;

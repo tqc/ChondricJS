@@ -1,3 +1,50 @@
+var app = app || {};
+app.Views = app.Views || {};
+app.ViewTemplates = app.ViewTemplates || {};
+
+
+app.ViewTemplates.HomePageTemplate = function(options) {
+    var settings = {
+            template: "home.html"
+    };
+    $.extend(settings, options)
+    Chondric.View.call(this, settings);
+}
+$.extend(app.ViewTemplates.HomePageTemplate.prototype, Chondric.View.prototype, 
+{
+    getDefaultModel: function() {
+        return {};
+    },
+    updateModel: function(dataId, callback) {
+        if (!this.model) this.model = this.getDefaultModel();
+        var m = this.model;
+
+     //   this.subViews["firstSubView"].setModel(m.subviewmodel);
+        callback();
+    },
+    updateView: function() {
+     //   this.subViews["firstSubView"].updateView();
+    },
+    attachSubviews: function() {
+        var page = this;
+     //   this.subViews["firstSubView"] = new Chondric.SampleSubviewTemplate({
+     //       id: page.id+"_subview1",
+     //       element: $(".subview", page.element)
+     //   });
+
+    }
+});
+
+
+
+app.Views.home = new app.ViewTemplates.HomePageTemplate({
+	id: "home",
+	next: "page2",
+	prev: "page5"
+});
+
+/*
+
 app.Pages.indexPage = new Chondric.Page({
 	getViewModel : function(callback) {
 		var page = this;
@@ -68,4 +115,4 @@ app.Pages.indexPage = new Chondric.Page({
 		page.updating = false;
 	}
 })
-
+*/
