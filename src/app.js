@@ -359,7 +359,7 @@ app.activeView = app.Views.appLoadPage;
         var thisPage = app.activeView;
         thisPage.ensureLoaded("active", function() {
             var nextPage = app.getView(nextPageId);
-            
+            thisPage.deactivating(nextPage);
             nextPage.ensureLoaded(inPageClass, function() {
 
                 thisPage.element.one("webkitTransitionEnd", function() {
@@ -529,6 +529,30 @@ else {
                 return false;
 
             })
+
+            $(document).on("tap click", "a.next", function() {
+                var link = $(this);
+                var id = link.attr("href").replace("#", "");
+
+                app.transition(id, "next", "prev");
+
+
+                return false;
+
+            })
+
+
+            $(document).on("tap click", "a.prev", function() {
+                var link = $(this);
+                var id = link.attr("href").replace("#", "");
+
+                app.transition(id, "prev", "next");
+
+
+                return false;
+
+            })
+
 
 
             callback();

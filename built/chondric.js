@@ -359,7 +359,7 @@ app.activeView = app.Views.appLoadPage;
         var thisPage = app.activeView;
         thisPage.ensureLoaded("active", function() {
             var nextPage = app.getView(nextPageId);
-            
+            thisPage.deactivating(nextPage);
             nextPage.ensureLoaded(inPageClass, function() {
 
                 thisPage.element.one("webkitTransitionEnd", function() {
@@ -530,6 +530,30 @@ else {
 
             })
 
+            $(document).on("tap click", "a.next", function() {
+                var link = $(this);
+                var id = link.attr("href").replace("#", "");
+
+                app.transition(id, "next", "prev");
+
+
+                return false;
+
+            })
+
+
+            $(document).on("tap click", "a.prev", function() {
+                var link = $(this);
+                var id = link.attr("href").replace("#", "");
+
+                app.transition(id, "prev", "next");
+
+
+                return false;
+
+            })
+
+
 
             callback();
         };
@@ -625,6 +649,11 @@ $.extend(Chondric.View.prototype, {
     updateViewBackground: function() {
 
     },
+    attachEvents: function() {
+          console.log("no events to attach");
+    },
+      renderThumbnail: function(el) {
+    },
         getDefaultModel: function() {
         return {};
     },
@@ -658,7 +687,9 @@ $.extend(Chondric.View.prototype, {
     activated: function() {
         console.log("activated");
     },
-
+    deactivating: function(nextPage) {
+        console.log("deactivating");
+    },
 
 load: function() {
 var view = this;
@@ -670,6 +701,7 @@ var html = $(data);
 var content = $(".page", html).html();
 view.element.html(content);
 view.updateViewBackground();
+view.attachEvents();
 })
 
 

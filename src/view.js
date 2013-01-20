@@ -17,6 +17,11 @@ $.extend(Chondric.View.prototype, {
     updateViewBackground: function() {
 
     },
+    attachEvents: function() {
+          console.log("no events to attach");
+    },
+      renderThumbnail: function(el) {
+    },
         getDefaultModel: function() {
         return {};
     },
@@ -50,7 +55,9 @@ $.extend(Chondric.View.prototype, {
     activated: function() {
         console.log("activated");
     },
-
+    deactivating: function(nextPage) {
+        console.log("deactivating");
+    },
 
 load: function() {
 var view = this;
@@ -62,6 +69,7 @@ var html = $(data);
 var content = $(".page", html).html();
 view.element.html(content);
 view.updateViewBackground();
+view.attachEvents();
 })
 
 
