@@ -430,8 +430,10 @@ app.activeView = app.Views.appLoadPage;
             var prevPage;
 
             var viewportWidth;
+            var horizontal = false;
+            var vertical = false;
 
-            $(document).on("mousedown touchstart", ".page", function(e) {
+            $(document).on("mousedown touchstart", ".page.active.swipe", function(e) {
 //                alert("1");
                 swiping = true;
 
@@ -446,6 +448,8 @@ app.activeView = app.Views.appLoadPage;
                 startY = e.clientY;
                 dx =0;
                 dy =0;
+                horizontal = false;
+                vertical = false;
 }
                 activePage = $(".page.active");
                 nextPage = $(".page.next");
@@ -455,9 +459,12 @@ app.activeView = app.Views.appLoadPage;
 
 
             });
-            $(document).on("mousemove touchmove", ".page.active", function(e) {
+
+
+            $(document).on("mousemove touchmove", ".page.active.swipe", function(e) {
                 if(app.transitioning) return;
                 if(!swiping) return;
+                if (vertical) return;
 
                 if (e.originalEvent.changedTouches) {
                  dx = e.originalEvent.changedTouches[0].clientX - startX;
@@ -468,21 +475,29 @@ else {
                 dx = e.clientX - startX;
                 dy = e.clientY - startY;
             }
-                if (dy > 20 || dy < -20) {
+                if (dx > 20 || dx < -20  && (dy < 20 && dy > -20) ) {
+                    horizontal = true;
+                }
+
+                if (!horizontal && (dy > 20 || dy < -20)) {
+                    vertical = true;
                     dx = 0;
                                     activePage[0].style.webkitTransitionDuration = 0;
                 activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
 
                 }
-                else {
-
+                else if (horizontal) {
 
                 activePage[0].style.webkitTransitionDuration = 0;
                 activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
+                if (dx < 0) {
                 if(nextPage[0]) nextPage[0].style.webkitTransitionDuration = 0;
                 if(nextPage[0]) nextPage[0].style.webkitTransform = "translateX(" + (viewportWidth + 10 + dx) + "px)";
+                }
+                if (dx > 0) {
                 if(prevPage[0]) prevPage[0].style.webkitTransitionDuration = 0;
                 if(prevPage[0]) prevPage[0].style.webkitTransform = "translateX(" + (-viewportWidth - 10 + dx) + "px)";
+                }
                 return false;
                 
                 }
@@ -491,7 +506,7 @@ else {
 //                return false;
 
             });
-            $(document).on("mouseup touchend", ".page", function(e) {
+            $(document).on("mouseup touchend", ".page.active.swipe", function(e) {
 
                 activePage[0].style.webkitTransitionDuration = null;
                 if(nextPage[0]) nextPage[0].style.webkitTransitionDuration = null;
@@ -510,10 +525,13 @@ else {
                     activePage[0].style.webkitTransform = null;
                     if(nextPage[0]) nextPage[0].style.webkitTransform = null;
                     if(prevPage[0]) prevPage[0].style.webkitTransform = null;
-
-
-
                 }
+
+                dx =0;
+                dy =0;
+                horizontal = false;
+                vertical = false;
+
 
 
             });
@@ -650,7 +668,8 @@ Chondric.View = function(options) {
     var settings = {
         id: null,
         element: null,  
-        init: function() {}    
+        init: function() {},
+        swipe: true
     };  
 
     $.extend(settings, options);
@@ -691,6 +710,7 @@ $.extend(Chondric.View.prototype, {
         this.template = options.template;
         this.next = options.next;
         this.prev = options.prev;
+        this.swipe = options.swipe;
         this.element = options.element;
     },
     init: function(options) {
@@ -777,6 +797,7 @@ view.load();
 
 $(".page."+pageclass).removeClass("pageclass");
 view.element.attr("class", "page "+templateId+" notransition "+pageclass);
+if (view.swipe) view.element.addClass("swipe");
 window.setTimeout(function() {view.element.removeClass("notransition");
 callback();
 }, 0);

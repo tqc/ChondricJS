@@ -4,7 +4,8 @@ Chondric.View = function(options) {
     var settings = {
         id: null,
         element: null,  
-        init: function() {}    
+        init: function() {},
+        swipe: true
     };  
 
     $.extend(settings, options);
@@ -45,6 +46,7 @@ $.extend(Chondric.View.prototype, {
         this.template = options.template;
         this.next = options.next;
         this.prev = options.prev;
+        this.swipe = options.swipe;
         this.element = options.element;
     },
     init: function(options) {
@@ -131,6 +133,7 @@ view.load();
 
 $(".page."+pageclass).removeClass("pageclass");
 view.element.attr("class", "page "+templateId+" notransition "+pageclass);
+if (view.swipe) view.element.addClass("swipe");
 window.setTimeout(function() {view.element.removeClass("notransition");
 callback();
 }, 0);
