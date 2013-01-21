@@ -66,7 +66,23 @@ var view = this;
 
 $.get(view.template, null, function(data) {
 var html = $(data);
-var content = $(".page", html).html();
+var pe = $(".page", html);
+
+var content = "";
+
+if (html.length == 0) {
+content = "Error - Invalid page template";
+}
+else if (html.hasClass("page")) {
+    content = html.html();
+}
+else if (pe.length >= 1) {
+content = pe.html();
+}
+else {
+    content = data
+}
+
 view.element.html(content);
 view.updateViewBackground();
 view.attachEvents();
@@ -121,6 +137,8 @@ callback();
 });
 
 },
+
+// todo: these don't really belong here
 
     showNextPage: function() {
         if (!this.next) return;

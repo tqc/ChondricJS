@@ -15,7 +15,7 @@ $.extend(app.ViewTemplates.HomePageTemplate.prototype, Chondric.View.prototype,
     getDefaultModel: function() {
         return {};
     },
-    updateModel: function(dataId, callback) {
+    updateModel: function(dataId, existingData, callback) {
         if (!this.model) this.model = this.getDefaultModel();
         var m = this.model;
 

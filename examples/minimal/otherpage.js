@@ -1,18 +1,12 @@
-
-
-app.ViewTemplates.OtherPageTemplate = function(options) {
-    var settings = {
-            template: "other.html"
-    };
-    $.extend(settings, options)
-    Chondric.View.call(this, settings);
-}
-$.extend(app.ViewTemplates.OtherPageTemplate.prototype, Chondric.View.prototype, 
-{
+app.createViewTemplate(
+    Chondric.View,
+    "OtherPageTemplate",
+    "other.html",
+    {
     getDefaultModel: function() {
         return {};
     },
-    updateModel: function(dataId, callback) {
+    updateModel: function(dataId, existingData, callback) {
         if (!this.model) this.model = this.getDefaultModel();
         var m = this.model;
 
@@ -30,7 +24,8 @@ $.extend(app.ViewTemplates.OtherPageTemplate.prototype, Chondric.View.prototype,
         });
 
     }
-});
+}
+   );
 
 
 

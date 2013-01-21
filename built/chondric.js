@@ -16,18 +16,28 @@ Chondric.App = function(options) {
 app.Views = {};
 app.ViewTemplates = {};
 
-app.ViewTemplates.appLoadPage = {};
 
-app.ViewTemplates.AppLoadTemplate = function(options) {
+app.createViewTemplate = function(baseView, viewName, templateFile, functions) {
+    
+var template = function(options) {
     var settings = {
-            template: "index.html"
+            template: templateFile
     };
     $.extend(settings, options)
-    Chondric.View.call(this, settings);
+    baseView.call(this, settings);
 }
-$.extend(app.ViewTemplates.AppLoadTemplate.prototype, Chondric.View.prototype, 
-{
-    getDefaultModel: function() {
+$.extend(template.prototype, baseView.prototype, functions);
+
+app.ViewTemplates[viewName] = template;
+
+};
+
+app.createViewTemplate(
+    Chondric.View,
+    "AppLoadTemplate",
+    "index.html",
+    {
+            getDefaultModel: function() {
         return {};
     },
     updateModel: function(dataId, existingData, callback) {
@@ -45,9 +55,11 @@ $.extend(app.ViewTemplates.AppLoadTemplate.prototype, Chondric.View.prototype,
       
 
     }
-});
+
+    })
 
 app.Views.appLoadPage = new app.ViewTemplates.AppLoadTemplate({ id: "appLoadPage"});
+
 app.activeView = app.Views.appLoadPage;
 
 
@@ -533,6 +545,7 @@ else {
             $(document).on("tap click", "a.next", function() {
                 var link = $(this);
                 var id = link.attr("href").replace("#", "");
+                if (id == "next") id = app.activeView.next;
 
                 app.transition(id, "next", "prev");
 
@@ -545,6 +558,7 @@ else {
             $(document).on("tap click", "a.prev", function() {
                 var link = $(this);
                 var id = link.attr("href").replace("#", "");
+                if (id == "prev") id = app.activeView.prev;
 
                 app.transition(id, "prev", "next");
 
@@ -698,7 +712,23 @@ var view = this;
 
 $.get(view.template, null, function(data) {
 var html = $(data);
-var content = $(".page", html).html();
+var pe = $(".page", html);
+
+var content = "";
+
+if (html.length == 0) {
+content = "Error - Invalid page template";
+}
+else if (html.hasClass("page")) {
+    content = html.html();
+}
+else if (pe.length >= 1) {
+content = pe.html();
+}
+else {
+    content = data
+}
+
 view.element.html(content);
 view.updateViewBackground();
 view.attachEvents();
@@ -753,6 +783,8 @@ callback();
 });
 
 },
+
+// todo: these don't really belong here
 
     showNextPage: function() {
         if (!this.next) return;
