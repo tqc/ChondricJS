@@ -13,6 +13,8 @@ Chondric.App = function(options) {
     this.Pages = {};
     this.Actions = {};
 
+    app.startTime = new Date().getTime();
+
 app.Views = {};
 app.ViewTemplates = {};
 
@@ -375,8 +377,8 @@ app.activeView = app.Views.appLoadPage;
             nextPage.ensureLoaded(inPageClass, function() {
 
                 thisPage.element.one("webkitTransitionEnd", function() {
-                    nextPage.activated();
                     app.transitioning = false;
+                    nextPage.activated();
                     $(".page.next").removeClass("next");
                     $(".page.prev").removeClass("prev");
                     if(nextPage.next) app.getView(nextPage.next).ensureLoaded("next", function() {});
@@ -406,6 +408,21 @@ app.activeView = app.Views.appLoadPage;
 
     var initEvents = function(callback) {
 
+            app.touchevents = {
+             touchstart: "touchstart",
+             touchend: "touchend",
+             touchmove: "touchmove"
+            };
+
+
+            if (document.ontouchend === undefined) {
+                // touch not supported - use mouse events for swipe
+            app.touchevents = {
+             touchstart: "mousedown",
+             touchend: "mouseup",
+             touchmove: "mousemove"
+            };
+            }
 
             app.appLoadLog("Setting up event handlers");
 
@@ -433,8 +450,10 @@ app.activeView = app.Views.appLoadPage;
             var horizontal = false;
             var vertical = false;
 
-            $(document).on("mousedown touchstart", ".page.active.swipe", function(e) {
+            $(document).on(app.touchevents.touchstart, ".page.active.swipe", function(e) {
 //                alert("1");
+                if(app.transitioning) return;
+                if(swiping) return;
                 swiping = true;
 
 
@@ -461,7 +480,7 @@ app.activeView = app.Views.appLoadPage;
             });
 
 
-            $(document).on("mousemove touchmove", ".page.active.swipe", function(e) {
+            $(document).on(app.touchevents.touchmove, ".page.active.swipe", function(e) {                
                 if(app.transitioning) return;
                 if(!swiping) return;
                 if (vertical) return;
@@ -506,7 +525,10 @@ else {
 //                return false;
 
             });
-            $(document).on("mouseup touchend", ".page.active.swipe", function(e) {
+            $(document).on(app.touchevents.touchend, ".page.active.swipe", function(e) {
+                if(app.transitioning) return;
+                if (!swiping) return;
+                swiping = false;
 
                 activePage[0].style.webkitTransitionDuration = null;
                 if(nextPage[0]) nextPage[0].style.webkitTransitionDuration = null;
