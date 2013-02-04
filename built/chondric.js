@@ -684,7 +684,9 @@ app.transition(vid, "behindsmall", "behindfull");
 
     }
     return this;
-};;;
+};
+
+;;
 
 Chondric.View = function(options) {
     var settings = {
@@ -899,7 +901,9 @@ $.extend(Chondric.SampleViewTemplate.prototype, Chondric.View.prototype, {
         });
 
     }
-});            (function($) {
+});
+
+            (function($) {
 
                 $.fn.listSync = function(rawdata, options) {
                     // populate a list using the template
@@ -1159,7 +1163,9 @@ $.extend(Chondric.SampleViewTemplate.prototype, Chondric.View.prototype, {
 
                     return this;
                 };
-            })(jQuery);;;
+            })(jQuery);
+
+;;
 
 Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 
@@ -1248,3 +1254,5 @@ Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
     }
 
 }
+
+
