@@ -53,7 +53,7 @@ exports.update = function(appdef) {
                                 if(fs.existsSync(htmlpath)) {
                                     console.log(appdef.pages[i].id + ".html already exists - skipping");
                                 } else {
-                                    var html = pagehtmltemplate.replace(/__PAGEID__/g, appdef.pages[i].id).replace(/__TITLE__/g, appdef.pages[i].id);
+                                    var html = pagehtmltemplate.replace(/__PAGEID__/g, appdef.pages[i].id).replace(/__TITLE__/g, appdef.pages[i].title);
 
                                     fs.writeFile(htmlpath, html);
 
