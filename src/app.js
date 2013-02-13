@@ -375,7 +375,7 @@ app.activeView = app.Views.appLoadPage;
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
             nextPage.ensureLoaded(inPageClass, function() {
-
+                nextPage.activating();
                 thisPage.element.one("webkitTransitionEnd", function() {
                     app.transitioning = false;
                     nextPage.activated();

@@ -375,7 +375,7 @@ app.activeView = app.Views.appLoadPage;
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
             nextPage.ensureLoaded(inPageClass, function() {
-
+                nextPage.activating();
                 thisPage.element.one("webkitTransitionEnd", function() {
                     app.transitioning = false;
                     nextPage.activated();
@@ -703,7 +703,11 @@ Chondric.View = function(options) {
     this.init(settings);
 }
 $.extend(Chondric.View.prototype, {
+    // obsolete - should use updateView instead
     updateViewBackground: function() {
+        this.updateView();
+    },
+    updateView: function() {
 
     },
     attachEvents: function() {
@@ -741,6 +745,9 @@ $.extend(Chondric.View.prototype, {
         options.init();
     },
     templateLoaded: function() {},
+    activating: function() {
+        console.log("activating");
+    },
     activated: function() {
         console.log("activated");
     },
