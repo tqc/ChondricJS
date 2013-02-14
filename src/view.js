@@ -5,7 +5,8 @@ Chondric.View = function(options) {
         id: null,
         element: null,
         init: function() {},
-        swipe: true
+        swipe: true,
+        swipeToBlank: false
     };
 
     $.extend(settings, options);
@@ -143,6 +144,7 @@ if (view.element && view.element.hasClass(pageclass)) {
             view.element.attr("class", "page " + templateId + " notransition " + pageclass);
 
             if(view.swipe) view.element.addClass("swipe");
+            if(view.swipeToBlank) view.element.addClass("swipetoblank");
 
 
             window.setTimeout(function() {

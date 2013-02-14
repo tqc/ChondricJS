@@ -450,6 +450,10 @@ app.activeView = app.Views.appLoadPage;
             var horizontal = false;
             var vertical = false;
 
+            var canSwipeLeft = false;
+            var canSwipeRight = false;
+
+
             $(document).on(app.touchevents.touchstart, ".page.active.swipe", function(e) {
 //                alert("1");
                 if(app.transitioning) return;
@@ -475,6 +479,9 @@ app.activeView = app.Views.appLoadPage;
                 prevPage = $(".page.prev");
 
                 viewportWidth = $(".viewport").width();
+
+                canSwipeRight = prevPage.length > 0 || activePage.hasClass("swipetoblank")
+                canSwipeLeft = nextPage.length > 0 || activePage.hasClass("swipetoblank")
 
 
             });
@@ -507,15 +514,21 @@ else {
                 }
                 else if (horizontal) {
 
-                activePage[0].style.webkitTransitionDuration = 0;
-                activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
-                if (dx < 0) {
-                if(nextPage[0]) nextPage[0].style.webkitTransitionDuration = 0;
-                if(nextPage[0]) nextPage[0].style.webkitTransform = "translateX(" + (viewportWidth + 10 + dx) + "px)";
+                if (dx < 0 && canSwipeLeft) {
+                    activePage[0].style.webkitTransitionDuration = 0;
+                    activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
+                    if(nextPage[0]) {
+                        nextPage[0].style.webkitTransitionDuration = 0;
+                        nextPage[0].style.webkitTransform = "translateX(" + (viewportWidth + 10 + dx) + "px)";
+                    }
                 }
-                if (dx > 0) {
-                if(prevPage[0]) prevPage[0].style.webkitTransitionDuration = 0;
-                if(prevPage[0]) prevPage[0].style.webkitTransform = "translateX(" + (-viewportWidth - 10 + dx) + "px)";
+                if (dx > 0 && canSwipeRight) {
+                    activePage[0].style.webkitTransitionDuration = 0;
+                    activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
+                    if(prevPage[0]) {
+                        prevPage[0].style.webkitTransitionDuration = 0;
+                        prevPage[0].style.webkitTransform = "translateX(" + (-viewportWidth - 10 + dx) + "px)";
+                    }
                 }
                 return false;
                 
