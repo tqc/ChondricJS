@@ -369,8 +369,23 @@ Chondric.App = function(options) {
     };
 
     this.transition = function(nextPageId, inPageClass, outPageClass) {
-        if (app.transitioning) return;
+
+        if (app.transitioning) {
+            if (app.transitioningTo != nextPageId) {
+               // transition changed
+               // immediately complete existing transition, but do not call activated event
+                    app.transitioning = false;
+                    app.transitioningTo = undefined;
+               
+           }
+           else {
+            // transition called twice - ignore
+            return;
+           }
+        }
+
         app.transitioning = true;
+        app.transitioningTo = nextPageId;
         var thisPage = app.activeView;
         thisPage.ensureLoaded("active", function() {
             var nextPage = app.getView(nextPageId);
@@ -379,6 +394,7 @@ Chondric.App = function(options) {
                 nextPage.activating();
                 thisPage.element.one("webkitTransitionEnd", function() {
                     app.transitioning = false;
+                    app.transitioningTo = undefined;
                     nextPage.activated();
                     $(".page.next").removeClass("next");
                     $(".page.prev").removeClass("prev");
