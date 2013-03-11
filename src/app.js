@@ -624,10 +624,12 @@ Chondric.App = function(options) {
     };
 
     var loadFirstPage = function(callback) {
-        var vid = settings.firstPageTemplate + "_" + settings.firstPageDataId;
-        if (vid.indexOf("_") == vid.length - 1) vid = settings.firstPageTemplate;
-
-        app.transition(vid, "behindsmall", "behindfull");
+        // if first page is not specified in settings, custominit is responsible for loading it
+        if (settings.firstPageTemplate) {
+            var vid = settings.firstPageTemplate + "_" + settings.firstPageDataId;
+            if (vid.indexOf("_") == vid.length - 1) vid = settings.firstPageTemplate;
+            app.transition(vid, "behindsmall", "behindfull");
+        }
 
         callback();
 
