@@ -15,62 +15,63 @@ Chondric.App = function(options) {
 
     app.startTime = new Date().getTime();
 
-app.Views = {};
-app.ViewTemplates = {};
+    app.Views = {};
+    app.ViewTemplates = {};
 
 
-app.createViewTemplate = function(baseView, viewName, templateFile, functions) {
-    
-var template = function(options) {
-    var settings = {
-            template: templateFile
+    app.createViewTemplate = function(baseView, viewName, templateFile, functions) {
+
+        var template = function(options) {
+            var settings = {
+                template: templateFile
+            };
+            $.extend(settings, options)
+            baseView.call(this, settings);
+        }
+        $.extend(template.prototype, baseView.prototype, functions);
+
+        app.ViewTemplates[viewName] = template;
+
     };
-    $.extend(settings, options)
-    baseView.call(this, settings);
-}
-$.extend(template.prototype, baseView.prototype, functions);
 
-app.ViewTemplates[viewName] = template;
-
-};
-
-app.createViewTemplate(
+    app.createViewTemplate(
     Chondric.View,
-    "AppLoadTemplate",
-    "index.html",
-    {
-            getDefaultModel: function() {
-        return {};
-    },
-    updateModel: function(dataId, existingData, callback) {
-        if (!this.model) this.model = this.getDefaultModel();
-        var m = this.model;
+        "AppLoadTemplate",
+        "index.html", {
+        getDefaultModel: function() {
+            return {};
+        },
+        updateModel: function(dataId, existingData, callback) {
+            if (!this.model) this.model = this.getDefaultModel();
+            var m = this.model;
 
-       
-        callback();
-    },
-    updateView: function() {
-        
-    },
-    attachSubviews: function() {
-        var page = this;
-      
 
-    }
+            callback();
+        },
+        updateView: function() {
+
+        },
+        attachSubviews: function() {
+            var page = this;
+
+
+        }
 
     })
 
-app.Views.appLoadPage = new app.ViewTemplates.AppLoadTemplate({ id: "appLoadPage"});
+    app.Views.appLoadPage = new app.ViewTemplates.AppLoadTemplate({
+        id: "appLoadPage"
+    });
 
-app.activeView = app.Views.appLoadPage;
+    app.activeView = app.Views.appLoadPage;
 
 
     app.platform = "web";
     app.isSimulator = false;
 
     function getByProp(arr, prop, val) {
-        for(var i = 0; i < arr.length; i++) {
-            if(arr[i][prop] == val) return arr[i];
+        for (var i = 0; i < arr.length; i++) {
+            if (arr[i][prop] == val) return arr[i];
         }
     }
 
@@ -95,7 +96,7 @@ app.activeView = app.Views.appLoadPage;
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
-        if(scriptGroupNum >= settings.scriptGroups.length) {
+        if (scriptGroupNum >= settings.scriptGroups.length) {
             return callback();
         }
         console.log("calling require");
@@ -108,7 +109,7 @@ app.activeView = app.Views.appLoadPage;
         console.log("getting database");
 
         app.db = settings.getDatabase();
-        if(!app.db) {
+        if (!app.db) {
             callback();
         } else {
             app.db.updateDatabase(function() {
@@ -124,26 +125,26 @@ app.activeView = app.Views.appLoadPage;
     app.contextValueStrings = {};
 
     // set up context functions
-    for(var cn0 in settings.contexts) {
+    for (var cn0 in settings.contexts) {
         function newscope(cn1) {
             var cn = cn1;
             var ctx = settings.contexts[cn];
             app.context[cn] = function(val, ctxcallback) {
                 // when called with no parameters, return the value
-                if(val === undefined && !ctxcallback) return app.contextValues[cn];
+                if (val === undefined && !ctxcallback) return app.contextValues[cn];
 
                 // if a string is provided, set the context
-                if(typeof(val) == "string") {
-                    if(!app.contextValueStrings[cn] || val != app.contextValueStrings[cn]) {
+                if (typeof(val) == "string") {
+                    if (!app.contextValueStrings[cn] || val != app.contextValueStrings[cn]) {
                         // value is changed
                         app.contextValueStrings[cn] = val;
-                        if(ctx.getValueFromString) {
+                        if (ctx.getValueFromString) {
                             app.contextValues[cn] = ctx.getValueFromString(val);
                         } else {
                             app.contextValues[cn] = val;
                         }
-                        if(ctx.childContexts) {
-                            for(var i = 0; i < ctx.childContexts.length; i++) {
+                        if (ctx.childContexts) {
+                            for (var i = 0; i < ctx.childContexts.length; i++) {
                                 app.context[ctx.childContexts[i]]("");
                             }
                         }
@@ -153,7 +154,7 @@ app.activeView = app.Views.appLoadPage;
                     localStorage["appcontext_" + settings.name] = JSON.stringify(app.contextValueStrings);
                 }
 
-                if(ctxcallback) ctxcallback(app.contextValues[cn])
+                if (ctxcallback) ctxcallback(app.contextValues[cn])
             }
         }
 
@@ -161,7 +162,7 @@ app.activeView = app.Views.appLoadPage;
     }
 
     function attachEvents(callback) {
-/*
+        /*
         // disable default scrolling
         if(!settings.enableScroll) {
             $(function() {
@@ -206,7 +207,7 @@ app.activeView = app.Views.appLoadPage;
     }
 
     function complete(callback) {
-        if(app.debugMode) {
+        if (app.debugMode) {
             $("body").addClass("debugmode");
         }
         $("#startPage").attr("data-url", document.location.pathname.replace(/\/$/, "/index.html"));
@@ -229,12 +230,12 @@ app.activeView = app.Views.appLoadPage;
 
         console.log("created page " + pageid);
         //    $(pagediv).attr("style", "")
-        if(isScriptless(pagediv)) {
+        if (isScriptless(pagediv)) {
 
             // TODO: allow this on scripted dialogs with data-autoclose attribute
             // scriptless dialogs can be closed by clicking outside
             // TODO: should this be vclick?
-            if($(pagediv).attr("data-role") == "dialog") {
+            if ($(pagediv).attr("data-role") == "dialog") {
                 $(pagediv).click(function() {
                     $('.ui-dialog').dialog('close');
                 });
@@ -262,7 +263,7 @@ app.activeView = app.Views.appLoadPage;
 
         });
         // ensure page script is loaded and call setup method of page
-        if(app.Pages[pageid]) {
+        if (app.Pages[pageid]) {
             app.Pages[pageid].attachEvents.call(app.Pages[pageid], pagediv);
             app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, true);
         } else {
@@ -284,9 +285,9 @@ app.activeView = app.Views.appLoadPage;
 
 
         //  $(pagediv).attr("style", "")
-        if(isScriptless(pagediv)) return;
+        if (isScriptless(pagediv)) return;
 
-        if(app.Pages[pageid]) {
+        if (app.Pages[pageid]) {
             app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, false);
         } else {
             require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
@@ -305,9 +306,9 @@ app.activeView = app.Views.appLoadPage;
 
 
         //      $(pagediv).attr("style", "")
-        if(isScriptless(pagediv)) return;
+        if (isScriptless(pagediv)) return;
 
-        if(app.Pages[pageid]) {
+        if (app.Pages[pageid]) {
             app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, false, false);
         } else {
             require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
@@ -322,25 +323,25 @@ app.activeView = app.Views.appLoadPage;
         //alert("vclick");
         var link = $(this);
 
-        if(link.attr("data-animate-click") && app.animateClick) {
+        if (link.attr("data-animate-click") && app.animateClick) {
             app.animateClick(link);
 
         }
 
         var action = app.Actions[link.attr("data-action")];
-        if(link.attr("data-prepopulate")) {
+        if (link.attr("data-prepopulate")) {
             app.prepopulate = JSON.parse(link.attr("data-prepopulate"));
         }
-        for(var cn in settings.contexts) {
+        for (var cn in settings.contexts) {
 
             // TODO: need a way to handle custom context like file/version
-            if(link.attr("data-context-" + cn)) {
+            if (link.attr("data-context-" + cn)) {
                 app.context[cn](link.attr("data-context-" + cn));
             }
 
         }
 
-        if(action) {
+        if (action) {
             action.execute();
         } else {
             return true;
@@ -355,20 +356,20 @@ app.activeView = app.Views.appLoadPage;
     };
 
     this.getView = function(viewId) {
-       var view = app.Views[viewId];
-       if (view) return view;
-                var ind = viewId.indexOf("_");
-                var templateId =  viewId.substr(0, ind) || viewId;
-                view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-                    id: viewId
-                });
+        var view = app.Views[viewId];
+        if (view) return view;
+        var ind = viewId.indexOf("_");
+        var templateId = viewId.substr(0, ind) || viewId;
+        view = app.Views[viewId] = new app.ViewTemplates[templateId]({
+            id: viewId
+        });
 
-                return view;
+        return view;
 
     };
 
     this.transition = function(nextPageId, inPageClass, outPageClass) {
-        if(app.transitioning) return;
+        if (app.transitioning) return;
         app.transitioning = true;
         var thisPage = app.activeView;
         thisPage.ensureLoaded("active", function() {
@@ -381,8 +382,8 @@ app.activeView = app.Views.appLoadPage;
                     nextPage.activated();
                     $(".page.next").removeClass("next");
                     $(".page.prev").removeClass("prev");
-                    if(nextPage.next) app.getView(nextPage.next).ensureLoaded("next", function() {});
-                    if(nextPage.prev) app.getView(nextPage.prev).ensureLoaded("prev", function() {});
+                    if (nextPage.next) app.getView(nextPage.next).ensureLoaded("next", function() {});
+                    if (nextPage.prev) app.getView(nextPage.prev).ensureLoaded("prev", function() {});
 
 
                 });
@@ -408,116 +409,113 @@ app.activeView = app.Views.appLoadPage;
 
     var initEvents = function(callback) {
 
+        app.touchevents = {
+            touchstart: "touchstart",
+            touchend: "touchend",
+            touchmove: "touchmove"
+        };
+
+
+        if (document.ontouchend === undefined) {
+            // touch not supported - use mouse events for swipe
             app.touchevents = {
-             touchstart: "touchstart",
-             touchend: "touchend",
-             touchmove: "touchmove"
+                touchstart: "mousedown",
+                touchend: "mouseup",
+                touchmove: "mousemove"
             };
+        }
 
-
-            if (document.ontouchend === undefined) {
-                // touch not supported - use mouse events for swipe
-            app.touchevents = {
-             touchstart: "mousedown",
-             touchend: "mouseup",
-             touchmove: "mousemove"
-            };
-            }
-
-            app.appLoadLog("Setting up event handlers");
+        app.appLoadLog("Setting up event handlers");
 
 
 
-            var nextPage = app.activeView;
-            nextPage.ensureLoaded("active", function() {});
-            if(nextPage.next) app.Views[nextPage.next].ensureLoaded("next", function() {});
-            if(nextPage.prev) app.Views[nextPage.prev].ensureLoaded("prev", function() {});
+        var nextPage = app.activeView;
+        nextPage.ensureLoaded("active", function() {});
+        if (nextPage.next) app.Views[nextPage.next].ensureLoaded("next", function() {});
+        if (nextPage.prev) app.Views[nextPage.prev].ensureLoaded("prev", function() {});
 
 
 
-            var swiping = false;
+        var swiping = false;
 
-            var startX = 0;
-            var startY = 0;
-            var dx = 0;
-            var dy = 0;
+        var startX = 0;
+        var startY = 0;
+        var dx = 0;
+        var dy = 0;
 
-            var activePage;
-            var nextPage;
-            var prevPage;
+        var activePage;
+        var nextPage;
+        var prevPage;
 
-            var viewportWidth;
-            var horizontal = false;
-            var vertical = false;
+        var viewportWidth;
+        var horizontal = false;
+        var vertical = false;
 
-            var canSwipeLeft = false;
-            var canSwipeRight = false;
-
-
-            $(document).on(app.touchevents.touchstart, ".page.active.swipe", function(e) {
-//                alert("1");
-                if(app.transitioning) return;
-                if(swiping) return;
-                swiping = true;
+        var canSwipeLeft = false;
+        var canSwipeRight = false;
 
 
-                if (e.originalEvent.changedTouches) {
-                                    startX = e.originalEvent.changedTouches[0].clientX;
+        $(document).on(app.touchevents.touchstart, ".page.active.swipe", function(e) {
+            //                alert("1");
+            if (app.transitioning) return;
+            if (swiping) return;
+            swiping = true;
+
+
+            if (e.originalEvent.changedTouches) {
+                startX = e.originalEvent.changedTouches[0].clientX;
                 startY = e.originalEvent.changedTouches[0].clientY;
 
-                }
-                else {
+            } else {
                 startX = e.clientX;
                 startY = e.clientY;
-                dx =0;
-                dy =0;
+                dx = 0;
+                dy = 0;
                 horizontal = false;
                 vertical = false;
-}
-                activePage = $(".page.active");
-                nextPage = $(".page.next");
-                prevPage = $(".page.prev");
+            }
+            activePage = $(".page.active");
+            nextPage = $(".page.next");
+            prevPage = $(".page.prev");
 
-                viewportWidth = $(".viewport").width();
+            viewportWidth = $(".viewport").width();
 
-                canSwipeRight = prevPage.length > 0 || activePage.hasClass("swipetoblank")
-                canSwipeLeft = nextPage.length > 0 || activePage.hasClass("swipetoblank")
-
-
-            });
+            canSwipeRight = prevPage.length > 0 || activePage.hasClass("swipetoblank")
+            canSwipeLeft = nextPage.length > 0 || activePage.hasClass("swipetoblank")
 
 
-            $(document).on(app.touchevents.touchmove, ".page.active.swipe", function(e) {                
-                if(app.transitioning) return;
-                if(!swiping) return;
-                if (vertical) return;
+        });
 
-                if (e.originalEvent.changedTouches) {
-                 dx = e.originalEvent.changedTouches[0].clientX - startX;
+
+        $(document).on(app.touchevents.touchmove, ".page.active.swipe", function(e) {
+            if (app.transitioning) return;
+            if (!swiping) return;
+            if (vertical) return;
+
+            if (e.originalEvent.changedTouches) {
+                dx = e.originalEvent.changedTouches[0].clientX - startX;
                 dy = e.originalEvent.changedTouches[0].clientY - startY;
-}
-else {
+            } else {
 
                 dx = e.clientX - startX;
                 dy = e.clientY - startY;
             }
-                if (dx > 20 || dx < -20  && (dy < 20 && dy > -20) ) {
-                    horizontal = true;
-                }
+            if (dx > 20 || dx < -20 && (dy < 20 && dy > -20)) {
+                horizontal = true;
+            }
 
-                if (!horizontal && (dy > 20 || dy < -20)) {
-                    vertical = true;
-                    dx = 0;
-                                    activePage[0].style.webkitTransitionDuration = 0;
+            if (!horizontal && (dy > 20 || dy < -20)) {
+                vertical = true;
+                dx = 0;
+                activePage[0].style.webkitTransitionDuration = 0;
                 activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
 
-                }
-                else if (horizontal) {
+            } else if (horizontal) {
 
                 if (dx < 0 && canSwipeLeft) {
                     activePage[0].style.webkitTransitionDuration = 0;
                     activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
-                    if(nextPage[0]) {
+                    if (nextPage[0]) {
                         nextPage[0].style.webkitTransitionDuration = 0;
                         nextPage[0].style.webkitTransform = "translateX(" + (viewportWidth + 10 + dx) + "px)";
                     }
@@ -525,145 +523,144 @@ else {
                 if (dx > 0 && canSwipeRight) {
                     activePage[0].style.webkitTransitionDuration = 0;
                     activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
-                    if(prevPage[0]) {
+                    if (prevPage[0]) {
                         prevPage[0].style.webkitTransitionDuration = 0;
                         prevPage[0].style.webkitTransform = "translateX(" + (-viewportWidth - 10 + dx) + "px)";
                     }
                 }
                 return false;
-                
-                }
 
-             //   e.stopPropagation();
-//                return false;
+            }
 
-            });
-            $(document).on(app.touchevents.touchend, ".page.active.swipe", function(e) {
-                if(app.transitioning) return;
-                if (!swiping) return;
-                swiping = false;
+            //   e.stopPropagation();
+            //                return false;
 
-                activePage[0].style.webkitTransitionDuration = null;
-                if(nextPage[0]) nextPage[0].style.webkitTransitionDuration = null;
-                if(prevPage[0]) prevPage[0].style.webkitTransitionDuration = null;
+        });
+        $(document).on(app.touchevents.touchend, ".page.active.swipe", function(e) {
+            if (app.transitioning) return;
+            if (!swiping) return;
+            swiping = false;
 
-                //  activePage[0].style.webkitTransform = null;
-                //  nextPage[0].style.webkitTransform = null;
-                //  prevPage[0].style.webkitTransform = null;
+            activePage[0].style.webkitTransitionDuration = null;
+            if (nextPage[0]) nextPage[0].style.webkitTransitionDuration = null;
+            if (prevPage[0]) prevPage[0].style.webkitTransitionDuration = null;
 
-                $(".page.active .page.next .page.prev").attr("style", "");
+            //  activePage[0].style.webkitTransform = null;
+            //  nextPage[0].style.webkitTransform = null;
+            //  prevPage[0].style.webkitTransform = null;
 
-                swiping = false;
-                if(dx < -100 && app.activeView.next) app.activeView.showNextPage();
-                else if(dx > 100 && app.activeView.prev) app.activeView.showPreviousPage();
-                else {
-                    activePage[0].style.webkitTransform = null;
-                    if(nextPage[0]) nextPage[0].style.webkitTransform = null;
-                    if(prevPage[0]) prevPage[0].style.webkitTransform = null;
-                }
+            $(".page.active .page.next .page.prev").attr("style", "");
 
-                dx =0;
-                dy =0;
-                horizontal = false;
-                vertical = false;
+            swiping = false;
+            if (dx < -100 && app.activeView.next) app.activeView.showNextPage();
+            else if (dx > 100 && app.activeView.prev) app.activeView.showPreviousPage();
+            else {
+                activePage[0].style.webkitTransform = null;
+                if (nextPage[0]) nextPage[0].style.webkitTransform = null;
+                if (prevPage[0]) prevPage[0].style.webkitTransform = null;
+            }
 
-
-
-            });
-
-
-            $(document).on("tap click", "a.pop", function() {
-                var link = $(this);
-                var id = link.attr("href").replace("#", "");
-
-                app.transition(id, "behindsmall", "behindfull");
-
-
-                return false;
-
-            })
-
-
-            $(document).on("tap click", "a.close", function() {
-                var link = $(this);
-                var id = link.attr("href").replace("#", "");
-
-                app.transition(id, "behindfull", "behindsmall");
-
-
-                return false;
-
-            })
-
-            $(document).on("tap click", "a.next", function() {
-                var link = $(this);
-                var id = link.attr("href").replace("#", "");
-                if (id == "next") id = app.activeView.next;
-
-                app.transition(id, "next", "prev");
-
-
-                return false;
-
-            })
-
-
-            $(document).on("tap click", "a.prev", function() {
-                var link = $(this);
-                var id = link.attr("href").replace("#", "");
-                if (id == "prev") id = app.activeView.prev;
-
-                app.transition(id, "prev", "next");
-
-
-                return false;
-
-            })
+            dx = 0;
+            dy = 0;
+            horizontal = false;
+            vertical = false;
 
 
 
-            callback();
-        };
+        });
+
+
+        $(document).on("tap click", "a.pop", function() {
+            var link = $(this);
+            var id = link.attr("href").replace("#", "");
+
+            app.transition(id, "behindsmall", "behindfull");
+
+
+            return false;
+
+        })
+
+
+        $(document).on("tap click", "a.close", function() {
+            var link = $(this);
+            var id = link.attr("href").replace("#", "");
+
+            app.transition(id, "behindfull", "behindsmall");
+
+
+            return false;
+
+        })
+
+        $(document).on("tap click", "a.next", function() {
+            var link = $(this);
+            var id = link.attr("href").replace("#", "");
+            if (id == "next") id = app.activeView.next;
+
+            app.transition(id, "next", "prev");
+
+
+            return false;
+
+        })
+
+
+        $(document).on("tap click", "a.prev", function() {
+            var link = $(this);
+            var id = link.attr("href").replace("#", "");
+            if (id == "prev") id = app.activeView.prev;
+
+            app.transition(id, "prev", "next");
+
+
+            return false;
+
+        })
+
+
+
+        callback();
+    };
 
     var loadFirstPage = function(callback) {
-            var vid = settings.firstPageTemplate+"_"+settings.firstPageDataId;
-            if (vid.indexOf("_") == vid.length-1) vid = settings.firstPageTemplate;
-           
-app.transition(vid, "behindsmall", "behindfull");
+        var vid = settings.firstPageTemplate + "_" + settings.firstPageDataId;
+        if (vid.indexOf("_") == vid.length - 1) vid = settings.firstPageTemplate;
 
-            callback();
-   
-        };
+        app.transition(vid, "behindsmall", "behindfull");
+
+        callback();
+
+    };
 
     this.init = function(callback) {
         // load required scripts
         console.log("beginning app initialization");
 
         var initInternal = function() {
-                console.log("begin internal init");
-                //  alert("running init")
-                loadScripts(0, function() {
-                    console.log("loaded scripts");
-                    initEvents(function() {
+            console.log("begin internal init");
+            //  alert("running init")
+            loadScripts(0, function() {
+                console.log("loaded scripts");
+                initEvents(function() {
 
 
-                        // create database
-                        initData(function() {
-                            console.log("loading context");
+                    // create database
+                    initData(function() {
+                        console.log("loading context");
 
-                            var loadedctx = JSON.parse(localStorage["appcontext_" + settings.name] || "{}");
-                            //load data
-                            settings.loadData.call(app, loadedctx, function() {
-                                // attach common events
-                                attachEvents(function() {
-                                    // custom init function
-                                    settings.customInit.call(app, function() {
-                                        // hide splash screen and show page
-                                        loadFirstPage(function() {
+                        var loadedctx = JSON.parse(localStorage["appcontext_" + settings.name] || "{}");
+                        //load data
+                        settings.loadData.call(app, loadedctx, function() {
+                            // attach common events
+                            attachEvents(function() {
+                                // custom init function
+                                settings.customInit.call(app, function() {
+                                    // hide splash screen and show page
+                                    loadFirstPage(function() {
 
-                                            complete(function() {
-                                                if(callback) callback();
-                                            })
+                                        complete(function() {
+                                            if (callback) callback();
                                         })
                                     })
                                 })
@@ -671,12 +668,13 @@ app.transition(vid, "behindsmall", "behindfull");
                         })
                     })
                 })
-            };
+            })
+        };
 
-        if(window.WinJS) {
+        if (window.WinJS) {
             app.platform = "windows"
             $(initInternal);
-        } else if(settings.mightBePhoneGap && document.location.protocol == "file:") {
+        } else if (settings.mightBePhoneGap && document.location.protocol == "file:") {
             // file protocol indicates phonegap
             app.isPhonegap = true;
             app.platform = "cordova";
