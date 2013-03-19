@@ -123,13 +123,16 @@ if (view.element && view.element.hasClass(pageclass)) {
 
         var ind = view.id.indexOf("_");
         var templateId = view.id.substr(0, ind) || view.id;
+
+var safeId=view.id.replace(/\/\.\|/g,"_");
+
         view.ensureDataLoaded(function() {
 
             view.element = $("#" + view.id);
 
             if(view.element.length == 0) {
                 // page not loaded - create it
-                $(".viewport").append("<div class=\"page " + templateId + " notransition " + pageclass + "\" id=\"" + view.id + "\">Not loaded</div>");
+                $(".viewport").append("<div class=\"page " + templateId + " notransition " + pageclass + "\" id=\"" + safeId+ "\">Not loaded</div>");
                 view.element = $("#" + view.id);
                 view.element.append("<div class=\"content\"></div>");
                 view.element.append("<div class=\"loadingOverlay\"></div>");
