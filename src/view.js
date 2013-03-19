@@ -128,12 +128,12 @@ var safeId=view.id.replace(/\/\.\|/g,"_");
 
         view.ensureDataLoaded(function() {
 
-            view.element = $("#" + view.id);
+            view.element = $("#" + safeId);
 
             if(view.element.length == 0) {
                 // page not loaded - create it
                 $(".viewport").append("<div class=\"page " + templateId + " notransition " + pageclass + "\" id=\"" + safeId+ "\">Not loaded</div>");
-                view.element = $("#" + view.id);
+                view.element = $("#" + safeId);
                 view.element.append("<div class=\"content\"></div>");
                 view.element.append("<div class=\"loadingOverlay\"></div>");
 
