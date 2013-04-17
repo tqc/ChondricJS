@@ -37,7 +37,7 @@ Chondric.App = function(options) {
             baseView: options.baseView || Chondric.View,
         };
 
-        if (options.initAngular) {
+        if (options.initAngular || options.angularModules) {
             options.useAngular = true;
         }
 
@@ -850,7 +850,7 @@ $.extend(Chondric.View.prototype, {
                 for (var k in view.controllers) {
                     module.controller(k, view.controllers[k]);
                 }
-                angular.bootstrap(view.element[0], ["page_" + view.id]);
+                angular.bootstrap(view.element[0], ["page_" + view.id].concat(view.angularModules || []));
 
 
 

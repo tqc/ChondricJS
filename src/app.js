@@ -37,7 +37,7 @@ Chondric.App = function(options) {
             baseView: options.baseView || Chondric.View,
         };
 
-        if (options.initAngular) {
+        if (options.initAngular || options.angularModules) {
             options.useAngular = true;
         }
 
