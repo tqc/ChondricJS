@@ -19,18 +19,49 @@ Chondric.App = function(options) {
     app.ViewTemplates = {};
 
 
-    app.createViewTemplate = function(baseView, viewName, templateFile, functions) {
+    app.createViewTemplate = function(baseView, templateId, templateFile, options) {
 
-        var template = function(options) {
-            var settings = {
-                template: templateFile
-            };
-            $.extend(settings, options)
-            baseView.call(this, settings);
+        if (typeof templateId == "string") {
+            // old format
+            options.baseView = baseView;
+            options.templateId = templateId;
+            options.templateFile = templateFile;
         }
-        $.extend(template.prototype, baseView.prototype, functions);
+        else {
+            options = baseView;
+        }
 
-        app.ViewTemplates[viewName] = template;
+        var templateSettings = {
+            templateId: options.templateId,
+            templateFile: options.templateFile || (options.templateId+".html"),
+            baseView: options.baseView || Chondric.View,
+        };
+
+        if (options.initAngular) {
+            options.useAngular = true;
+        }
+
+        var template = function(viewoptions) {
+            var settings = {};
+            $.extend(settings, templateSettings, viewoptions);
+            templateSettings.baseView.call(this, settings);
+            this.settings = settings;
+        };
+
+        var functions = {};
+
+        for (var k in options) {
+            var v = options[k];
+            if (k == "baseView") continue;
+            else if (k == "templateId") continue;
+            else if (k == "templateFile") continue;
+            else if (typeof v == "function") functions[k]=v;
+            else templateSettings[k]=v;
+        }
+
+        $.extend(template.prototype, templateSettings.baseView.prototype, functions);
+
+        app.ViewTemplates[options.templateId] = template;
 
     };
 
@@ -391,7 +422,7 @@ Chondric.App = function(options) {
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
             nextPage.ensureLoaded(inPageClass, function() {
-                nextPage.activating();
+                nextPage.activating(thisPage);
                 thisPage.element.one("webkitTransitionEnd", function() {
                     app.transitioning = false;
                     app.transitioningTo = undefined;

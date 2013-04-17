@@ -19,18 +19,49 @@ Chondric.App = function(options) {
     app.ViewTemplates = {};
 
 
-    app.createViewTemplate = function(baseView, viewName, templateFile, functions) {
+    app.createViewTemplate = function(baseView, templateId, templateFile, options) {
 
-        var template = function(options) {
-            var settings = {
-                template: templateFile
-            };
-            $.extend(settings, options)
-            baseView.call(this, settings);
+        if (typeof templateId == "string") {
+            // old format
+            options.baseView = baseView;
+            options.templateId = templateId;
+            options.templateFile = templateFile;
         }
-        $.extend(template.prototype, baseView.prototype, functions);
+        else {
+            options = baseView;
+        }
 
-        app.ViewTemplates[viewName] = template;
+        var templateSettings = {
+            templateId: options.templateId,
+            templateFile: options.templateFile || (options.templateId+".html"),
+            baseView: options.baseView || Chondric.View,
+        };
+
+        if (options.initAngular) {
+            options.useAngular = true;
+        }
+
+        var template = function(viewoptions) {
+            var settings = {};
+            $.extend(settings, templateSettings, viewoptions);
+            templateSettings.baseView.call(this, settings);
+            this.settings = settings;
+        };
+
+        var functions = {};
+
+        for (var k in options) {
+            var v = options[k];
+            if (k == "baseView") continue;
+            else if (k == "templateId") continue;
+            else if (k == "templateFile") continue;
+            else if (typeof v == "function") functions[k]=v;
+            else templateSettings[k]=v;
+        }
+
+        $.extend(template.prototype, templateSettings.baseView.prototype, functions);
+
+        app.ViewTemplates[options.templateId] = template;
 
     };
 
@@ -391,7 +422,7 @@ Chondric.App = function(options) {
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
             nextPage.ensureLoaded(inPageClass, function() {
-                nextPage.activating();
+                nextPage.activating(thisPage);
                 thisPage.element.one("webkitTransitionEnd", function() {
                     app.transitioning = false;
                     app.transitioningTo = undefined;
@@ -721,16 +752,19 @@ Chondric.View = function(options) {
     var settings = {
         id: null,
         element: null,
-        init: function() {},
         swipe: true,
         swipeToBlank: false
     };
 
     $.extend(settings, options);
 
-    if(!settings.template) settings.template = settings.id + ".html";
-    this.copyValues(settings);
-    this.init(settings);
+    this.settings = settings;
+
+    for (var k in settings) {
+        this[k] = settings[k];
+    }
+    //$.extend(this, settings);
+    this.initInternal(settings);
 }
 $.extend(Chondric.View.prototype, {
     // obsolete - should use updateView instead
@@ -748,7 +782,7 @@ $.extend(Chondric.View.prototype, {
         return {};
     },
     updateModel: function(dataId, existingData, callback) {
-        if(!this.model) this.model = this.getDefaultModel();
+        if (!this.model) this.model = this.getDefaultModel();
         var m = this.model;
 
 
@@ -762,19 +796,18 @@ $.extend(Chondric.View.prototype, {
     updateData: function(d) {
 
     },
-    copyValues: function(options) {
-        this.id = options.id;
-        this.template = options.template;
-        this.next = options.next;
-        this.prev = options.prev;
-        this.swipe = options.swipe;
-        this.element = options.element;
-    },
     init: function(options) {
-        console.log("init view - " + options.testOption);
-        options.init();
+        //  console.log("init view - " + options.testOption);
+        // default implementation
     },
-    templateLoaded: function() {},
+    initAngular: function() {},
+    initInternal: function(options) {
+        console.log("init view - " + options.testOption);
+        this.init(options);
+    },
+    templateLoaded: function() {
+        console.log("template loaded");
+    },
     activating: function() {
         console.log("activating");
     },
@@ -789,7 +822,7 @@ $.extend(Chondric.View.prototype, {
         var view = this;
 
         // todo: load via ajax
-        var viewurl = view.template + "?nocache=" + app.startTime;
+        var viewurl = view.templateFile + "?nocache=" + app.startTime;
 
         $.get(viewurl, null, function(data) {
             var html = $(data);
@@ -797,17 +830,33 @@ $.extend(Chondric.View.prototype, {
 
             var content = "";
 
-            if(html.length == 0) {
+            if (html.length == 0) {
                 content = "Error - Invalid page template";
-            } else if(html.hasClass("page")) {
+            } else if (html.hasClass("page")) {
                 content = html.html();
-            } else if(pe.length >= 1) {
+            } else if (pe.length >= 1) {
                 content = pe.html();
             } else {
                 content = data
             }
 
             view.element.html(content);
+            if (view.useAngular) {
+                console.log("Init angular");
+
+                view.initAngular();
+
+                var module = angular.module("page_" + view.id, []);
+                for (var k in view.controllers) {
+                    module.controller(k, view.controllers[k]);
+                }
+                angular.bootstrap(view.element[0], ["page_" + view.id]);
+
+
+
+            }
+
+
             view.updateViewBackground();
             view.attachEvents();
         })
@@ -817,7 +866,7 @@ $.extend(Chondric.View.prototype, {
     },
     ensureDataLoaded: function(callback) {
         var view = this;
-        if(!view.model) {
+        if (!view.model) {
             var ind = view.id.indexOf("_");
             var templateId = view.id.substr(0, ind) || view.id;
             var dataId = view.id.substr(templateId.length + 1);
@@ -832,22 +881,25 @@ $.extend(Chondric.View.prototype, {
     ensureLoaded: function(pageclass, callback) {
         var view = this;
 
-if (view.element && view.element.hasClass(pageclass)) {
-    // page already exists and is positioned correctly - eg during next/prev swipe
-    return callback();
-}
+        if (view.element && view.element.hasClass(pageclass)) {
+            // page already exists and is positioned correctly - eg during next/prev swipe
+            return callback();
+        }
 
 
         var ind = view.id.indexOf("_");
         var templateId = view.id.substr(0, ind) || view.id;
+
+        var safeId = view.id.replace(/\/\.\|/g, "_");
+
         view.ensureDataLoaded(function() {
 
-            view.element = $("#" + view.id);
+            view.element = $("#" + safeId);
 
-            if(view.element.length == 0) {
+            if (view.element.length == 0) {
                 // page not loaded - create it
-                $(".viewport").append("<div class=\"page " + templateId + " notransition " + pageclass + "\" id=\"" + view.id + "\">Not loaded</div>");
-                view.element = $("#" + view.id);
+                $(".viewport").append("<div class=\"page " + templateId + " notransition " + pageclass + "\" id=\"" + safeId + "\">Not loaded</div>");
+                view.element = $("#" + safeId);
                 view.element.append("<div class=\"content\"></div>");
                 view.element.append("<div class=\"loadingOverlay\"></div>");
 
@@ -860,8 +912,8 @@ if (view.element && view.element.hasClass(pageclass)) {
             $(".page." + pageclass).removeClass("pageclass");
             view.element.attr("class", "page " + templateId + " notransition " + pageclass);
 
-            if(view.swipe) view.element.addClass("swipe");
-            if(view.swipeToBlank) view.element.addClass("swipetoblank");
+            if (view.swipe) view.element.addClass("swipe");
+            if (view.swipeToBlank) view.element.addClass("swipetoblank");
 
 
             window.setTimeout(function() {
@@ -875,11 +927,11 @@ if (view.element && view.element.hasClass(pageclass)) {
 
     // todo: these don't really belong here
     showNextPage: function() {
-        if(!this.next) return;
+        if (!this.next) return;
         app.transition(this.next, "next", "prev");
     },
     showPreviousPage: function() {
-        if(!this.prev) return;
+        if (!this.prev) return;
         app.transition(this.prev, "prev", "next");
     }
 
@@ -898,7 +950,7 @@ $.extend(Chondric.SampleSubviewTemplate.prototype, Chondric.View.prototype, {
         return {};
     },
     updateModel: function(dataId, callback) {
-        if(!this.model) this.model = this.getDefaultModel();
+        if (!this.model) this.model = this.getDefaultModel();
         var m = this.model;
 
         callback();
@@ -922,7 +974,7 @@ $.extend(Chondric.SampleViewTemplate.prototype, Chondric.View.prototype, {
         return {};
     },
     updateModel: function(dataId, callback) {
-        if(!this.model) this.model = this.getDefaultModel();
+        if (!this.model) this.model = this.getDefaultModel();
         var m = this.model;
 
         this.subViews["firstSubView"].setModel(m.subviewmodel);
