@@ -844,11 +844,12 @@ $.extend(Chondric.View.prototype, {
             if (view.useAngular) {
                 console.log("Init angular");
 
+                view.angularModule = angular.module("page_" + view.id, []);
+
                 view.initAngular();
 
-                var module = angular.module("page_" + view.id, []);
                 for (var k in view.controllers) {
-                    module.controller(k, view.controllers[k]);
+                    view.angularModule.controller(k, view.controllers[k]);
                 }
                 angular.bootstrap(view.element[0], ["page_" + view.id].concat(view.angularModules || []));
 
