@@ -830,18 +830,21 @@ $.extend(Chondric.View.prototype, {
 
             var content = "";
 
-            if (html.length == 0) {
+            if (html.length === 0) {
                 content = "Error - Invalid page template";
             } else if (html.hasClass("page")) {
                 content = html.html();
             } else if (pe.length >= 1) {
                 content = pe.html();
             } else {
-                content = data
+                content = data;
             }
 
             view.element.html(content);
             if (view.useAngular) {
+                var ctrl = pe.attr("ng-controller") || html.attr("ng-controller") 
+                if (ctrl) view.element.attr("ng-controller", ctrl);
+
                 console.log("Init angular");
 
                 view.angularModule = angular.module("page_" + view.id, []);
@@ -860,7 +863,7 @@ $.extend(Chondric.View.prototype, {
 
             view.updateViewBackground();
             view.attachEvents();
-        })
+        });
 
 
 

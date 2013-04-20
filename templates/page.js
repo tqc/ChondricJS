@@ -1,8 +1,6 @@
 app.createViewTemplate(
-    Chondric.View,
-    "__PAGEID__",
-    "__PAGEID__.html",
     {
+    templateId: "__PAGEID__",
     getDefaultModel: function() {
         return {};
     },
@@ -12,14 +10,14 @@ app.createViewTemplate(
 
         this.prev = "__PREVPAGEID__";
         this.next = "__NEXTPAGEID__";
-     
+
         callback();
     },
     attachEvents: function() {
 
     },
     updateView: function() {
-      
+
     },
 
 }
