@@ -26,14 +26,13 @@ Chondric.App = function(options) {
             options.baseView = baseView;
             options.templateId = templateId;
             options.templateFile = templateFile;
-        }
-        else {
+        } else {
             options = baseView;
         }
 
         var templateSettings = {
             templateId: options.templateId,
-            templateFile: options.templateFile || (options.templateId+".html"),
+            templateFile: options.templateFile || (options.templateId + ".html"),
             baseView: options.baseView || Chondric.View,
         };
 
@@ -55,8 +54,8 @@ Chondric.App = function(options) {
             if (k == "baseView") continue;
             else if (k == "templateId") continue;
             else if (k == "templateFile") continue;
-            else if (typeof v == "function") functions[k]=v;
-            else templateSettings[k]=v;
+            else if (typeof v == "function") functions[k] = v;
+            else templateSettings[k] = v;
         }
 
         $.extend(template.prototype, templateSettings.baseView.prototype, functions);
@@ -403,16 +402,15 @@ Chondric.App = function(options) {
 
         if (app.transitioning) {
             if (app.transitioningTo != nextPageId) {
-               // transition changed
-               // immediately complete existing transition, but do not call activated event
-                    app.transitioning = false;
-                    app.transitioningTo = undefined;
-               
-           }
-           else {
-            // transition called twice - ignore
-            return;
-           }
+                // transition changed
+                // immediately complete existing transition, but do not call activated event
+                app.transitioning = false;
+                app.transitioningTo = undefined;
+
+            } else {
+                // transition called twice - ignore
+                return;
+            }
         }
 
         app.transitioning = true;
@@ -422,17 +420,18 @@ Chondric.App = function(options) {
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
             nextPage.ensureLoaded(inPageClass, function() {
+                history.pushState({}, null,  "#" + nextPageId);
                 nextPage.activating(thisPage);
                 thisPage.element.one("webkitTransitionEnd", function() {
-                    app.transitioning = false;
-                    app.transitioningTo = undefined;
-                    nextPage.activated();
-                    $(".page.next").removeClass("next");
-                    $(".page.prev").removeClass("prev");
-                    if (nextPage.next) app.getView(nextPage.next).ensureLoaded("next", function() {});
-                    if (nextPage.prev) app.getView(nextPage.prev).ensureLoaded("prev", function() {});
-
-
+                    window.setTimeout(function() {
+                        app.transitioning = false;
+                        app.transitioningTo = undefined;
+                        nextPage.activated();
+                        $(".page.next").removeClass("next");
+                        $(".page.prev").removeClass("prev");
+                        if (nextPage.next) app.getView(nextPage.next).ensureLoaded("next", function() {});
+                        if (nextPage.prev) app.getView(nextPage.prev).ensureLoaded("prev", function() {});
+                    }, 0);
                 });
 
                 thisPage.element[0].style.webkitTransform = null;
