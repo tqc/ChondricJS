@@ -419,9 +419,13 @@ Chondric.App = function(options) {
         thisPage.ensureLoaded("active", function() {
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
+//            $("."+inPageClass).removeClass(inPageClass);
             nextPage.ensureLoaded(inPageClass, function() {
+                    window.setTimeout(function() {
                 history.pushState({}, null,  "#" + nextPageId);
                 nextPage.activating(thisPage);
+                    }, 0);
+
                 thisPage.element.one("webkitTransitionEnd", function() {
                     window.setTimeout(function() {
                         app.transitioning = false;
@@ -437,6 +441,7 @@ Chondric.App = function(options) {
                 thisPage.element[0].style.webkitTransform = null;
                 nextPage.element[0].style.webkitTransform = null;
 
+  //              $("."+outPageClass).removeClass(outPageClass);
                 thisPage.element.addClass(outPageClass).removeClass("active");
                 nextPage.element.addClass("active").removeClass(inPageClass);
 
@@ -621,6 +626,28 @@ Chondric.App = function(options) {
             var id = link.attr("href").replace("#", "");
 
             app.transition(id, "behindsmall", "behindfull");
+
+
+            return false;
+
+        })
+
+        $(document).on("tap click", "a.dlgpop", function() {
+            var link = $(this);
+            var id = link.attr("href").replace("#", "");
+
+            app.transition(id, "behindsmall", "behinddlg");
+
+
+            return false;
+
+        })
+
+        $(document).on("tap click", "a.dlgclose", function() {
+            var link = $(this);
+            var id = link.attr("href").replace("#", "");
+
+            app.transition(id, "behinddlg", "behindsmall");
 
 
             return false;

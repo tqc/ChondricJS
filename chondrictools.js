@@ -85,17 +85,16 @@ exports.update = function(appdef) {
                                 }
 
 
-if (angularUsed) {
-    frameworkscriptrefs += "<script src=\"lib/angular.min.js\"></script>\n";
-        fs.createReadStream(path.resolve(chondricdir, "lib/angular.min.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/angular.min.js")));
+                                if (angularUsed) {
+                                    frameworkscriptrefs += "<script src=\"lib/angular.min.js\"></script>\n";
+                                    fs.createReadStream(path.resolve(chondricdir, "lib/angular.min.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/angular.min.js")));
 
-}
+                                }
 
 
-                                var html = apphtmltemplate
-                                .replace(/__TITLE__/g, appdef.title)
-                                .replace(/<!--BEGIN PAGESCRIPTS-->[\s\S]*<!--END PAGESCRIPTS-->/g, "<!--BEGIN PAGESCRIPTS-->" + scriptrefs + "<!--END PAGESCRIPTS-->")
-                                .replace(/<!--BEGIN FRAMEWORKSCRIPTS-->[\s\S]*<!--END FRAMEWORKSCRIPTS-->/g, "<!--BEGIN FRAMEWORKSCRIPTS-->" + frameworkscriptrefs + "<!--END FRAMEWORKSCRIPTS-->");
+                                var html = apphtmltemplate.replace(/__TITLE__/g, appdef.title)
+                                    .replace(/<!--BEGIN PAGESCRIPTS-->[\s\S]*<!--END PAGESCRIPTS-->/g, "<!--BEGIN PAGESCRIPTS-->" + scriptrefs + "<!--END PAGESCRIPTS-->")
+                                    .replace(/<!--BEGIN FRAMEWORKSCRIPTS-->[\s\S]*<!--END FRAMEWORKSCRIPTS-->/g, "<!--BEGIN FRAMEWORKSCRIPTS-->" + frameworkscriptrefs + "<!--END FRAMEWORKSCRIPTS-->");
 
                                 fs.writeFile(path.resolve(appdir, "index.html"), html);
 
@@ -146,4 +145,54 @@ if (angularUsed) {
 
     });
 
+};
+
+exports.hostApp = function(options) {
+    var express = require('express');
+    var newapp = false;
+    var app = options.app;
+    if (!app) {
+        newapp = true;
+        app = express();
+
+        app.use(express.cookieParser());
+        app.use(express.session({
+            secret: 'tW876DcNV4B5N33FmVDbBq8h3p8txp'
+        }));
+
+        app.use(express.bodyParser());
+
+
+    }
+
+    var ensureAuthenticated = options.ensureAuthenticated;
+    if (!ensureAuthenticated) {
+        var authstarter = require("authstarter");
+        authstarter.configure(app, options.authOptions);
+        ensureAuthenticated = authstarter.ensureAuthenticated;
+    }
+
+
+    app.use("/platformscripts", express.static(process.cwd()  + '/platformscripts'));
+    var staticMiddleware = express.static(process.cwd()  + '/apphtml');
+
+
+    app.get('/demo*', ensureAuthenticated, function(req, res, next) {
+        if (req.path == "/demo") return res.redirect("/demo/index.html");
+        req.url = req.url.replace(/^\/demo/, '');
+        staticMiddleware(req, res, next);
+    });
+
+if (options.settingsJson) {
+    app.get('/settings.json', ensureAuthenticated, options.settingsJson);
+}
+
+    if (newapp) {
+        var port = process.env.PORT || 5000;
+        app.listen(port, function() {
+            console.log("Listening on " + port);
+        });
+    }
+
+    return app;
 };
