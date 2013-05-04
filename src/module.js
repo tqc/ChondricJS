@@ -29,7 +29,8 @@ if (tapping) {
     });
     element.bind('touchend mouseup', function(e) {
       element.removeClass('active');
-      if (tapping) {        
+      if (tapping) {    
+        tapping = false;    
         scope.$apply(attrs['ngTap'], element);
       }
       e.preventDefault();

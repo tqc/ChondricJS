@@ -530,7 +530,7 @@ Chondric.App = function(options) {
             // touch not supported - use mouse events for swipe
             app.touchevents = {
                 touchstart: "mousedown",
-                touchend: "mouseup",
+                touchend: "mouseup mouseleave",
                 touchmove: "mousemove"
             };
         }
