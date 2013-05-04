@@ -199,15 +199,18 @@ exports.update = function(appdef) {
                                                 frameworkjs += data + "\n\n";
                                                 fs.readFile(path.resolve(chondricdir, "src/versioneddatabase.js"), "utf8", function(err, data) {
                                                     frameworkjs += data + "\n\n";
-                                                    fs.readFile(path.resolve(chondricdir, "src/app.css"), "utf8", function(err, data) {
-                                                        frameworkcss += data + "\n\n";
-                                                        // todo: this won't work when installed globally - replace with seperate build script
-                                                        fs.writeFile(path.resolve(chondricdir, "built/chondric.js"), frameworkjs);
-                                                        fs.writeFile(path.resolve(chondricdir, "built/chondric.css"), frameworkcss);
+                                                    fs.readFile(path.resolve(chondricdir, "src/module.js"), "utf8", function(err, data) {
+                                                        frameworkjs += data + "\n\n";
+                                                        fs.readFile(path.resolve(chondricdir, "src/app.css"), "utf8", function(err, data) {
+                                                            frameworkcss += data + "\n\n";
+                                                            // todo: this won't work when installed globally - replace with seperate build script
+                                                            fs.writeFile(path.resolve(chondricdir, "built/chondric.js"), frameworkjs);
+                                                            fs.writeFile(path.resolve(chondricdir, "built/chondric.css"), frameworkcss);
 
-                                                        fs.writeFile(path.resolve(appdir, "lib/chondric.js"), frameworkjs);
-                                                        fs.writeFile(path.resolve(appdir, "lib/chondric.css"), frameworkcss);
+                                                            fs.writeFile(path.resolve(appdir, "lib/chondric.js"), frameworkjs);
+                                                            fs.writeFile(path.resolve(appdir, "lib/chondric.css"), frameworkcss);
 
+                                                        });
                                                     });
                                                 });
                                             });

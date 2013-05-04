@@ -70,6 +70,40 @@ $.extend(Chondric.View.prototype, {
         console.log("deactivating");
     },
 
+    setSwipePosition: function(prevPageElement, nextPageElement, dx, duration) {
+        console.log("default: "+dx);
+        var thisPage = this;
+        if (duration !== undefined) {
+            thisPage.element[0].style.webkitTransitionDuration = duration;
+            if (nextPageElement && nextPageElement[0]) nextPageElement[0].style.webkitTransitionDuration = duration;
+            if (prevPageElement && prevPageElement[0]) prevPageElement[0].style.webkitTransitionDuration = duration;
+
+        }
+
+        if (dx === null) {
+            thisPage.element[0].style.webkitTransform = null;
+            if (nextPageElement && nextPageElement[0]) nextPageElement[0].style.webkitTransform = null;
+            if (prevPageElement && prevPageElement[0]) prevPageElement[0].style.webkitTransform = null;
+
+        } else if (dx !== undefined) {
+        if (prevPageElement) prevPageElement.addClass("prev");
+        if (nextPageElement) nextPageElement.addClass("next");
+
+            thisPage.element[0].style.webkitTransform = "translateX(" + (dx) + "px)";
+            if (nextPageElement && nextPageElement[0] && dx < 0) {
+                
+                    nextPageElement[0].style.webkitTransform = "translateX(" + (app.viewportWidth + 10 + dx) + "px)";
+                
+            }
+            if (prevPageElement && prevPageElement[0] && dx > 0) {
+                
+                    prevPageElement[0].style.webkitTransform = "translateX(" + (-app.viewportWidth - 10 + dx) + "px)";
+                
+            }
+
+        }
+    },
+
     load: function() {
         var view = this;
 
@@ -94,7 +128,7 @@ $.extend(Chondric.View.prototype, {
 
             view.element.html(content);
             if (view.useAngular) {
-                var ctrl = pe.attr("ng-controller") || html.attr("ng-controller") 
+                var ctrl = pe.attr("ng-controller") || html.attr("ng-controller");
                 if (ctrl) view.element.attr("ng-controller", ctrl);
 
                 console.log("Init angular");
@@ -106,7 +140,7 @@ $.extend(Chondric.View.prototype, {
                 for (var k in view.controllers) {
                     view.angularModule.controller(k, view.controllers[k]);
                 }
-                angular.bootstrap(view.element[0], ["page_" + view.id].concat(view.angularModules || []));
+                angular.bootstrap(view.element[0], ["page_" + view.id, "chondric"].concat(app.angularModules || [], view.angularModules || []));
 
 
 
@@ -137,7 +171,7 @@ $.extend(Chondric.View.prototype, {
     ensureLoaded: function(pageclass, callback) {
         var view = this;
 
-        if (view.element && view.element.hasClass(pageclass)) {
+        if (view.element && (!pageclass || view.element.attr("class") == "page " + templateId + " " + pageclass)) {
             // page already exists and is positioned correctly - eg during next/prev swipe
             return callback();
         }
@@ -162,12 +196,13 @@ $.extend(Chondric.View.prototype, {
                 view.load();
             }
 
-
-            // todo: add loading overlay if not already present
-
-            $(".page." + pageclass).removeClass("pageclass");
-            view.element.attr("class", "page " + templateId + " notransition " + pageclass);
-
+            if (pageclass) {
+                // remove pageclass from any other pages
+                $(".page." + pageclass).each(function() {
+                    if (this != view.element[0]) $(this).removeClass(pageclass);
+                });
+                view.element.attr("class", "page " + templateId + " notransition " + pageclass);
+            }
             if (view.swipe) view.element.addClass("swipe");
             if (view.swipeToBlank) view.element.addClass("swipetoblank");
 
@@ -181,14 +216,13 @@ $.extend(Chondric.View.prototype, {
 
     },
 
-    // todo: these don't really belong here
     showNextPage: function() {
         if (!this.next) return;
-        app.transition(this.next, "next", "prev");
+        app.changePage(this.next, "next");
     },
     showPreviousPage: function() {
         if (!this.prev) return;
-        app.transition(this.prev, "prev", "next");
+        app.changePage(this.prev, "prev");
     }
 
 });

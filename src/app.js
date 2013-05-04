@@ -1,3 +1,12 @@
+// ie doesn't like console.log
+
+if (!window.console) {
+    window.console = {
+        log: function() {},
+        error: alert
+    };
+}
+
 // jqm autoinit doesn't work for dynamic pages
 $(document).bind("mobileinit", function() {
     $.mobile.autoInitializePage = false;
@@ -398,7 +407,17 @@ Chondric.App = function(options) {
 
     };
 
+
+
     this.transition = function(nextPageId, inPageClass, outPageClass) {
+        /*
+        if (!app.transitionClasses) {
+            app.transitionClasses= {};
+            for (var tn in transitions) {
+                app.transitionClasses[app.transitions[tn].inPageClass] = true;
+                app.transitionClasses[app.transitions[tn].outPageClass] = true;
+            }
+        }*/
 
         if (app.transitioning) {
             if (app.transitioningTo != nextPageId) {
@@ -419,29 +438,28 @@ Chondric.App = function(options) {
         thisPage.ensureLoaded("active", function() {
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
-//            $("."+inPageClass).removeClass(inPageClass);
+
+            //            $("."+inPageClass).removeClass(inPageClass);
             nextPage.ensureLoaded(inPageClass, function() {
-                    window.setTimeout(function() {
-                history.pushState({}, null,  "#" + nextPageId);
-                nextPage.activating(thisPage);
-                    }, 0);
+                window.setTimeout(function() {
+                    history.pushState({}, null, "#" + nextPageId);
+                    nextPage.activating(thisPage);
+                }, 0);
 
                 thisPage.element.one("webkitTransitionEnd", function() {
                     window.setTimeout(function() {
                         app.transitioning = false;
                         app.transitioningTo = undefined;
                         nextPage.activated();
-                        $(".page.next").removeClass("next");
-                        $(".page.prev").removeClass("prev");
-                        if (nextPage.next) app.getView(nextPage.next).ensureLoaded("next", function() {});
-                        if (nextPage.prev) app.getView(nextPage.prev).ensureLoaded("prev", function() {});
+                        if (nextPage.next) app.getView(nextPage.next).ensureLoaded(null, function() {});
+                        if (nextPage.prev) app.getView(nextPage.prev).ensureLoaded(null, function() {});
                     }, 0);
                 });
 
-                thisPage.element[0].style.webkitTransform = null;
-                nextPage.element[0].style.webkitTransform = null;
 
-  //              $("."+outPageClass).removeClass(outPageClass);
+                thisPage.setSwipePosition(null, nextPage.element, null);
+
+                //              $("."+outPageClass).removeClass(outPageClass);
                 thisPage.element.addClass(outPageClass).removeClass("active");
                 nextPage.element.addClass("active").removeClass(inPageClass);
 
@@ -456,7 +474,48 @@ Chondric.App = function(options) {
         });
 
 
-    }
+    };
+
+
+    this.transitions = {
+        pop: {
+            inPageClass: "behindsmall",
+            outPageClass: "behindfull"
+        },
+        dlgpop: {
+            inPageClass: "behindsmall",
+            outPageClass: "behinddlg"
+        },
+        dlgclose: {
+            inPageClass: "behinddlg",
+            outPageClass: "behindsmall"
+        },
+        close: {
+            inPageClass: "behindfull",
+            outPageClass: "behindsmall"
+        },
+        prev: {
+            inPageClass: "prev",
+            outPageClass: "next"
+        },
+        next: {
+            inPageClass: "next",
+            outPageClass: "prev"
+        },
+        crossfade: {
+            inPageClass: "behindfull",
+            outPageClass: "behindfull"
+        }
+    };
+
+    this.changePage = function(pageId, transitionId) {
+        var transition = app.transitions[transitionId] || app.transitions.pop;
+        if (pageId == "prev") pageId = app.activeView.prev;
+        if (pageId == "next") pageId = app.activeView.next;
+        if (!pageId) return;
+        app.transition(pageId, transition.inPageClass, transition.outPageClass);
+    };
+
 
     var initEvents = function(callback) {
 
@@ -512,6 +571,7 @@ Chondric.App = function(options) {
             if (swiping) return;
             swiping = true;
 
+            console.log("start swipe");
 
             if (e.originalEvent.changedTouches) {
                 startX = e.originalEvent.changedTouches[0].clientX;
@@ -525,14 +585,15 @@ Chondric.App = function(options) {
                 horizontal = false;
                 vertical = false;
             }
-            activePage = $(".page.active");
-            nextPage = $(".page.next");
-            prevPage = $(".page.prev");
 
-            viewportWidth = $(".viewport").width();
+            activePage = app.activeView.element;
+            nextPage = app.activeView.next && app.getView(app.activeView.next).element;
+            prevPage = app.activeView.prev && app.getView(app.activeView.prev).element;
 
-            canSwipeRight = prevPage.length > 0 || activePage.hasClass("swipetoblank")
-            canSwipeLeft = nextPage.length > 0 || activePage.hasClass("swipetoblank")
+            app.viewportWidth = $(".viewport").width();
+
+            canSwipeRight = prevPage && prevPage.length > 0 || activePage.hasClass("swipetoblank");
+            canSwipeLeft = nextPage && nextPage.length > 0 || activePage.hasClass("swipetoblank");
 
 
         });
@@ -542,6 +603,7 @@ Chondric.App = function(options) {
             if (app.transitioning) return;
             if (!swiping) return;
             if (vertical) return;
+                  console.log("continue swipe");
 
             if (e.originalEvent.changedTouches) {
                 dx = e.originalEvent.changedTouches[0].clientX - startX;
@@ -558,26 +620,16 @@ Chondric.App = function(options) {
             if (!horizontal && (dy > 20 || dy < -20)) {
                 vertical = true;
                 dx = 0;
-                activePage[0].style.webkitTransitionDuration = 0;
-                activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
+                app.activeView.setSwipePosition(prevPage, nextPage, dx, 0);
 
             } else if (horizontal) {
 
                 if (dx < 0 && canSwipeLeft) {
-                    activePage[0].style.webkitTransitionDuration = 0;
-                    activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
-                    if (nextPage[0]) {
-                        nextPage[0].style.webkitTransitionDuration = 0;
-                        nextPage[0].style.webkitTransform = "translateX(" + (viewportWidth + 10 + dx) + "px)";
-                    }
+                    app.activeView.setSwipePosition(prevPage, nextPage, dx, 0);
                 }
                 if (dx > 0 && canSwipeRight) {
-                    activePage[0].style.webkitTransitionDuration = 0;
-                    activePage[0].style.webkitTransform = "translateX(" + (dx) + "px)";
-                    if (prevPage[0]) {
-                        prevPage[0].style.webkitTransitionDuration = 0;
-                        prevPage[0].style.webkitTransform = "translateX(" + (-viewportWidth - 10 + dx) + "px)";
-                    }
+                    app.activeView.setSwipePosition(prevPage, nextPage, dx, 0);
+
                 }
                 return false;
 
@@ -591,14 +643,9 @@ Chondric.App = function(options) {
             if (app.transitioning) return;
             if (!swiping) return;
             swiping = false;
+      console.log("end swipe");
 
-            activePage[0].style.webkitTransitionDuration = null;
-            if (nextPage[0]) nextPage[0].style.webkitTransitionDuration = null;
-            if (prevPage[0]) prevPage[0].style.webkitTransitionDuration = null;
-
-            //  activePage[0].style.webkitTransform = null;
-            //  nextPage[0].style.webkitTransform = null;
-            //  prevPage[0].style.webkitTransform = null;
+            app.activeView.setSwipePosition(prevPage, nextPage, undefined, null);
 
             $(".page.active .page.next .page.prev").attr("style", "");
 
@@ -606,9 +653,9 @@ Chondric.App = function(options) {
             if (dx < -100 && app.activeView.next) app.activeView.showNextPage();
             else if (dx > 100 && app.activeView.prev) app.activeView.showPreviousPage();
             else {
-                activePage[0].style.webkitTransform = null;
-                if (nextPage[0]) nextPage[0].style.webkitTransform = null;
-                if (prevPage[0]) prevPage[0].style.webkitTransform = null;
+
+                app.activeView.setSwipePosition(prevPage, nextPage, null, null);
+
             }
 
             dx = 0;
@@ -621,75 +668,53 @@ Chondric.App = function(options) {
         });
 
 
+
         $(document).on("tap click", "a.pop", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-
-            app.transition(id, "behindsmall", "behindfull");
-
-
+            app.changePage(id, "pop");
             return false;
-
-        })
-
+        });
         $(document).on("tap click", "a.dlgpop", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-
-            app.transition(id, "behindsmall", "behinddlg");
-
-
+            app.changePage(id, "dlgpop");
             return false;
-
-        })
-
+        });
         $(document).on("tap click", "a.dlgclose", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-
-            app.transition(id, "behinddlg", "behindsmall");
-
-
+            app.changePage(id, "dlgclose");
             return false;
-
-        })
+        });
 
 
         $(document).on("tap click", "a.close", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-
-            app.transition(id, "behindfull", "behindsmall");
-
-
+            app.changePage(id, "close");
             return false;
 
-        })
+        });
 
         $(document).on("tap click", "a.next", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
             if (id == "next") id = app.activeView.next;
-
-            app.transition(id, "next", "prev");
-
-
+            app.changePage(id, "next");
             return false;
 
-        })
+        });
 
 
         $(document).on("tap click", "a.prev", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
             if (id == "prev") id = app.activeView.prev;
-
-            app.transition(id, "prev", "next");
-
-
+            app.changePage(id, "prev");
             return false;
 
-        })
+        });
 
 
 
@@ -736,18 +761,18 @@ Chondric.App = function(options) {
 
                                         complete(function() {
                                             if (callback) callback();
-                                        })
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            })
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
         };
 
         if (window.WinJS) {
-            app.platform = "windows"
+            app.platform = "windows";
             $(initInternal);
         } else if (settings.mightBePhoneGap && document.location.protocol == "file:") {
             // file protocol indicates phonegap
@@ -768,6 +793,6 @@ Chondric.App = function(options) {
             $(initInternal);
         }
 
-    }
+    };
     return this;
 };
