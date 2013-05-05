@@ -231,7 +231,7 @@ exports.update = function(appdef) {
 };
 
 exports.hostApp = function(options) {
-    var express = require('express');
+    var express = exports.express = require('express');
     var newapp = false;
     var app = options.app;
     if (!app) {
@@ -250,7 +250,7 @@ exports.hostApp = function(options) {
 
     var ensureAuthenticated = options.ensureAuthenticated;
     if (!ensureAuthenticated) {
-        var authstarter = require("authstarter");
+        var authstarter = require("../authstarter/authstarter");
         authstarter.configure(app, options.authOptions);
         ensureAuthenticated = authstarter.ensureAuthenticated;
     }
@@ -270,11 +270,15 @@ exports.hostApp = function(options) {
         app.get('/settings.json', ensureAuthenticated, options.settingsJson);
     }
 
-    if (newapp) {
+    exports.listen = function() {
         var port = process.env.PORT || 5000;
         app.listen(port, function() {
             console.log("Listening on " + port);
         });
+    };
+
+    if (newapp && !options.delayListen) {
+        exports.listen();
     }
 
     return app;
