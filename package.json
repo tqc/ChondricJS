@@ -6,7 +6,7 @@
   "repository": {
     "url": "http://github.com/tqc/ChondricJS"
   },
-  "main": "./chondrictools",
+  "main": "./chondric-tools",
   "dependencies": {
     "mkdirp": "*",
     "express": ">=3.2",
