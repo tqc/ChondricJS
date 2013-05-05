@@ -239,7 +239,7 @@ exports.hostApp = function(options) {
         app = express();
 
         app.use(express.cookieParser());
-        app.use(express.session({
+        app.use(express.session(options.sessionOptions || {
             secret: 'tW876DcNV4B5N33FmVDbBq8h3p8txp'
         }));
 
