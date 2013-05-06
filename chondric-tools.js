@@ -250,7 +250,7 @@ exports.hostApp = function(options) {
 
     var ensureAuthenticated = options.ensureAuthenticated;
     if (!ensureAuthenticated) {
-        var authstarter = require("../authstarter/authstarter");
+        var authstarter = require("authstarter");
         authstarter.configure(app, options.authOptions);
         ensureAuthenticated = authstarter.ensureAuthenticated;
     }
