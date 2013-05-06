@@ -726,7 +726,7 @@ Chondric.App = function(options) {
         if (settings.firstPageTemplate) {
             var vid = settings.firstPageTemplate + "_" + settings.firstPageDataId;
             if (vid.indexOf("_") == vid.length - 1) vid = settings.firstPageTemplate;
-            app.transition(vid, "behindsmall", "behindfull");
+            app.changePage(vid, "crossfade");
         }
 
         callback();
