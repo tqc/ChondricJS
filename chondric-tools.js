@@ -253,7 +253,9 @@ exports.hostApp = function(options) {
         var authstarter = require("authstarter");
         authstarter.configure(app, options.authOptions);
         ensureAuthenticated = authstarter.ensureAuthenticated;
+        exports.authstarter = authstarter;
     }
+    app.ensureAuthenticated = ensureAuthenticated;
 
 
     app.use("/platformscripts", express.static(process.cwd() + '/platformscripts'));
