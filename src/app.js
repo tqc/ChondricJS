@@ -408,6 +408,38 @@ Chondric.App = function(options) {
     };
 
 
+    var pageCleanupTimer = 0;
+    this.pageCleanup = function() {
+        var currentPage = app.activeView;
+        var lastPage = app.lastPage;
+        var preloads = app.activeView.preloads || [];
+
+
+        // todo: remove any pages not in preload list
+
+        for (var k in app.Views) {
+            if (currentPage && currentPage.id == k) continue;
+            if (currentPage && currentPage.prev == k) continue;
+            if (currentPage && currentPage.next == k) continue;
+            if (lastPage && lastPage.id == k) continue;
+            if (preloads.indexOf(k) >= 0) continue;
+            var v = app.Views[k];
+            if (v.element) v.element.remove();
+            delete v.element;
+            delete app.Views[k];
+        }
+
+
+        // todo: load any pages in preload list that are not already loaded
+
+        pageCleanupTimer = 0;
+    }
+
+    this.queuePageCleanup = function() {
+        if (!pageCleanupTimer) {
+            pageCleanupTimer = window.setTimeout(app.pageCleanup, 200);
+        }
+    }
 
     this.transition = function(nextPageId, inPageClass, outPageClass) {
         /*
@@ -434,7 +466,7 @@ Chondric.App = function(options) {
 
         app.transitioning = true;
         app.transitioningTo = nextPageId;
-        var thisPage = app.activeView;
+        var thisPage = app.lastPage = app.activeView;
         thisPage.ensureLoaded("active", function() {
             var nextPage = app.getView(nextPageId);
             thisPage.deactivating(nextPage);
@@ -451,6 +483,7 @@ Chondric.App = function(options) {
                         app.transitioning = false;
                         app.transitioningTo = undefined;
                         nextPage.activated();
+                        app.queuePageCleanup();
                         if (nextPage.next) app.getView(nextPage.next).ensureLoaded(null, function() {});
                         if (nextPage.prev) app.getView(nextPage.prev).ensureLoaded(null, function() {});
                     }, 0);
