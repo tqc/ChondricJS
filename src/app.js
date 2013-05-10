@@ -413,9 +413,10 @@ Chondric.App = function(options) {
         var currentPage = app.activeView;
         var lastPage = app.lastPage;
         var preloads = app.activeView.preloads || [];
+        if (currentPage.next) preloads.push(currentPage.next);
+        if (currentPage.prev) preloads.push(currentPage.prev);
 
-
-        // todo: remove any pages not in preload list
+        // remove any pages not in preload list
 
         for (var k in app.Views) {
             if (currentPage && currentPage.id == k) continue;
@@ -429,8 +430,12 @@ Chondric.App = function(options) {
             delete app.Views[k];
         }
 
-
         // todo: load any pages in preload list that are not already loaded
+
+        for (var i = 0; i < preloads.length; i++) {
+            console.log("preload: "+preloads[i]);
+            if (!app.Views[preloads[i]]) app.getView(preloads[i]).ensureLoaded(null, function() {});
+        }
 
         pageCleanupTimer = 0;
     }
@@ -484,8 +489,6 @@ Chondric.App = function(options) {
                         app.transitioningTo = undefined;
                         nextPage.activated();
                         app.queuePageCleanup();
-                        if (nextPage.next) app.getView(nextPage.next).ensureLoaded(null, function() {});
-                        if (nextPage.prev) app.getView(nextPage.prev).ensureLoaded(null, function() {});
                     }, 0);
                 });
 
