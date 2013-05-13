@@ -1483,42 +1483,58 @@ angular.module('chondric', [])
     if (attrs.ngTap && attrs.ngTap.indexOf("app.") == 0 && !scope.app) scope.app = app;
     var tapping;
     tapping = false;
-    element.bind('touchstart mousedown', function(e) {
+    touching = false;
+
+    var touchstart = function(e) {
+      touching = true;
       element.addClass('active');
       element.removeClass('deactivated');
       tapping = true;
-   //   e.preventDefault();
-    //        e.stopPropagation();
+    };
 
-//      return false;
-    });
-    element.bind('touchmove mousemove', function(e) {
+    var touchmove = function(e) {
       element.removeClass('active');
       element.addClass('deactivated');
-if (tapping) {
-      tapping = false;
-    //  e.preventDefault();
-    //  e.stopPropagation();
-    //  return false;
-    }
+      if (tapping) {
+        tapping = false;
+      }
+      };
 
-    });
-    element.bind('touchend mouseup', function(e) {
+var touchend = function(e) {
+
+
       element.removeClass('active');
       if (tapping) {    
         tapping = false;    
         scope.$apply(attrs['ngTap'], element);
       }
+      touching = false;
       e.preventDefault();
       e.stopPropagation();
       return false;
+    };
+
+    element.bind('mousedown', function(e) {
+      if (touching) return;
+      touchstart(e);
     });
 
-      element.bind('tap click', function(e) {
-//   e.preventDefault();
-//      e.stopPropagation();
-  //    return false;
+    element.bind('touchstart', function(e) {
+      touching = true;
+      touchstart(e)
+    });
 
+    element.bind('touchmove mousemove', touchmove);
+
+    element.bind('touchend', touchend);
+
+    element.bind('mouseup',  function(e) {
+      if (touching) return;
+      touchend(e);
+    });
+
+
+      element.bind('tap click', function(e) {
       });
   };
 });
