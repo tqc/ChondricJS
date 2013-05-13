@@ -1486,7 +1486,6 @@ angular.module('chondric', [])
     touching = false;
 
     var touchstart = function(e) {
-      touching = true;
       element.addClass('active');
       element.removeClass('deactivated');
       tapping = true;
