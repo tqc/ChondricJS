@@ -130,8 +130,11 @@ Chondric.App = function(options) {
         debugMode: false
     };
 
+
     $.extend(settings, options);
     app.debugMode = settings.debugMode;
+    app.angularModules = settings.angularModules;
+
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
@@ -545,7 +548,7 @@ Chondric.App = function(options) {
     };
 
     this.changePage = function(pageId, transitionId) {
-        var transition = app.transitions[transitionId] || app.transitions.pop;
+        var transition = app.transitions[transitionId] || app.transitions.crossfade;
         if (pageId == "prev") pageId = app.activeView.prev;
         if (pageId == "next") pageId = app.activeView.next;
         if (!pageId) return;
