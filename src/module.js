@@ -5,9 +5,10 @@ angular.module('chondric', [])
     element.addClass('tappable');
     // eanble use of app global in angular expression if necessary
     if (attrs.ngTap && attrs.ngTap.indexOf("app.") == 0 && !scope.app) scope.app = app;
-    var tapping;
-    tapping = false;
-    touching = false;
+    var tapping = false;
+    var touching = false;
+    var clicking = false;
+
 
     var touchstart = function(e) {
       element.addClass('active');
@@ -31,7 +32,9 @@ var touchend = function(e) {
         tapping = false;    
         scope.$apply(attrs['ngTap'], element);
       }
+      clicking = false;      
       touching = false;
+      tapping = false;
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -39,6 +42,7 @@ var touchend = function(e) {
 
     element.bind('mousedown', function(e) {
       if (touching) return;
+      clicking = true;
       touchstart(e);
     });
 
@@ -52,8 +56,9 @@ var touchend = function(e) {
     element.bind('touchend', touchend);
 
     element.bind('mouseup',  function(e) {
-      if (touching) return;
+      if (!clicking) return;
       touchend(e);
+      clicking = false;
     });
 
 
