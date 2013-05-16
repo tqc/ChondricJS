@@ -33,7 +33,7 @@ var touchend = function(e) {
         scope.$apply(attrs['ngTap'], element);
       }
       clicking = false;      
-      touching = false;
+   //   touching = false;
       tapping = false;
       e.preventDefault();
       e.stopPropagation();
@@ -56,7 +56,7 @@ var touchend = function(e) {
     element.bind('touchend', touchend);
 
     element.bind('mouseup',  function(e) {
-      if (!clicking) return;
+      if (touching || !clicking) return;
       touchend(e);
       clicking = false;
     });
