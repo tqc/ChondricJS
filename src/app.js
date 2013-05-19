@@ -437,7 +437,7 @@ Chondric.App = function(options) {
 
         for (var i = 0; i < preloads.length; i++) {
             console.log("preload: "+preloads[i]);
-            if (!app.Views[preloads[i]]) app.getView(preloads[i]).ensureLoaded(null, function() {});
+            app.getView(preloads[i]).ensureLoaded(null, function() {});
         }
 
         pageCleanupTimer = 0;
@@ -610,7 +610,7 @@ Chondric.App = function(options) {
             if (swiping) return;
             swiping = true;
 
-            console.log("start swipe");
+//            console.log("start swipe");
 
             if (e.originalEvent.changedTouches) {
                 startX = e.originalEvent.changedTouches[0].clientX;
@@ -642,7 +642,7 @@ Chondric.App = function(options) {
             if (app.transitioning) return;
             if (!swiping) return;
             if (vertical) return;
-                  console.log("continue swipe");
+      //            console.log("continue swipe");
 
             if (e.originalEvent.changedTouches) {
                 dx = e.originalEvent.changedTouches[0].clientX - startX;
@@ -682,7 +682,7 @@ Chondric.App = function(options) {
             if (app.transitioning) return;
             if (!swiping) return;
             swiping = false;
-      console.log("end swipe");
+   //   console.log("end swipe");
 
             app.activeView.setSwipePosition(prevPage, nextPage, undefined, null);
 

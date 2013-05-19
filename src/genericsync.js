@@ -151,9 +151,7 @@ saveToDb: function(wrapper) {}
 }); 
 
 // init
-itemStore.loadFromDb(allwrappers, function() {
-// ...	
-});
+itemStore.loadFromDbResults(allwrappers);
 
 // get list
 		itemStore.getItems(function(wrapper) {
