@@ -71,7 +71,7 @@ $.extend(Chondric.View.prototype, {
     },
 
     setSwipePosition: function(prevPageElement, nextPageElement, dx, duration) {
-        console.log("default: "+dx);
+//        console.log("default: "+dx);
         var thisPage = this;
         if (duration !== undefined) {
             thisPage.element[0].style.webkitTransitionDuration = duration;
