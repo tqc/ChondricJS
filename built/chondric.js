@@ -909,7 +909,7 @@ $.extend(Chondric.View.prototype, {
     },
 
     setSwipePosition: function(prevPageElement, nextPageElement, dx, duration) {
-//        console.log("default: "+dx);
+        //        console.log("default: "+dx);
         var thisPage = this;
         if (duration !== undefined) {
             thisPage.element[0].style.webkitTransitionDuration = duration;
@@ -924,19 +924,19 @@ $.extend(Chondric.View.prototype, {
             if (prevPageElement && prevPageElement[0]) prevPageElement[0].style.webkitTransform = null;
 
         } else if (dx !== undefined) {
-        if (prevPageElement) prevPageElement.addClass("prev");
-        if (nextPageElement) nextPageElement.addClass("next");
+            if (prevPageElement) prevPageElement.addClass("prev");
+            if (nextPageElement) nextPageElement.addClass("next");
 
             thisPage.element[0].style.webkitTransform = "translateX(" + (dx) + "px)";
             if (nextPageElement && nextPageElement[0] && dx < 0) {
-                
-                    nextPageElement[0].style.webkitTransform = "translateX(" + (app.viewportWidth + 10 + dx) + "px)";
-                
+
+                nextPageElement[0].style.webkitTransform = "translateX(" + (app.viewportWidth + 10 + dx) + "px)";
+
             }
             if (prevPageElement && prevPageElement[0] && dx > 0) {
-                
-                    prevPageElement[0].style.webkitTransform = "translateX(" + (-app.viewportWidth - 10 + dx) + "px)";
-                
+
+                prevPageElement[0].style.webkitTransform = "translateX(" + (-app.viewportWidth - 10 + dx) + "px)";
+
             }
 
         }
@@ -1051,7 +1051,9 @@ $.extend(Chondric.View.prototype, {
 
             window.setTimeout(function() {
                 view.element.removeClass("notransition");
-                callback();
+                window.setTimeout(function() {
+                    callback();
+                }, 0);
             }, 0);
 
         });
