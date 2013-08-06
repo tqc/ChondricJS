@@ -526,6 +526,33 @@ body.debugmode .debugonly {
     display:block !important;
 }
 
+/* loading overlay */
+
+.loadingOverlay {
+display:none;
+position:absolute;
+left: 0;
+right:0;
+top:0;
+bottom:0;
+background-color: transparent;
+text-align: center;
+padding-top: 300px;
+}
+
+.page.loading .loadingOverlay {
+display: block;
+}
+
+.loadingOverlay::before {
+content: "Loading Page";
+}
+
+.loadingOverlay a {
+display: block;
+margin-top: 10px;
+}
+
 
 
 

@@ -987,6 +987,8 @@ $.extend(Chondric.View.prototype, {
 
             view.updateViewBackground();
             view.attachEvents();
+            view.loading = false;
+            view.element.removeClass("loading");
         });
 
 
@@ -1025,11 +1027,12 @@ $.extend(Chondric.View.prototype, {
             view.element = $("#" + safeId);
 
             if (view.element.length == 0) {
+                view.loading = true;
                 // page not loaded - create it
-                $(".viewport").append("<div class=\"page " + templateId + " notransition " + pageclass + "\" id=\"" + safeId + "\">Not loaded</div>");
+                $(".viewport").append("<div class=\"page " + templateId + " notransition loading " + pageclass + "\" id=\"" + safeId + "\"></div>");
                 view.element = $("#" + safeId);
                 view.element.append("<div class=\"content\"></div>");
-                view.element.append("<div class=\"loadingOverlay\"></div>");
+                view.element.append("<div class=\"loadingOverlay\"><a href=\"javascript:window.location.reload()\">Reload</a></div>");
 
                 view.load();
             }
@@ -1043,6 +1046,7 @@ $.extend(Chondric.View.prototype, {
             }
             if (view.swipe) view.element.addClass("swipe");
             if (view.swipeToBlank) view.element.addClass("swipetoblank");
+            if (view.loading) view.element.addClass("loading");
 
 
             window.setTimeout(function() {
