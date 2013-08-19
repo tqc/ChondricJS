@@ -72,6 +72,7 @@ exports.update = function(appdef) {
         updateIfMissing(appdef.appHost + ".js", "apphost.js", standardSubstitution);
         updateIfMissing("package.json", "package.jsontemplate", standardSubstitution);
         updateIfMissing(".env", "template.env", noSubstitution);
+        updateIfMissing(".gitignore", "template.gitignore", noSubstitution);
     }
 
     if (appdef.pageTemplate) {
