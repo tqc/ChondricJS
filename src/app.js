@@ -74,29 +74,29 @@ Chondric.App = function(options) {
     };
 
     app.createViewTemplate(
-    Chondric.View,
+        Chondric.View,
         "AppLoadTemplate",
         "index.html", {
-        getDefaultModel: function() {
-            return {};
-        },
-        updateModel: function(dataId, existingData, callback) {
-            if (!this.model) this.model = this.getDefaultModel();
-            var m = this.model;
+            getDefaultModel: function() {
+                return {};
+            },
+            updateModel: function(dataId, existingData, callback) {
+                if (!this.model) this.model = this.getDefaultModel();
+                var m = this.model;
 
 
-            callback();
-        },
-        updateView: function() {
+                callback();
+            },
+            updateView: function() {
 
-        },
-        attachSubviews: function() {
-            var page = this;
+            },
+            attachSubviews: function() {
+                var page = this;
 
 
-        }
+            }
 
-    })
+        })
 
     app.Views.appLoadPage = new app.ViewTemplates.AppLoadTemplate({
         id: "appLoadPage"
@@ -436,7 +436,7 @@ Chondric.App = function(options) {
         // todo: load any pages in preload list that are not already loaded
 
         for (var i = 0; i < preloads.length; i++) {
-            console.log("preload: "+preloads[i]);
+            console.log("preload: " + preloads[i]);
             app.getView(preloads[i]).ensureLoaded(null, function() {});
         }
 
@@ -490,6 +490,7 @@ Chondric.App = function(options) {
                     window.setTimeout(function() {
                         app.transitioning = false;
                         app.transitioningTo = undefined;
+                        if (!app.splashScreenHidden) app.hideSplashScreen();
                         nextPage.activated();
                         app.queuePageCleanup();
                     }, 0);
@@ -610,7 +611,7 @@ Chondric.App = function(options) {
             if (swiping) return;
             swiping = true;
 
-//            console.log("start swipe");
+            //            console.log("start swipe");
 
             if (e.originalEvent.changedTouches) {
                 startX = e.originalEvent.changedTouches[0].clientX;
@@ -642,7 +643,7 @@ Chondric.App = function(options) {
             if (app.transitioning) return;
             if (!swiping) return;
             if (vertical) return;
-      //            console.log("continue swipe");
+            //            console.log("continue swipe");
 
             if (e.originalEvent.changedTouches) {
                 dx = e.originalEvent.changedTouches[0].clientX - startX;
@@ -682,7 +683,7 @@ Chondric.App = function(options) {
             if (app.transitioning) return;
             if (!swiping) return;
             swiping = false;
-   //   console.log("end swipe");
+            //   console.log("end swipe");
 
             app.activeView.setSwipePosition(prevPage, nextPage, undefined, null);
 
@@ -711,7 +712,7 @@ Chondric.App = function(options) {
         $(document).on("tap click", "a.pop", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'pop')")
+            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'pop')");
 
             app.changePage(id, "pop");
             return false;
@@ -719,14 +720,14 @@ Chondric.App = function(options) {
         $(document).on("tap click", "a.dlgpop", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'dlgpop')")
+            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'dlgpop')");
             app.changePage(id, "dlgpop");
             return false;
         });
         $(document).on("tap click", "a.dlgclose", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'dlgclose')")
+            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'dlgclose')");
             app.changePage(id, "dlgclose");
             return false;
         });
@@ -735,7 +736,7 @@ Chondric.App = function(options) {
         $(document).on("tap click", "a.close", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'close')")
+            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'close')");
             app.changePage(id, "close");
             return false;
 
@@ -745,7 +746,7 @@ Chondric.App = function(options) {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
             if (id == "next") id = app.activeView.next;
-            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'next')")
+            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'next')");
             app.changePage(id, "next");
             return false;
 
@@ -756,7 +757,7 @@ Chondric.App = function(options) {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
             if (id == "prev") id = app.activeView.prev;
-            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'prev')")
+            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'prev')");
             app.changePage(id, "prev");
             return false;
 
@@ -778,6 +779,17 @@ Chondric.App = function(options) {
         callback();
 
     };
+
+    app.splashScreenHidden = false;
+    app.hideSplashScreen = function() {
+        if (!app.splashScreenHidden) return;
+        if (app.platform == "cordova" && navigator && navigator.splashscreen) {
+            navigator.splashscreen.hide();
+        }
+        app.splashScreenHidden = true;
+    }
+
+
 
     this.init = function(callback) {
         // load required scripts
@@ -825,13 +837,13 @@ Chondric.App = function(options) {
             app.isPhonegap = true;
             app.platform = "cordova";
             document.addEventListener("deviceready", function() {
-                console.log("appframework deviceready");
-                console.log(device.platform);
-                app.isSimulator = device.platform.indexOf("Simulator") > 0;
-                $(initInternal);
-            }
+                    console.log("appframework deviceready");
+                    console.log(device.platform);
+                    app.isSimulator = device.platform.indexOf("Simulator") > 0;
+                    $(initInternal);
+                }
 
-            , false);
+                , false);
         } else {
             // no phonegap - web preview mode
             app.platform = "web"
