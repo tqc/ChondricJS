@@ -21,6 +21,33 @@ exports.init = function() {
     console.log("node appdef.js");
 };
 
+
+exports.buildFramework = function(chondricdir, callback) {
+    var frameworkjs = "";
+    var frameworkcss = "";
+
+    fs.readFile(path.resolve(chondricdir, "src/app.js"), "utf8", function(err, data) {
+        frameworkjs += data + "\n\n";
+        fs.readFile(path.resolve(chondricdir, "src/view.js"), "utf8", function(err, data) {
+            frameworkjs += data + "\n\n";
+            fs.readFile(path.resolve(chondricdir, "src/listsync.js"), "utf8", function(err, data) {
+                frameworkjs += data + "\n\n";
+                fs.readFile(path.resolve(chondricdir, "src/versioneddatabase.js"), "utf8", function(err, data) {
+                    frameworkjs += data + "\n\n";
+                    fs.readFile(path.resolve(chondricdir, "src/module.js"), "utf8", function(err, data) {
+                        frameworkjs += data + "\n\n";
+                        fs.readFile(path.resolve(chondricdir, "src/app.css"), "utf8", function(err, data) {
+                            frameworkcss += data + "\n\n";
+                            callback(frameworkjs, frameworkcss);
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+}
+
 exports.update = function(appdef) {
 
     var chondricdir = __dirname;
@@ -188,35 +215,13 @@ exports.update = function(appdef) {
                                     }
 
 
-                                    var frameworkjs = "";
-                                    var frameworkcss = "";
 
-
-                                    fs.readFile(path.resolve(chondricdir, "src/app.js"), "utf8", function(err, data) {
-                                        frameworkjs += data + "\n\n";
-                                        fs.readFile(path.resolve(chondricdir, "src/view.js"), "utf8", function(err, data) {
-                                            frameworkjs += data + "\n\n";
-                                            fs.readFile(path.resolve(chondricdir, "src/listsync.js"), "utf8", function(err, data) {
-                                                frameworkjs += data + "\n\n";
-                                                fs.readFile(path.resolve(chondricdir, "src/versioneddatabase.js"), "utf8", function(err, data) {
-                                                    frameworkjs += data + "\n\n";
-                                                    fs.readFile(path.resolve(chondricdir, "src/module.js"), "utf8", function(err, data) {
-                                                        frameworkjs += data + "\n\n";
-                                                        fs.readFile(path.resolve(chondricdir, "src/app.css"), "utf8", function(err, data) {
-                                                            frameworkcss += data + "\n\n";
-                                                            // todo: this won't work when installed globally - replace with seperate build script
-                                                            fs.writeFile(path.resolve(chondricdir, "built/chondric.js"), frameworkjs);
-                                                            fs.writeFile(path.resolve(chondricdir, "built/chondric.css"), frameworkcss);
-
-                                                            fs.writeFile(path.resolve(appdir, "lib/chondric.js"), frameworkjs);
-                                                            fs.writeFile(path.resolve(appdir, "lib/chondric.css"), frameworkcss);
-
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
+                                    exports.buildFramework(chondricdir, function(frameworkjs, frameworkcss) {
+                                        fs.writeFile(path.resolve(appdir, "lib/chondric.js"), frameworkjs);
+                                        fs.writeFile(path.resolve(appdir, "lib/chondric.css"), frameworkcss);
                                     });
+
+
                                 });
                             });
                         });
