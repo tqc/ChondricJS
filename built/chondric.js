@@ -122,10 +122,10 @@ Chondric.App = function(options) {
         enableScroll: true,
         getDatabase: null,
         loadData: function(loadedctx, callback) {
-            callback()
+            callback();
         },
         customInit: function(callback) {
-            callback()
+            callback();
         },
         debugMode: false
     };
@@ -252,9 +252,6 @@ Chondric.App = function(options) {
         if (app.debugMode) {
             $("body").addClass("debugmode");
         }
-        $("#startPage").attr("data-url", document.location.pathname.replace(/\/$/, "/index.html"));
-        //        $.mobile.initializePage();
-        app.autohidesplashscreen && navigator && navigator.splashscreen && navigator.splashscreen.hide();
 
         app.ready = true;
         callback();
@@ -789,7 +786,25 @@ Chondric.App = function(options) {
         app.splashScreenHidden = true;
     }
 
+    var loadHostSettings = function(callback) {
 
+        $.ajax({
+            url: "../settings.json" + location.search,
+            dataType: "json",
+            error: function(data) {
+                console.warn("error loading ../settings.json");
+                app.hostSettings = {};
+                callback();
+            },
+            success: function(data) {
+                app.hostSettings = data;
+                if (data.debug !== undefined) app.debugMode = data.debug;
+                callback();
+            }
+        });
+
+        callback;
+    };
 
     this.init = function(callback) {
         // load required scripts
@@ -801,24 +816,25 @@ Chondric.App = function(options) {
             loadScripts(0, function() {
                 console.log("loaded scripts");
                 initEvents(function() {
+                    loadHostSettings(function() {
 
+                        // create database
+                        initData(function() {
+                            console.log("loading context");
 
-                    // create database
-                    initData(function() {
-                        console.log("loading context");
+                            var loadedctx = JSON.parse(localStorage["appcontext_" + settings.name] || "{}");
+                            //load data
+                            settings.loadData.call(app, loadedctx, function() {
+                                // attach common events
+                                attachEvents(function() {
+                                    // custom init function
+                                    settings.customInit.call(app, function() {
+                                        // hide splash screen and show page
+                                        loadFirstPage(function() {
 
-                        var loadedctx = JSON.parse(localStorage["appcontext_" + settings.name] || "{}");
-                        //load data
-                        settings.loadData.call(app, loadedctx, function() {
-                            // attach common events
-                            attachEvents(function() {
-                                // custom init function
-                                settings.customInit.call(app, function() {
-                                    // hide splash screen and show page
-                                    loadFirstPage(function() {
-
-                                        complete(function() {
-                                            if (callback) callback();
+                                            complete(function() {
+                                                if (callback) callback();
+                                            });
                                         });
                                     });
                                 });
