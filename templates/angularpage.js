@@ -5,6 +5,8 @@ app.createViewTemplate({
         var page = this;
         page.controllers = {
             __ANGULARCONTROLLER__: function($scope) {
+                page.scope = $scope;
+                var m = $scope.m = page.model;
                 $scope.exampleValue = "Example";
 
                 $scope.exampleFunction = function() {
