@@ -270,3 +270,58 @@ margin-top: 10px;
 }
 
 
+
+
+
+
+/* App preview frames */
+
+@media (min-device-width: 1025px) and (max-width: 767px) {
+/* iphone sized viewport when used on a desktop */
+    .viewport {
+        position: relative;
+        width: 320px;
+        height: 548px;
+        margin: 144px auto;
+    }
+
+    body {
+        /* https://developer.apple.com/appstore/resources/marketing/index.html */
+        /* http://www.fuzzimo.com/free-hi-res-canvas-textures-seamless/ */
+        background-color: black;
+        background-image: url(images/iPhone5.png), url(images/canvas.jpg);
+        background-repeat: no-repeat, repeat;
+        margin: auto;
+        background-position-y: -70px;
+        background-position-x: center;
+    }
+}
+
+@media (min-device-width: 1025px) and (min-width: 1025px) {
+/* ipad sized viewport when used on a desktop */
+    .viewport {
+        position: relative;
+        width: 1024px;
+        height: 748px;
+        margin: 30px auto;
+
+    }
+
+    body {
+        /* https://developer.apple.com/appstore/resources/marketing/index.html */
+        /* http://www.fuzzimo.com/free-hi-res-canvas-textures-seamless/ */
+        background-color: black;
+        background-image: url(images/iPad.png), url(images/canvas.jpg);
+        background-repeat: no-repeat, repeat;
+        margin: auto;
+        background-position-y: -70px;
+        background-position-x: center;
+    }
+}
+
+
+
+
+
+
+
