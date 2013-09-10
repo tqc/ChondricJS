@@ -36,9 +36,12 @@ exports.buildFramework = function(chondricdir, callback) {
                     frameworkjs += data + "\n\n";
                     fs.readFile(path.resolve(chondricdir, "src/module.js"), "utf8", function(err, data) {
                         frameworkjs += data + "\n\n";
-                        fs.readFile(path.resolve(chondricdir, "src/app.css"), "utf8", function(err, data) {
-                            frameworkcss += data + "\n\n";
-                            callback(frameworkjs, frameworkcss);
+                        fs.readFile(path.resolve(chondricdir, "src/genericsync.js"), "utf8", function(err, data) {
+                            frameworkjs += data + "\n\n";
+                            fs.readFile(path.resolve(chondricdir, "src/app.css"), "utf8", function(err, data) {
+                                frameworkcss += data + "\n\n";
+                                callback(frameworkjs, frameworkcss);
+                            });
                         });
                     });
                 });

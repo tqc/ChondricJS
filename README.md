@@ -14,6 +14,12 @@ To start building a new app, create an app definition file (appdef.js). This can
     node
     require("chondric-tools").init()
 
+To use a local instance:
+
+    node
+    require("../../ChondricJS/chondric-tools").init()
+
+
 The app definition should look something like:
 
     var chondric = require("chondric-tools");
