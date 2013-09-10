@@ -19,8 +19,7 @@ var app = new Chondric.App({
     },
     customInit: function(callback) {
         callback();
-    },
-    enableScroll: true
+    }
 });
 
 app.items = {};

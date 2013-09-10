@@ -766,11 +766,16 @@ Chondric.App = function(options) {
     };
 
     var loadFirstPage = function(callback) {
-        // if first page is not specified in settings, custominit is responsible for loading it
-        if (settings.firstPageTemplate) {
-            var vid = settings.firstPageTemplate + "_" + settings.firstPageDataId;
-            if (vid.indexOf("_") == vid.length - 1) vid = settings.firstPageTemplate;
-            app.changePage(vid, "crossfade");
+        // if first page is not specified in settings or hash, custominit is responsible for loading it
+
+        if (location.hash.length > 1) {
+            app.changePage(location.hash.substr(1));
+        } else {
+            if (settings.firstPageTemplate) {
+                var vid = settings.firstPageTemplate + "_" + settings.firstPageDataId;
+                if (vid.indexOf("_") == vid.length - 1) vid = settings.firstPageTemplate;
+                app.changePage(vid, "crossfade");
+            }
         }
 
         callback();
