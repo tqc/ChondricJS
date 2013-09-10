@@ -8,8 +8,8 @@ var settings = {
     appHost: "apphost", // use something unique here if you need to run multiple apps with forever
     pages: [
         {
-            id: "apphome",
-            title: "Home"
+            id: "start",
+            title: "Start"
         }
         ],
     pageTemplate: "pagetemplate.html" // remove this if you want to create pages with the default template
