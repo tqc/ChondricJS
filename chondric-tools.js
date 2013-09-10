@@ -49,7 +49,7 @@ exports.buildFramework = function(chondricdir, callback) {
         });
     });
 
-}
+};
 
 exports.update = function(appdef) {
 
@@ -65,14 +65,16 @@ exports.update = function(appdef) {
         return s;
     };
     var standardSubstitution = function(template, appdef, pagedef) {
-        var result = template.replace(/__APPHOST_NAME__/g, appdef.appHost);
+        var result = template.replace(/__APPHOST_NAME__/g, appdef.appHost)
+                .replace(/__APPTITLE__/g, appdef.title);
 
         if (pagedef) {
             result = result.replace(/__PAGEID__/g, pagedef.id)
                 .replace(/__PREVPAGEID__/g, pagedef.prev)
                 .replace(/__NEXTPAGEID__/g, pagedef.next)
                 .replace(/__ANGULARMODULES__/g, JSON.stringify(pagedef.angularModules || []))
-                .replace(/__ANGULARCONTROLLER__/g, pagedef.angularController);
+                .replace(/__ANGULARCONTROLLER__/g, pagedef.angularController)
+                .replace(/__PAGETITLE__/g, pagedef.title);
         }
         return result;
     };
@@ -104,6 +106,10 @@ exports.update = function(appdef) {
         updateIfMissing(".env", "template.env", noSubstitution);
         updateIfMissing(".gitignore", "template.gitignore", noSubstitution);
     }
+
+    updateIfMissing("apphtml/splash.html", "splash.html", standardSubstitution);
+    updateIfMissing("apphtml/icon.html", "icon.html", standardSubstitution);
+
 
     if (appdef.pageTemplate) {
         if (updateIfMissing(appdef.pageTemplate, "page.html", noSubstitution)) {

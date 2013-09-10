@@ -119,7 +119,6 @@ Chondric.App = function(options) {
         mightBePhoneGap: true,
         scriptGroups: [],
         contexts: {},
-        enableScroll: true,
         getDatabase: null,
         loadData: function(loadedctx, callback) {
             callback();
