@@ -1,3 +1,6 @@
+body {
+    font-family: helvetica;
+}
 
 .viewport {
     position: absolute;
@@ -222,6 +225,21 @@ max-height: none;
 
 body.debugmode .debugonly {
     display:block !important;
+}
+
+body.debugmode::after {
+    content: "Debug mode - do not release";
+    display:block !important;
+    position:absolute;
+    bottom: 0;
+    left:0;
+    right: 0;
+    text-align: center;
+    pointer-events:none;
+    color: red;
+    text-transform: uppercase;
+    font-weight: bold;
+    z-index: 100;
 }
 
 /* loading overlay */
