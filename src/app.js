@@ -711,18 +711,22 @@ Chondric.App = function(options) {
         $(document).on("tap click", "a.pop", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
+            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'pop')")
+
             app.changePage(id, "pop");
             return false;
         });
         $(document).on("tap click", "a.dlgpop", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
+            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'dlgpop')")
             app.changePage(id, "dlgpop");
             return false;
         });
         $(document).on("tap click", "a.dlgclose", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
+            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'dlgclose')")
             app.changePage(id, "dlgclose");
             return false;
         });
@@ -731,6 +735,7 @@ Chondric.App = function(options) {
         $(document).on("tap click", "a.close", function() {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
+            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'close')")
             app.changePage(id, "close");
             return false;
 
@@ -740,6 +745,7 @@ Chondric.App = function(options) {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
             if (id == "next") id = app.activeView.next;
+            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'next')")
             app.changePage(id, "next");
             return false;
 
@@ -750,6 +756,7 @@ Chondric.App = function(options) {
             var link = $(this);
             var id = link.attr("href").replace("#", "");
             if (id == "prev") id = app.activeView.prev;
+            console.warn("obsolete - use ng-tap=\"app.changePage('"+id+"', 'prev')")
             app.changePage(id, "prev");
             return false;
 
