@@ -1,46 +1,31 @@
 var app = new Chondric.App({
-    name : "__TITLE__",
+    name: "__TITLE__",
     mightBePhoneGap: true,
-    scriptGroups : [],
+    scriptGroups: [],
     angularModules: [],
     firstPageTemplate: "__FIRSTPAGETEMPLATE__",
     firstPageDataId: "",
-    contexts : {
-        "item" : {
-            childContexts : [],
-            getValueFromString : function(s) {
-                return s;
-            }
-        }
-    },
-    getDatabase : function() {
+    getDatabase: function() {
         return new ExampleDb();
     },
-    loadData : function(loadedctx, callback) {  
+    loadData: function(loadedctx, callback) {
         console.log("loading data");
-
-
-        
-        app.db.getItems( function(items) {
-            
+        app.db.getItems(function(items) {
             console.log("items loaded");
             app.items = items;
-        app.context.item(loadedctx.item);
-
-                                        callback();
+            callback();
         });
-    
+
     },
-    customInit : function(callback) {
+    customInit: function(callback) {
         callback()
     },
-    enableScroll : true
+    enableScroll: true
 })
 
 app.items = {};
 
 
 $(function() {
-app.init();
+    app.init();
 });
-
