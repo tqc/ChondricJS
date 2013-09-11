@@ -126,6 +126,13 @@ Chondric.App = function(options) {
         customInit: function(callback) {
             callback();
         },
+        updateNotificationSettings: function(deviceId, notificationsEnabled) {
+            // send details to the notification server
+            console.warn("updateNotificationSettings is not implemented");
+        },
+        notificationReceived: function(event) {
+            console.warn("notificationReceived is not implemented");
+        },
         debugMode: false
     };
 
@@ -133,7 +140,7 @@ Chondric.App = function(options) {
     $.extend(settings, options);
     app.debugMode = settings.debugMode;
     app.angularModules = settings.angularModules;
-
+    app.notificationReceived = settings.notificationReceived();
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
@@ -788,7 +795,25 @@ Chondric.App = function(options) {
             navigator.splashscreen.hide();
         }
         app.splashScreenHidden = true;
-    }
+    };
+
+    app.registerForNotifications = function() {
+        if (app.platform == "cordova" && window.plugins && window.plugins.pushNotification) {
+            window.plugins.pushNotification.register(function(result) {
+                settings.updateNotificationSettings(result, true);
+            }, function(error) {
+                console.error(error);
+                settings.updateNotificationSettings(null, false);
+                // alert(error);
+            }, {
+                badge: "true",
+                sound: "true",
+                alert: "true",
+                ecb: "app.notificationReceived"
+            });
+
+        }
+    };
 
     var loadHostSettings = function(callback) {
 
