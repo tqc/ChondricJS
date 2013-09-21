@@ -140,7 +140,7 @@ Chondric.App = function(options) {
     $.extend(settings, options);
     app.debugMode = settings.debugMode;
     app.angularModules = settings.angularModules;
-    app.notificationReceived = settings.notificationReceived();
+    app.notificationReceived = settings.notificationReceived;
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
