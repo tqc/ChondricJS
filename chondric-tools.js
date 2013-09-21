@@ -125,6 +125,7 @@ exports.update = function(appdef) {
             // add jquery to lib folder
             fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
 
+            fs.createReadStream(path.resolve(chondricdir, "lib/pure.min.css")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/pure.min.css")));
 
             if (fs.existsSync(path.resolve(appdir, "app.css"))) {
                 console.log("app.css already exists - skipping");
