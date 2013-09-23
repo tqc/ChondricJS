@@ -15,6 +15,10 @@ var settings = {
             id: "page2",
             title: "Second Page"
         },
+        {
+            id: "page3",
+            title: "Default Page"
+        }
         ],
     pageTemplate: "pagetemplate.html" // remove this if you want to create pages with the default template
 };

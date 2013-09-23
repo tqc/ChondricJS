@@ -11,6 +11,29 @@
     overflow: hidden;
 }
 
+.viewport {
+    width:1024px;
+    height:768px;
+    margin: 10px auto;
+    border: 1px solid black;
+}
+
+.viewport::after {
+    content:"Status Bar";
+    position: absolute;
+    top:0;
+    left: 0;
+    right:0;
+    height: 20px;
+    background-color: rgba(248,248,248,0.9);
+    font-size: 9pt;
+    font-weight: bold;
+    color: black;
+    z-index: 10;
+    line-height: 20px;
+    text-align: center;
+}
+
 .page {
 display: none;
 background-color: white;
@@ -554,8 +577,242 @@ margin-top: 10px;
 }
 
 
+/* IOS 7 Default styles */
+body {
+    font-family: "Helvetica Neue", Helvetica;
+    font-size: 14pt;
+    font-weight: 300;
+}
+
 
 /* Header */
+
+.navbar {
+    position: absolute;
+    top:20px;
+    left: 0;
+    right:0;
+    background-color: rgba(248,248,248,0.9);
+    height: 40px;
+    z-index: 10;
+}
+
+.navbar.nobg {
+    background-color: transparent;
+}
+
+.navbar button {
+color: rgb(21,125,251);
+background: transparent;
+border: none;
+padding: 9px;
+}
+
+.navbar button.left {
+float:left;
+}
+
+.navbar button.right {
+float:right;
+}
+
+.navbar h1 {
+    position: absolute;
+    top:0;
+    left: 0;
+    right:0;
+    margin: 0;
+    text-align: center;
+    font-size: 14pt;
+    line-height: 40px;
+    font-weight: 300;
+    z-index: -1;
+}
+
+/* tabbar */
+
+.tabbar {
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    text-align: center;
+    background-color: rgba(0,0,0,0.7);
+z-index: 10;
+}
+
+.tabbar button {
+background: transparent;
+border: none;
+color: rgb(111,111,116);
+font-family: "Helvetica Neue","Helvetica";
+font-weight: 300;
+font-size: 12pt;
+}
+
+.tabbar button.active, .tabbar button.selected {
+color: rgb(21,125,251);
+text-shadow: 0px 0px 10px rgba(255,255,255,0.5);
+}
+
+/* vertical tab bar */
+
+.tabbar.left {
+    top: 60px;
+    left:0;
+    right:auto;
+    bottom:0;
+    width:80px;
+
+}
+
+.tabbar.left button {
+margin: 10px auto;
+}
+
+
+
+/* Content sections */
+
+
+.body {
+    overflow:auto;
+    position: absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    padding: 60px 0 80px 0;
+    z-index: 1;
+}
+
+.body.hidden {
+    display: none;
+}
+
+.body.left {
+left:0;
+    width: 341px;
+}
+
+
+.tabbar.left:not(.hidden) ~ .body.left {
+    width: 315px;
+    left:80px;
+}
+
+
+.body.middle {
+    left: 0;
+    width: 341px
+}
+
+.tabbar.left:not(.hidden) ~ .body.middle {
+    width: 315px;
+    left:80px;
+}
+
+.body.left:not(.hidden) ~ .body.middle {
+    left:341px;
+}
+
+.tabbar.left:not(.hidden) ~ .body.left:not(.hidden) ~ .body.middle {
+    width: 315px;
+    left:395px;
+}
+
+
+.body.right {
+left: 0;
+right: 0;
+}
+
+.tabbar.left:not(.hidden) ~ .body.right {
+   left:80px;
+}
+.body.left:not(.hidden) ~ .body.right {
+    left:341px;
+}
+
+.body.middle:not(.hidden) ~ .body.right {
+    left:341px;
+}
+
+.body.left:not(.hidden) ~ .body.middle:not(.hidden) ~ .body.right {
+    left:682px;
+}
+
+.tabbar.left:not(.hidden) ~ .body.left:not(.hidden) ~ .body.right {
+    left:395px;
+}
+
+.tabbar.left:not(.hidden) ~ .body.middle:not(.hidden) ~ .body.right {
+    left:395px;
+}
+
+.tabbar.left:not(.hidden) ~ .body.left:not(.hidden) ~ .body.middle:not(.hidden) ~ .body.right {
+    left:710px;
+}
+
+
+
+
+
+/* Content Styles */
+
+.body {
+font-size: 12pt;
+font-weight: 100;
+}
+
+.body p {
+    margin: 10px;
+}
+
+.body h2 {
+margin: 10px;
+font-size: 14pt;
+font-weight: 100;
+}
+
+/* Collapsing sections */
+.collapsible {
+position: relative;
+}
+
+.collapsible.collapsed {
+
+}
+
+.collapsible.collapsed > :not(h2){
+display: none;
+}
+
+.collapsible::after {
+position: absolute;
+right:0;
+top:0;
+line-height: 20px;
+content: "-";
+font-size: 14pt;
+padding: 0 10px;
+}
+
+.collapsible.collapsed::after {
+content:"+";
+}
+
+/* Small form */
+
+.smallform {
+width:400px;
+margin:50px auto 0 auto;
+}
+
+.smallform h1 {
+    font-weight: 100;
+    text-align: center;
+}
 
 /* Icons */
 
@@ -566,23 +823,39 @@ margin-top: 10px;
 .icon::after {
     font-family: Helvetica;
     font-size: 20pt;
+    position: absolute;
+    padding: 0;
+    line-height: 40px;
 }
 
-
-.icon::after {
-position: absolute;
+.navbar .left.icon {
+padding-left:20px;
 }
 
-.header .leftbutton.icon::after {
+.navbar .left.icon::after {
 left:0;
+top:0;
 }
 
-.header .rightbutton.icon::after {
+.navbar .right.icon {
+padding-right:20px;
+}
+
+
+.navbar .right.icon::after {
 right: 0;
+top:0;
+}
+
+.tabbar .icon {
+padding-top:40px;
 }
 
 .tabbar .icon::after {
-
+top:0;
+left: 0;
+right: 0;
+text-align: center;
 }
 
 
@@ -591,10 +864,14 @@ right: 0;
 }
 
 .icon-leftarrow::after {
+    font-weight: bold;
     content: "<";
 }
 
 .icon-rightarrow::after {
+    font-weight: bold;
     content: ">";
 }
+
+
 

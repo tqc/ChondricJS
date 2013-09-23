@@ -3,7 +3,7 @@ var app = new Chondric.App({
     mightBePhoneGap: true,
     scriptGroups : [],
     angularModules: [],
-    firstPageTemplate: "page2",
+    firstPageTemplate: "start",
     firstPageDataId: "",
     contexts : {
         "item" : {
