@@ -570,7 +570,7 @@ body {
 
 /* Header */
 
-.header {
+.navbar {
     position: absolute;
      top:0;
     left: 0;
@@ -580,26 +580,26 @@ body {
     z-index: 10;
 }
 
-.header.nobg {
+.navbar.nobg {
     background-color: transparent;
 }
 
-.header button {
+.navbar button {
 color: rgb(21,125,251);
 background: transparent;
 border: none;
 padding: 9px;
 }
 
-.header button.left {
+.navbar button.left {
 float:left;
 }
 
-.header button.right {
+.navbar button.right {
 float:right;
 }
 
-.header h1 {
+.navbar h1 {
     position: absolute;
     top:0;
     left: 0;
@@ -811,21 +811,21 @@ margin:50px auto 0 auto;
     line-height: 40px;
 }
 
-.header .left.icon {
+.navbar .left.icon {
 padding-left:20px;
 }
 
-.header .left.icon::after {
+.navbar .left.icon::after {
 left:0;
 top:0;
 }
 
-.header .right.button.icon {
+.navbar .right.icon {
 padding-right:20px;
 }
 
 
-.header .right.button.icon::after {
+.navbar .right.icon::after {
 right: 0;
 top:0;
 }
