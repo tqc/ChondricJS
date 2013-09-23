@@ -17,7 +17,7 @@ app.createViewTemplate({
         if (!this.model) this.model = this.getDefaultModel();
         var m = this.model;
 
-        this.prev = "start";
+     //   this.prev = "start";
         this.next = "";
 
         callback();

@@ -17,8 +17,8 @@ app.createViewTemplate({
         if (!this.model) this.model = this.getDefaultModel();
         var m = this.model;
 
-        this.prev = "";
-        this.next = "page2";
+     //   this.prev = "";
+     //   this.next = "page2";
 
         callback();
     },

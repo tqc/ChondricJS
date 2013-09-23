@@ -3,7 +3,7 @@ var app = new Chondric.App({
     mightBePhoneGap: true,
     scriptGroups : [],
     angularModules: [],
-    firstPageTemplate: "start",
+    firstPageTemplate: "page2",
     firstPageDataId: "",
     contexts : {
         "item" : {
@@ -16,20 +16,20 @@ var app = new Chondric.App({
     getDatabase : function() {
         return new ExampleDb();
     },
-    loadData : function(loadedctx, callback) {  
+    loadData : function(loadedctx, callback) {
         console.log("loading data");
 
 
-        
+
         app.db.getItems( function(items) {
-            
+
             console.log("items loaded");
             app.items = items;
         app.context.item(loadedctx.item);
 
                                         callback();
         });
-    
+
     },
     customInit : function(callback) {
         callback()

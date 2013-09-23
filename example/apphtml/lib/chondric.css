@@ -580,7 +580,9 @@ body {
     z-index: 10;
 }
 
-
+.header.nobg {
+    background-color: transparent;
+}
 
 .header button {
 color: rgb(21,125,251);
@@ -607,6 +609,7 @@ float:right;
     font-size: 14pt;
     line-height: 40px;
     font-weight: 300;
+    z-index: -1;
 }
 
 /* tabbar */
@@ -782,6 +785,17 @@ padding: 0 10px;
 content:"+";
 }
 
+/* Small form */
+
+.smallform {
+width:400px;
+margin:50px auto 0 auto;
+}
+
+.smallform h1 {
+    font-weight: 100;
+    text-align: center;
+}
 
 /* Icons */
 
