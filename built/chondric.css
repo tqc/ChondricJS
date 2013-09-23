@@ -194,7 +194,7 @@ max-height: none;
 
 .sidebar .pageName {
 }
-   /* 
+   /*
 .hasupsidebar>.ui-header, .hasupsidebar>.ui-content {
     margin-top:15px;
 }
@@ -282,7 +282,7 @@ margin-top: 0.12em;
 }
 
 .ui-header .ui-btn-inner {
-    border: none;   
+    border: none;
 }
 
 
@@ -555,4 +555,46 @@ margin-top: 10px;
 
 
 
+/* Header */
+
+/* Icons */
+
+.icon {
+    position: relative;
+}
+
+.icon::after {
+    font-family: Helvetica;
+    font-size: 20pt;
+}
+
+
+.icon::after {
+position: absolute;
+}
+
+.header .leftbutton.icon::after {
+left:0;
+}
+
+.header .rightbutton.icon::after {
+right: 0;
+}
+
+.tabbar .icon::after {
+
+}
+
+
+.icon::after {
+    content: "X";
+}
+
+.icon-leftarrow::after {
+    content: "<";
+}
+
+.icon-rightarrow::after {
+    content: ">";
+}
 
