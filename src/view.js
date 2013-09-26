@@ -43,7 +43,7 @@ $.extend(Chondric.View.prototype, {
 
     // called to update the view with new data - eg download status
     // may do nothing if the view is not loaded.
-    // if the view is loaded but not visible, the model is updated so that the change 
+    // if the view is loaded but not visible, the model is updated so that the change
     // can be applied when the view is shown.
     updateData: function(d) {
 
@@ -103,8 +103,19 @@ $.extend(Chondric.View.prototype, {
 
         }
     },
+unload: function() {
+      var view = this;
+            if (view.element) view.element.remove();
+            delete view.element;
 
-    load: function() {
+      if (view.scope) {
+        view.scope.$destroy();
+        delete(view.scope);
+      }
+
+},
+
+    getViewTemplate: function(callback) {
         var view = this;
 
         // todo: load via ajax
@@ -126,25 +137,65 @@ $.extend(Chondric.View.prototype, {
                 content = data;
             }
 
+            var ctrl = pe.attr("ng-controller") || html.attr("ng-controller");
+
+            callback(content, ctrl);
+        });
+
+    },
+    load: function() {
+        var view = this;
+
+        view.getViewTemplate(function(content, controllerName) {
+
+
+
+        var ind = view.id.indexOf("_");
+        var templateId = view.id.substr(0, ind) || view.id;
+
+        controllerName = controllerName || view.controllerName || templateId+"Ctrl";
+
+        var controller = null;
+
+        // first see if the controller already exists in the app module
+        if (!controller) {
+            controller = app.angularAppModule.controller(controllerName);
+        }
+
+        view.initAngular();
+
+        // look for a function provided as view.controller
+        if (!controller && view.controller) {
+            controller = app.angularAppModule.controller(controllerName, view.controller);
+        }
+
+        // look for a controller in view.controllers array
+        if (!controller && view.controllers && view.controllers[controllerName]) {
+            controller = app.angularAppModule.controller(controllerName, view.controllers[controllerName]);
+        }
+
+
+
+
+            // todo: add data loading view to template content
+
             view.element.html(content);
-            if (view.useAngular) {
-                var ctrl = pe.attr("ng-controller") || html.attr("ng-controller");
-                if (ctrl) view.element.attr("ng-controller", ctrl);
 
-                console.log("Init angular");
 
-                view.angularModule = angular.module("page_" + view.id, []);
 
                 view.initAngular();
 
-                for (var k in view.controllers) {
-                    view.angularModule.controller(k, view.controllers[k]);
-                }
-                angular.bootstrap(view.element[0], ["page_" + view.id, "chondric"].concat(app.angularModules || [], view.angularModules || []));
+                view.scope = app.rootScope.$new();
+
+
+    view.element.children().data('$ngControllerController',controller);
+    app.compile( view.element.contents() )( view.scope );
+
+//                angular.bootstrap(view.element[0], ["page_" + view.id, "chondric"].concat(app.angularModules || [], view.angularModules || []));
 
 
 
-            }
+
 
 
             view.updateViewBackground();

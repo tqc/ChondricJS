@@ -145,7 +145,7 @@ Chondric.App = function(options) {
     app.notificationReceived = settings.notificationReceived;
 
 
-    app.angularAppModule = angular.module("AppModule", app.angularModules);
+    app.angularAppModule = angular.module("AppModule", ["chondric"].concat(app.angularModules));
 
 
 
@@ -386,8 +386,9 @@ Chondric.App = function(options) {
             if (lastPage && lastPage.id == k) continue;
             if (preloads.indexOf(k) >= 0) continue;
             var v = app.Views[k];
-            if (v.element) v.element.remove();
-            delete v.element;
+            if (v) {
+                v.unload();
+            }
             delete app.Views[k];
         }
 
@@ -860,8 +861,9 @@ Chondric.App = function(options) {
     };
 
 
-    app.angularAppModule.run(["$rootScope", function($rootScope)
+    app.angularAppModule.run(["$rootScope", "$compile", function($rootScope, $compile)
 {
+    app.compile = $compile;
     app.rootScope = $rootScope;
     console.log("angular app module run");
     init();
