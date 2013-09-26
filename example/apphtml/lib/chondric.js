@@ -17,6 +17,7 @@ Chondric = {};
 
 Chondric.App = function(options) {
     var app = this;
+
     this.ready = false;
     this.autohidesplashscreen = false;
     this.Pages = {};
@@ -118,6 +119,7 @@ Chondric.App = function(options) {
         name: "Base App",
         mightBePhoneGap: true,
         scriptGroups: [],
+        angularModules: [],
         contexts: {},
         getDatabase: null,
         loadData: function(loadedctx, callback) {
@@ -141,6 +143,12 @@ Chondric.App = function(options) {
     app.debugMode = settings.debugMode;
     app.angularModules = settings.angularModules;
     app.notificationReceived = settings.notificationReceived;
+
+
+    app.angularAppModule = angular.module("AppModule", app.angularModules);
+
+
+
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
@@ -167,60 +175,7 @@ Chondric.App = function(options) {
         }
     }
 
-
-    app.context = {};
-    app.contextValues = {};
-    app.contextValueStrings = {};
-
-    // set up context functions
-    for (var cn0 in settings.contexts) {
-        function newscope(cn1) {
-            var cn = cn1;
-            var ctx = settings.contexts[cn];
-            app.context[cn] = function(val, ctxcallback) {
-                // when called with no parameters, return the value
-                if (val === undefined && !ctxcallback) return app.contextValues[cn];
-
-                // if a string is provided, set the context
-                if (typeof(val) == "string") {
-                    if (!app.contextValueStrings[cn] || val != app.contextValueStrings[cn]) {
-                        // value is changed
-                        app.contextValueStrings[cn] = val;
-                        if (ctx.getValueFromString) {
-                            app.contextValues[cn] = ctx.getValueFromString(val);
-                        } else {
-                            app.contextValues[cn] = val;
-                        }
-                        if (ctx.childContexts) {
-                            for (var i = 0; i < ctx.childContexts.length; i++) {
-                                app.context[ctx.childContexts[i]]("");
-                            }
-                        }
-                        // TODO: if not in initial load, save context to localstorage here.
-                    }
-
-                    localStorage["appcontext_" + settings.name] = JSON.stringify(app.contextValueStrings);
-                }
-
-                if (ctxcallback) ctxcallback(app.contextValues[cn])
-            }
-        }
-
-        newscope(cn0);
-    }
-
     function attachEvents(callback) {
-        /*
-        // disable default scrolling
-        if(!settings.enableScroll) {
-            $(function() {
-                $("body")[0].ontouchmove = function(event) {
-                    event.preventDefault();
-                    return false;
-                };
-            });
-        }
-*/
         $('div[data-role="page"], div[data-role="dialog"]').live('pagecreate', PageCreated);
 
         $('div[data-role="dialog"]').live('pagebeforeshow', function(e, ui) {
@@ -835,11 +790,17 @@ Chondric.App = function(options) {
         callback;
     };
 
-    this.init = function(callback) {
+    app.init = function(callback) {
+        console.warn("no longer need to call app.init manually")
+    };
+
+    var init = function(callback) {
         // load required scripts
         console.log("beginning app initialization");
 
         var initInternal = function() {
+            app.rootScope.platform = app.platform;
+            app.rootScope.$apply();
             console.log("begin internal init");
             //  alert("running init")
             loadScripts(0, function() {
@@ -897,6 +858,25 @@ Chondric.App = function(options) {
         }
 
     };
+
+
+    app.angularAppModule.run(["$rootScope", function($rootScope)
+{
+    app.rootScope = $rootScope;
+    console.log("angular app module run");
+    init();
+}]);
+
+    // settings and all functions are loaded, now initialize angular
+    // This won't do much, but lets us use angular on the loading page
+    // for example to display root scope values as they are loaded
+
+ angular.element(document).ready(function() {
+    angular.bootstrap(document, ["AppModule"]);
+       });
+
+
+
     return this;
 };
 
