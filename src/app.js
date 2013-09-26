@@ -64,6 +64,7 @@ Chondric.App = function(options) {
             if (k == "baseView") continue;
             else if (k == "templateId") continue;
             else if (k == "templateFile") continue;
+            else if (k == "controller") templateSettings[k] = v;
             else if (typeof v == "function") functions[k] = v;
             else templateSettings[k] = v;
         }
@@ -145,7 +146,12 @@ Chondric.App = function(options) {
     app.notificationReceived = settings.notificationReceived;
 
 
-    app.angularAppModule = angular.module("AppModule", ["chondric"].concat(app.angularModules));
+    app.angularAppModule = angular.module(
+        "AppModule",
+        ["chondric"].concat(app.angularModules),
+        function($controllerProvider) {
+            app.controllerProvider = $controllerProvider;
+        });
 
 
 
@@ -360,9 +366,19 @@ Chondric.App = function(options) {
         if (view) return view;
         var ind = viewId.indexOf("_");
         var templateId = viewId.substr(0, ind) || viewId;
-        view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-            id: viewId
-        });
+
+        if (!app.ViewTemplates[templateId]) {
+            // template doesn't exist. possibly this is a scriptless page so try creating a default template
+            app.createViewTemplate({
+                templateId: templateId
+                });
+        }
+
+            view = app.Views[viewId] = new app.ViewTemplates[templateId]({
+                id: viewId
+                });
+
+
 
         return view;
 
@@ -861,9 +877,10 @@ Chondric.App = function(options) {
     };
 
 
-    app.angularAppModule.run(["$rootScope", "$compile", function($rootScope, $compile)
+    app.angularAppModule.run(["$rootScope", "$compile", "$controller", function($rootScope, $compile, $controller)
 {
     app.compile = $compile;
+    app.$controller = $controller;
     app.rootScope = $rootScope;
     console.log("angular app module run");
     init();

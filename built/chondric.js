@@ -17,6 +17,7 @@ Chondric = {};
 
 Chondric.App = function(options) {
     var app = this;
+
     this.ready = false;
     this.autohidesplashscreen = false;
     this.Pages = {};
@@ -63,6 +64,7 @@ Chondric.App = function(options) {
             if (k == "baseView") continue;
             else if (k == "templateId") continue;
             else if (k == "templateFile") continue;
+            else if (k == "controller") templateSettings[k] = v;
             else if (typeof v == "function") functions[k] = v;
             else templateSettings[k] = v;
         }
@@ -118,6 +120,7 @@ Chondric.App = function(options) {
         name: "Base App",
         mightBePhoneGap: true,
         scriptGroups: [],
+        angularModules: [],
         contexts: {},
         getDatabase: null,
         loadData: function(loadedctx, callback) {
@@ -141,6 +144,17 @@ Chondric.App = function(options) {
     app.debugMode = settings.debugMode;
     app.angularModules = settings.angularModules;
     app.notificationReceived = settings.notificationReceived;
+
+
+    app.angularAppModule = angular.module(
+        "AppModule",
+        ["chondric"].concat(app.angularModules),
+        function($controllerProvider) {
+            app.controllerProvider = $controllerProvider;
+        });
+
+
+
 
     function loadScripts(scriptGroupNum, callback) {
         console.log("starting loadscripts");
@@ -167,60 +181,7 @@ Chondric.App = function(options) {
         }
     }
 
-
-    app.context = {};
-    app.contextValues = {};
-    app.contextValueStrings = {};
-
-    // set up context functions
-    for (var cn0 in settings.contexts) {
-        function newscope(cn1) {
-            var cn = cn1;
-            var ctx = settings.contexts[cn];
-            app.context[cn] = function(val, ctxcallback) {
-                // when called with no parameters, return the value
-                if (val === undefined && !ctxcallback) return app.contextValues[cn];
-
-                // if a string is provided, set the context
-                if (typeof(val) == "string") {
-                    if (!app.contextValueStrings[cn] || val != app.contextValueStrings[cn]) {
-                        // value is changed
-                        app.contextValueStrings[cn] = val;
-                        if (ctx.getValueFromString) {
-                            app.contextValues[cn] = ctx.getValueFromString(val);
-                        } else {
-                            app.contextValues[cn] = val;
-                        }
-                        if (ctx.childContexts) {
-                            for (var i = 0; i < ctx.childContexts.length; i++) {
-                                app.context[ctx.childContexts[i]]("");
-                            }
-                        }
-                        // TODO: if not in initial load, save context to localstorage here.
-                    }
-
-                    localStorage["appcontext_" + settings.name] = JSON.stringify(app.contextValueStrings);
-                }
-
-                if (ctxcallback) ctxcallback(app.contextValues[cn])
-            }
-        }
-
-        newscope(cn0);
-    }
-
     function attachEvents(callback) {
-        /*
-        // disable default scrolling
-        if(!settings.enableScroll) {
-            $(function() {
-                $("body")[0].ontouchmove = function(event) {
-                    event.preventDefault();
-                    return false;
-                };
-            });
-        }
-*/
         $('div[data-role="page"], div[data-role="dialog"]').live('pagecreate', PageCreated);
 
         $('div[data-role="dialog"]').live('pagebeforeshow', function(e, ui) {
@@ -405,9 +366,19 @@ Chondric.App = function(options) {
         if (view) return view;
         var ind = viewId.indexOf("_");
         var templateId = viewId.substr(0, ind) || viewId;
-        view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-            id: viewId
-        });
+
+        if (!app.ViewTemplates[templateId]) {
+            // template doesn't exist. possibly this is a scriptless page so try creating a default template
+            app.createViewTemplate({
+                templateId: templateId
+                });
+        }
+
+            view = app.Views[viewId] = new app.ViewTemplates[templateId]({
+                id: viewId
+                });
+
+
 
         return view;
 
@@ -431,8 +402,9 @@ Chondric.App = function(options) {
             if (lastPage && lastPage.id == k) continue;
             if (preloads.indexOf(k) >= 0) continue;
             var v = app.Views[k];
-            if (v.element) v.element.remove();
-            delete v.element;
+            if (v) {
+                v.unload();
+            }
             delete app.Views[k];
         }
 
@@ -835,11 +807,17 @@ Chondric.App = function(options) {
         callback;
     };
 
-    this.init = function(callback) {
+    app.init = function(callback) {
+        console.warn("no longer need to call app.init manually")
+    };
+
+    var init = function(callback) {
         // load required scripts
         console.log("beginning app initialization");
 
         var initInternal = function() {
+            app.rootScope.platform = app.platform;
+            app.rootScope.$apply();
             console.log("begin internal init");
             //  alert("running init")
             loadScripts(0, function() {
@@ -897,6 +875,27 @@ Chondric.App = function(options) {
         }
 
     };
+
+
+    app.angularAppModule.run(["$rootScope", "$compile", "$controller", function($rootScope, $compile, $controller)
+{
+    app.compile = $compile;
+    app.$controller = $controller;
+    app.rootScope = $rootScope;
+    console.log("angular app module run");
+    init();
+}]);
+
+    // settings and all functions are loaded, now initialize angular
+    // This won't do much, but lets us use angular on the loading page
+    // for example to display root scope values as they are loaded
+
+ angular.element(document).ready(function() {
+    angular.bootstrap(document, ["AppModule"]);
+       });
+
+
+
     return this;
 };
 
@@ -945,7 +944,7 @@ $.extend(Chondric.View.prototype, {
 
     // called to update the view with new data - eg download status
     // may do nothing if the view is not loaded.
-    // if the view is loaded but not visible, the model is updated so that the change 
+    // if the view is loaded but not visible, the model is updated so that the change
     // can be applied when the view is shown.
     updateData: function(d) {
 
@@ -1005,8 +1004,19 @@ $.extend(Chondric.View.prototype, {
 
         }
     },
+unload: function() {
+      var view = this;
+            if (view.element) view.element.remove();
+            delete view.element;
 
-    load: function() {
+      if (view.scope) {
+        view.scope.$destroy();
+        delete(view.scope);
+      }
+
+},
+
+    getViewTemplate: function(callback) {
         var view = this;
 
         // todo: load via ajax
@@ -1028,26 +1038,56 @@ $.extend(Chondric.View.prototype, {
                 content = data;
             }
 
+            var ctrl = pe.attr("ng-controller") || html.attr("ng-controller");
+
+            callback(content, ctrl);
+        });
+
+    },
+    load: function() {
+        var view = this;
+
+        view.getViewTemplate(function(content, controllerName) {
+
+
+
+        var ind = view.id.indexOf("_");
+        var templateId = view.id.substr(0, ind) || view.id;
+
+        controllerName = controllerName || view.controllerName || templateId+"Ctrl";
+
+        var controller = null;
+
+        view.initAngular();
+
+        if (!controller && view.controller) {
+            // look for a function provided as view.controller
+            app.controllerProvider.register(controllerName, view.controller);
+        }
+        else if (!controller && view.controllers && view.controllers[controllerName]) {
+            // look for a controller in view.controllers array
+            app.controllerProvider.register(controllerName, view.controllers[controllerName]);
+        } else {
+            // no defined controller - don't use one
+            controllerName = null;
+        }
+
+
+
+
+            // todo: add data loading view to template content
+
             view.element.html(content);
-            if (view.useAngular) {
-                var ctrl = pe.attr("ng-controller") || html.attr("ng-controller");
-                if (ctrl) view.element.attr("ng-controller", ctrl);
-
-                console.log("Init angular");
-
-                view.angularModule = angular.module("page_" + view.id, []);
-
-                view.initAngular();
-
-                for (var k in view.controllers) {
-                    view.angularModule.controller(k, view.controllers[k]);
-                }
-                angular.bootstrap(view.element[0], ["page_" + view.id, "chondric"].concat(app.angularModules || [], view.angularModules || []));
+            if (controllerName) view.element.attr("ng-controller", controllerName);
 
 
+                view.scope = app.rootScope.$new();
 
-            }
 
+    app.compile( view.element)( view.scope );
+
+
+view.scope.$apply();
 
             view.updateViewBackground();
             view.attachEvents();

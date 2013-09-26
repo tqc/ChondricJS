@@ -10,6 +10,11 @@ var settings = {
         {
             id: "start",
             title: "Start"
+        },
+        {
+            id: "staticpage",
+            title: "Scriptless Content Page",
+            scriptless: true;
         }
         ],
     pageTemplate: "pagetemplate.html" // remove this if you want to create pages with the default template
@@ -18,4 +23,4 @@ var settings = {
 chondric.update(settings);
 
 
-    
+

@@ -64,6 +64,7 @@ Chondric.App = function(options) {
             if (k == "baseView") continue;
             else if (k == "templateId") continue;
             else if (k == "templateFile") continue;
+            else if (k == "controller") templateSettings[k] = v;
             else if (typeof v == "function") functions[k] = v;
             else templateSettings[k] = v;
         }
@@ -145,7 +146,12 @@ Chondric.App = function(options) {
     app.notificationReceived = settings.notificationReceived;
 
 
-    app.angularAppModule = angular.module("AppModule", ["chondric"].concat(app.angularModules));
+    app.angularAppModule = angular.module(
+        "AppModule",
+        ["chondric"].concat(app.angularModules),
+        function($controllerProvider) {
+            app.controllerProvider = $controllerProvider;
+        });
 
 
 
@@ -360,9 +366,19 @@ Chondric.App = function(options) {
         if (view) return view;
         var ind = viewId.indexOf("_");
         var templateId = viewId.substr(0, ind) || viewId;
-        view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-            id: viewId
-        });
+
+        if (!app.ViewTemplates[templateId]) {
+            // template doesn't exist. possibly this is a scriptless page so try creating a default template
+            app.createViewTemplate({
+                templateId: templateId
+                });
+        }
+
+            view = app.Views[viewId] = new app.ViewTemplates[templateId]({
+                id: viewId
+                });
+
+
 
         return view;
 
@@ -861,9 +877,10 @@ Chondric.App = function(options) {
     };
 
 
-    app.angularAppModule.run(["$rootScope", "$compile", function($rootScope, $compile)
+    app.angularAppModule.run(["$rootScope", "$compile", "$controller", function($rootScope, $compile, $controller)
 {
     app.compile = $compile;
+    app.$controller = $controller;
     app.rootScope = $rootScope;
     console.log("angular app module run");
     init();
@@ -1041,21 +1058,18 @@ unload: function() {
 
         var controller = null;
 
-        // first see if the controller already exists in the app module
-        if (!controller) {
-            controller = app.angularAppModule.controller(controllerName);
-        }
-
         view.initAngular();
 
-        // look for a function provided as view.controller
         if (!controller && view.controller) {
-            controller = app.angularAppModule.controller(controllerName, view.controller);
+            // look for a function provided as view.controller
+            app.controllerProvider.register(controllerName, view.controller);
         }
-
-        // look for a controller in view.controllers array
-        if (!controller && view.controllers && view.controllers[controllerName]) {
-            controller = app.angularAppModule.controller(controllerName, view.controllers[controllerName]);
+        else if (!controller && view.controllers && view.controllers[controllerName]) {
+            // look for a controller in view.controllers array
+            app.controllerProvider.register(controllerName, view.controllers[controllerName]);
+        } else {
+            // no defined controller - don't use one
+            controllerName = null;
         }
 
 
@@ -1064,23 +1078,16 @@ unload: function() {
             // todo: add data loading view to template content
 
             view.element.html(content);
+            if (controllerName) view.element.attr("ng-controller", controllerName);
 
-
-
-                view.initAngular();
 
                 view.scope = app.rootScope.$new();
 
 
-    view.element.children().data('$ngControllerController',controller);
-    app.compile( view.element.contents() )( view.scope );
-
-//                angular.bootstrap(view.element[0], ["page_" + view.id, "chondric"].concat(app.angularModules || [], view.angularModules || []));
+    app.compile( view.element)( view.scope );
 
 
-
-
-
+view.scope.$apply();
 
             view.updateViewBackground();
             view.attachEvents();

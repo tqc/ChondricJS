@@ -167,13 +167,14 @@ exports.update = function(appdef) {
                                         var jspath = path.resolve(appdir, appdef.pages[i].id + ".js");
                                         var htmlpath = path.resolve(appdir, appdef.pages[i].id + ".html");
                                         var template = pagejstemplate;
+                                        var scriptless = appdef.pages[i].scriptless;
                                         var useAngular = pagedef.useAngular || (appdef.useAngular && pagedef.useAngular !== false);
                                         var angularController = pagedef.angularController = pagedef.angularController || (pagedef.id + "Ctrl");
                                         if (useAngular) template = angularpagejstemplate;
 
                                         if (fs.existsSync(jspath)) {
                                             console.log(appdef.pages[i].id + ".js already exists - skipping");
-                                        } else {
+                                        } else if(!scriptless) {
                                             var pagejs = standardSubstitution(template, appdef, pagedef);
 
                                             fs.writeFile(jspath, pagejs);
@@ -187,9 +188,9 @@ exports.update = function(appdef) {
                                                 .replace(/ng-controller="__ANGULARCONTROLLER__"/g, useAngular ? "ng-controller=\"" + angularController + "\"" : "");
                                             fs.writeFile(htmlpath, pagehtml);
                                         }
-
-                                        scriptrefs += "<script src=\"" + appdef.pages[i].id + ".js\"></script>\n";
-
+                                        if (!scriptless) {
+                                            scriptrefs += "<script src=\"" + appdef.pages[i].id + ".js\"></script>\n";
+                                        }
                                     }
 
                                     if (fs.existsSync(path.resolve(appdir, "app.js"))) {
