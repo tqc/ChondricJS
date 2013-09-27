@@ -5,14 +5,6 @@ var app = new Chondric.App({
     angularModules: [],
     firstPageTemplate: "start",
     firstPageDataId: "",
-    contexts : {
-        "item" : {
-            childContexts : [],
-            getValueFromString : function(s) {
-                return s;
-            }
-        }
-    },
     getDatabase : function() {
         return new ExampleDb();
     },
@@ -25,7 +17,6 @@ var app = new Chondric.App({
 
             console.log("items loaded");
             app.items = items;
-        app.context.item(loadedctx.item);
 
                                         callback();
         });
