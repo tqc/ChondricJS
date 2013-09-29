@@ -103,17 +103,17 @@ $.extend(Chondric.View.prototype, {
 
         }
     },
-unload: function() {
-      var view = this;
-            if (view.element) view.element.remove();
-            delete view.element;
+    unload: function() {
+        var view = this;
+        if (view.element) view.element.remove();
+        delete view.element;
 
-      if (view.scope) {
-        view.scope.$destroy();
-        delete(view.scope);
-      }
+        if (view.scope) {
+            view.scope.$destroy();
+            delete(view.scope);
+        }
 
-},
+    },
 
     getViewTemplate: function(callback) {
         var view = this;
@@ -150,27 +150,25 @@ unload: function() {
 
 
 
-        var ind = view.id.indexOf("_");
-        var templateId = view.id.substr(0, ind) || view.id;
+            var ind = view.id.indexOf("_");
+            var templateId = view.id.substr(0, ind) || view.id;
 
-        controllerName = controllerName || view.controllerName || templateId+"Ctrl";
+            controllerName = controllerName || view.controllerName || templateId + "Ctrl";
 
-        var controller = null;
+            var controller = null;
 
-        view.initAngular();
+            view.initAngular();
 
-        if (!controller && view.controller) {
-            // look for a function provided as view.controller
-            app.controllerProvider.register(controllerName, view.controller);
-        }
-        else if (!controller && view.controllers && view.controllers[controllerName]) {
-            // look for a controller in view.controllers array
-            app.controllerProvider.register(controllerName, view.controllers[controllerName]);
-        } else {
-            // no defined controller - don't use one
-            controllerName = null;
-        }
-
+            if (!controller && view.controller) {
+                // look for a function provided as view.controller
+                app.controllerProvider.register(controllerName, view.controller);
+            } else if (!controller && view.controllers && view.controllers[controllerName]) {
+                // look for a controller in view.controllers array
+                app.controllerProvider.register(controllerName, view.controllers[controllerName]);
+            } else {
+                // no defined controller - don't use one
+                controllerName = null;
+            }
 
 
 
@@ -180,13 +178,23 @@ unload: function() {
             if (controllerName) view.element.attr("ng-controller", controllerName);
 
 
-                view.scope = app.rootScope.$new();
+            view.scope = app.rootScope.$new();
 
 
-    app.compile( view.element)( view.scope );
+            app.compile(view.element)(view.scope);
 
 
-view.scope.$apply();
+            if (view.isActivating) {
+                view.activating();
+                view.isActivating = false;
+            }
+
+            if (view.isActivated) {
+                view.activated();
+                view.isActivated = false;
+            }
+
+            view.scope.$apply();
 
             view.updateViewBackground();
             view.attachEvents();

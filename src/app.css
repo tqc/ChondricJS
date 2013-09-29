@@ -611,24 +611,27 @@ margin:50px auto 0 auto;
     line-height: 40px;
 }
 
-.navbar .left.icon {
+.navbar .icon {
 padding-left:30px;
 }
 
-.navbar .left.icon::after {
+.navbar .icon::after {
 left:0;
 top:0;
 }
 
-.navbar .right.icon {
+
+.navbar .right.icon-rightarrow {
+padding-left: 0;
 padding-right:30px;
 }
 
 
-.navbar .right.icon::after {
+.navbar .right.icon-rightarrow::after {
 right: 0;
 top:0;
 }
+
 
 .tabbar .icon {
 padding-top:40px;

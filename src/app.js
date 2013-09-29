@@ -147,12 +147,10 @@ Chondric.App = function(options) {
 
 
     app.angularAppModule = angular.module(
-        "AppModule",
-        ["chondric"].concat(app.angularModules),
+        "AppModule", ["chondric"].concat(app.angularModules),
         function($controllerProvider) {
             app.controllerProvider = $controllerProvider;
         });
-
 
 
 
@@ -371,12 +369,12 @@ Chondric.App = function(options) {
             // template doesn't exist. possibly this is a scriptless page so try creating a default template
             app.createViewTemplate({
                 templateId: templateId
-                });
+            });
         }
 
-            view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-                id: viewId
-                });
+        view = app.Views[viewId] = new app.ViewTemplates[templateId]({
+            id: viewId
+        });
 
 
 
@@ -458,7 +456,14 @@ Chondric.App = function(options) {
             nextPage.ensureLoaded(inPageClass, function() {
                 window.setTimeout(function() {
                     history.pushState({}, null, "#" + nextPageId);
-                    nextPage.activating(thisPage);
+                    if (nextPage.loading) {
+                        nextPage.isActivating = true;
+                    } else {
+                        nextPage.activating(thisPage);
+                        if (nextPage.scope) {
+                            nextPage.scope.$apply();
+                        }
+                    }
                 }, 0);
 
                 thisPage.element.one("webkitTransitionEnd", function() {
@@ -466,7 +471,16 @@ Chondric.App = function(options) {
                         app.transitioning = false;
                         app.transitioningTo = undefined;
                         if (!app.splashScreenHidden) app.hideSplashScreen();
-                        nextPage.activated();
+
+                        if (nextPage.loading) {
+                            nextPage.isActivated = true;
+                        } else {
+                            nextPage.activated();
+                            if (nextPage.scope) {
+                                nextPage.scope.$apply();
+                            }
+                        }
+
                         app.queuePageCleanup();
                     }, 0);
                 });
@@ -877,22 +891,23 @@ Chondric.App = function(options) {
     };
 
 
-    app.angularAppModule.run(["$rootScope", "$compile", "$controller", function($rootScope, $compile, $controller)
-{
-    app.compile = $compile;
-    app.$controller = $controller;
-    app.rootScope = $rootScope;
-    console.log("angular app module run");
-    init();
-}]);
+    app.angularAppModule.run(["$rootScope", "$compile", "$controller",
+        function($rootScope, $compile, $controller) {
+            app.compile = $compile;
+            app.$controller = $controller;
+            app.rootScope = $rootScope;
+            console.log("angular app module run");
+            init();
+        }
+    ]);
 
     // settings and all functions are loaded, now initialize angular
     // This won't do much, but lets us use angular on the loading page
     // for example to display root scope values as they are loaded
 
- angular.element(document).ready(function() {
-    angular.bootstrap(document, ["AppModule"]);
-       });
+    angular.element(document).ready(function() {
+        angular.bootstrap(document, ["AppModule"]);
+    });
 
 
 
