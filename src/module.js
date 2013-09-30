@@ -98,8 +98,6 @@ var touchend = function(e) {
     height: h,
     overlayStatusBar: overlayStatusBar
   };
-  scope.$apply();
-
     };
   }
 }

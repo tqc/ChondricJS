@@ -836,8 +836,9 @@ Chondric.App = function(options) {
             var sizeChanged = function() {
             // on ios 7 we need to leave space for the status bar
             // for now just check if height matches the full screen
-            var w = $(".viewport").width();
-            var h = $(".viewport").height();
+            var w = $(window).width();
+            var h = $(window).height();
+            console.log(w+","+h);
             if(h == 1024 || h == 768 || h == 320 || h==568 || h == 480) {
                $(".viewport").addClass("hasstatusbar");
                 } else {
@@ -846,11 +847,13 @@ Chondric.App = function(options) {
 
             // for phone screens a multicolumn layout doesn't make sense
             if (w < 768 && app.rootScope.maxColumns != 1) {
+                console.log("setting singlecolumn")
                 app.rootScope.maxColumns = 1;
                $(".viewport").addClass("singlecolumn");
                app.rootScope.$apply();
             }
-            else if (app.rootScope.maxColumns != 3) {
+            else if (w >= 768 && app.rootScope.maxColumns != 3) {
+                console.log("setting multicolumn")
                 app.rootScope.maxColumns = 3;
                $(".viewport").removeClass("singlecolumn");
                app.rootScope.$apply();
