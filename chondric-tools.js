@@ -109,6 +109,7 @@ exports.update = function(appdef) {
 
     updateIfMissing("apphtml/splash.html", "splash.html", standardSubstitution);
     updateIfMissing("apphtml/icon.html", "icon.html", standardSubstitution);
+    updateIfMissing("apphtml/preview.html", "preview.html", standardSubstitution);
 
 
     if (appdef.pageTemplate) {

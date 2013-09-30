@@ -832,6 +832,35 @@ Chondric.App = function(options) {
         var initInternal = function() {
             app.rootScope.platform = app.platform;
             app.rootScope.$apply();
+
+            var sizeChanged = function() {
+            // on ios 7 we need to leave space for the status bar
+            // for now just check if height matches the full screen
+            var w = $(".viewport").width();
+            var h = $(".viewport").height();
+            if(h == 1024 || h == 768 || h == 320 || h==568 || h == 480) {
+               $(".viewport").addClass("hasstatusbar");
+                } else {
+               $(".viewport").removeClass("hasstatusbar");
+            }
+
+            // for phone screens a multicolumn layout doesn't make sense
+            if (w < 768 && app.rootScope.maxColumns != 1) {
+                app.rootScope.maxColumns = 1;
+               $(".viewport").addClass("singlecolumn");
+               app.rootScope.$apply();
+            }
+            else if (app.rootScope.maxColumns != 3) {
+                app.rootScope.maxColumns = 3;
+               $(".viewport").removeClass("singlecolumn");
+               app.rootScope.$apply();
+            }
+
+
+            }
+            sizeChanged();
+            $(window).on("resize", sizeChanged);
+
             console.log("begin internal init");
             //  alert("running init")
             loadScripts(0, function() {
@@ -1637,11 +1666,11 @@ var touchend = function(e) {
 
 
       element.removeClass('active');
-      if (tapping) {    
-        tapping = false;    
+      if (tapping) {
+        tapping = false;
         scope.$apply(attrs['ngTap'], element);
       }
-      clicking = false;      
+      clicking = false;
    //   touching = false;
       tapping = false;
       e.preventDefault();
@@ -1674,6 +1703,44 @@ var touchend = function(e) {
       element.bind('tap click', function(e) {
       });
   };
+})
+
+.directive("previewcontrols", function() {
+
+  return {
+    restrict: "E",
+    template: "<div id='previewcontrols'>"
+    +"<button ng-tap='updatePreviewSettings(1024,768, true)'>iPad landscape</button>"
+    +"<button ng-tap='updatePreviewSettings(768, 1024, true)'>iPad portrait</button>"
+    +"<button ng-tap='updatePreviewSettings(568,320, true)'>iPhone5 landscape</button>"
+    +"<button ng-tap='updatePreviewSettings(320, 568, true)'>iPhone5 portrait</button>"
+    +"<button ng-tap='updatePreviewSettings(1024,748, false)'>iPad landscape iOS6</button>"
+    +"<button ng-tap='updatePreviewSettings(768, 1004, false)'>iPad portrait iOS6</button>"
+    +"<button ng-tap='updatePreviewSettings(568,300, false)'>iPhone5 landscape iOS6</button>"
+    +"<button ng-tap='updatePreviewSettings(320,548, false)'>iPhone5 portrait iOS6</button>"
+    +"<button ng-tap='reloadPreview()'>Reload</button>"
+
+    +"</div>",
+    link: function(scope, element, attrs) {
+  scope.previewSettings = {
+    width: 1024,
+    height: 768,
+    overlayStatusBar: true
+  };
+  scope.reloadPreview = function (){
+    document.getElementById("preview").contentDocument.location.reload(true);
+  }
+  scope.updatePreviewSettings = function (w, h, overlayStatusBar){
+  scope.previewSettings = {
+    width: w,
+    height: h,
+    overlayStatusBar: overlayStatusBar
+  };
+  scope.$apply();
+
+    };
+  }
+}
 });
 
 Chondric.Syncable = function(options) {

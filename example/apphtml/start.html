@@ -8,7 +8,7 @@
     </div>
 
 
-<div class="tabbar left">
+<div class="tabbar" ng-class="{left: maxColumns > 1}">
 
 <button ng-tap="" class="selected icon icon-default">Tab 1</button>
 
@@ -20,7 +20,6 @@
 
 
     <div class="body left" ng-class="{hidden: !showleft}">
-
 <div class="collapsible" ng-class="{collapsed: s1collapsed}" >
 <h2 ng-tap="s1collapsed=!s1collapsed">First Section</h2>
 
