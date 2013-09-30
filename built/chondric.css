@@ -353,10 +353,14 @@ margin-top: 10px;
 /* IOS 7 Default styles */
 body {
     font-family: "Helvetica Neue", Helvetica;
-    font-size: 14pt;
+    font-size: 13pt;
     font-weight: 300;
 }
 
+
+button:focus {
+outline: none;
+}
 
 /* Header */
 
@@ -379,7 +383,12 @@ color: rgb(21,125,251);
 background: transparent;
 border: none;
 padding: 9px;
+font-size: 13pt;
+font-weight: 300;
+line-height: 25px;
 }
+
+
 
 .navbar button.left {
 float:left;
@@ -396,9 +405,9 @@ float:right;
     right:0;
     margin: 0;
     text-align: center;
-    font-size: 14pt;
+    font-size: 13pt;
     line-height: 40px;
-    font-weight: 300;
+    font-weight: 500;
     z-index: -1;
 }
 
@@ -597,28 +606,32 @@ margin:50px auto 0 auto;
     font-family: Helvetica;
     font-size: 20pt;
     position: absolute;
-    padding: 0;
+    padding: 0 9px;
+    text-align: center;
     line-height: 40px;
 }
 
-.navbar .left.icon {
-padding-left:20px;
+.navbar .icon {
+padding-left:30px;
 }
 
-.navbar .left.icon::after {
+.navbar .icon::after {
 left:0;
 top:0;
 }
 
-.navbar .right.icon {
-padding-right:20px;
+
+.navbar .right.icon-rightarrow {
+padding-left: 0;
+padding-right:30px;
 }
 
 
-.navbar .right.icon::after {
-right: 0;
+.navbar .right.icon-rightarrow::after {
+right: -30px;
 top:0;
 }
+
 
 .tabbar .icon {
 padding-top:40px;
@@ -647,7 +660,7 @@ text-align: center;
 }
 
 .icon-left.icon {
-padding-left:20px;
+padding-left:30px;
 }
 
 .icon-left.icon::after {
@@ -656,12 +669,24 @@ top:0;
 }
 
 .icon-right.icon {
-padding-right:20px;
+padding-right:30px;
 }
 
 .icon-right.icon::after {
-right:0;
+right:-30px;
 top:0;
 }
+
+.icon-top.icon {
+padding-top:40px;
+}
+
+.icon-top.icon::after {
+top:0;
+left: 0;
+right: 0;
+text-align: center;
+}
+
 
 

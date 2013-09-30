@@ -628,7 +628,7 @@ padding-right:30px;
 
 
 .navbar .right.icon-rightarrow::after {
-right: 0;
+right: -30px;
 top:0;
 }
 
@@ -660,7 +660,7 @@ text-align: center;
 }
 
 .icon-left.icon {
-padding-left:20px;
+padding-left:30px;
 }
 
 .icon-left.icon::after {
@@ -669,11 +669,11 @@ top:0;
 }
 
 .icon-right.icon {
-padding-right:20px;
+padding-right:30px;
 }
 
 .icon-right.icon::after {
-right:0;
+right:-30px;
 top:0;
 }
 

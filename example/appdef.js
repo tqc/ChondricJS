@@ -18,7 +18,12 @@ var settings = {
         {
             id: "page3",
             title: "Default Page"
-        }
+        },
+        {
+            id: "staticpage",
+            title: "Static Page",
+            scriptless: true
+        },
         ],
     pageTemplate: "pagetemplate.html" // remove this if you want to create pages with the default template
 };

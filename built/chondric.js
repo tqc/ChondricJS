@@ -147,12 +147,10 @@ Chondric.App = function(options) {
 
 
     app.angularAppModule = angular.module(
-        "AppModule",
-        ["chondric"].concat(app.angularModules),
+        "AppModule", ["chondric"].concat(app.angularModules),
         function($controllerProvider) {
             app.controllerProvider = $controllerProvider;
         });
-
 
 
 
@@ -371,12 +369,12 @@ Chondric.App = function(options) {
             // template doesn't exist. possibly this is a scriptless page so try creating a default template
             app.createViewTemplate({
                 templateId: templateId
-                });
+            });
         }
 
-            view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-                id: viewId
-                });
+        view = app.Views[viewId] = new app.ViewTemplates[templateId]({
+            id: viewId
+        });
 
 
 
@@ -458,7 +456,14 @@ Chondric.App = function(options) {
             nextPage.ensureLoaded(inPageClass, function() {
                 window.setTimeout(function() {
                     history.pushState({}, null, "#" + nextPageId);
-                    nextPage.activating(thisPage);
+                    if (nextPage.loading) {
+                        nextPage.isActivating = true;
+                    } else {
+                        nextPage.activating(thisPage);
+                        if (nextPage.scope) {
+                            nextPage.scope.$apply();
+                        }
+                    }
                 }, 0);
 
                 thisPage.element.one("webkitTransitionEnd", function() {
@@ -466,7 +471,16 @@ Chondric.App = function(options) {
                         app.transitioning = false;
                         app.transitioningTo = undefined;
                         if (!app.splashScreenHidden) app.hideSplashScreen();
-                        nextPage.activated();
+
+                        if (nextPage.loading) {
+                            nextPage.isActivated = true;
+                        } else {
+                            nextPage.activated();
+                            if (nextPage.scope) {
+                                nextPage.scope.$apply();
+                            }
+                        }
+
                         app.queuePageCleanup();
                     }, 0);
                 });
@@ -877,22 +891,23 @@ Chondric.App = function(options) {
     };
 
 
-    app.angularAppModule.run(["$rootScope", "$compile", "$controller", function($rootScope, $compile, $controller)
-{
-    app.compile = $compile;
-    app.$controller = $controller;
-    app.rootScope = $rootScope;
-    console.log("angular app module run");
-    init();
-}]);
+    app.angularAppModule.run(["$rootScope", "$compile", "$controller",
+        function($rootScope, $compile, $controller) {
+            app.compile = $compile;
+            app.$controller = $controller;
+            app.rootScope = $rootScope;
+            console.log("angular app module run");
+            init();
+        }
+    ]);
 
     // settings and all functions are loaded, now initialize angular
     // This won't do much, but lets us use angular on the loading page
     // for example to display root scope values as they are loaded
 
- angular.element(document).ready(function() {
-    angular.bootstrap(document, ["AppModule"]);
-       });
+    angular.element(document).ready(function() {
+        angular.bootstrap(document, ["AppModule"]);
+    });
 
 
 
@@ -1004,17 +1019,17 @@ $.extend(Chondric.View.prototype, {
 
         }
     },
-unload: function() {
-      var view = this;
-            if (view.element) view.element.remove();
-            delete view.element;
+    unload: function() {
+        var view = this;
+        if (view.element) view.element.remove();
+        delete view.element;
 
-      if (view.scope) {
-        view.scope.$destroy();
-        delete(view.scope);
-      }
+        if (view.scope) {
+            view.scope.$destroy();
+            delete(view.scope);
+        }
 
-},
+    },
 
     getViewTemplate: function(callback) {
         var view = this;
@@ -1051,27 +1066,25 @@ unload: function() {
 
 
 
-        var ind = view.id.indexOf("_");
-        var templateId = view.id.substr(0, ind) || view.id;
+            var ind = view.id.indexOf("_");
+            var templateId = view.id.substr(0, ind) || view.id;
 
-        controllerName = controllerName || view.controllerName || templateId+"Ctrl";
+            controllerName = controllerName || view.controllerName || templateId + "Ctrl";
 
-        var controller = null;
+            var controller = null;
 
-        view.initAngular();
+            view.initAngular();
 
-        if (!controller && view.controller) {
-            // look for a function provided as view.controller
-            app.controllerProvider.register(controllerName, view.controller);
-        }
-        else if (!controller && view.controllers && view.controllers[controllerName]) {
-            // look for a controller in view.controllers array
-            app.controllerProvider.register(controllerName, view.controllers[controllerName]);
-        } else {
-            // no defined controller - don't use one
-            controllerName = null;
-        }
-
+            if (!controller && view.controller) {
+                // look for a function provided as view.controller
+                app.controllerProvider.register(controllerName, view.controller);
+            } else if (!controller && view.controllers && view.controllers[controllerName]) {
+                // look for a controller in view.controllers array
+                app.controllerProvider.register(controllerName, view.controllers[controllerName]);
+            } else {
+                // no defined controller - don't use one
+                controllerName = null;
+            }
 
 
 
@@ -1081,13 +1094,23 @@ unload: function() {
             if (controllerName) view.element.attr("ng-controller", controllerName);
 
 
-                view.scope = app.rootScope.$new();
+            view.scope = app.rootScope.$new();
 
 
-    app.compile( view.element)( view.scope );
+            app.compile(view.element)(view.scope);
 
 
-view.scope.$apply();
+            if (view.isActivating) {
+                view.activating();
+                view.isActivating = false;
+            }
+
+            if (view.isActivated) {
+                view.activated();
+                view.isActivated = false;
+            }
+
+            view.scope.$apply();
 
             view.updateViewBackground();
             view.attachEvents();
