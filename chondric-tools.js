@@ -107,9 +107,6 @@ exports.update = function(appdef) {
         updateIfMissing(".gitignore", "template.gitignore", noSubstitution);
     }
 
-    updateIfMissing("apphtml/splash.html", "splash.html", standardSubstitution);
-    updateIfMissing("apphtml/icon.html", "icon.html", standardSubstitution);
-    updateIfMissing("apphtml/preview.html", "preview.html", standardSubstitution);
 
 
     if (appdef.pageTemplate) {
@@ -122,6 +119,11 @@ exports.update = function(appdef) {
     mkdirp(path.resolve(apphostdir, "platformscripts"), function() {
 
         mkdirp(path.resolve(appdir, "lib"), function() {
+
+            updateIfMissing("apphtml/splash.html", "splash.html", standardSubstitution);
+            updateIfMissing("apphtml/icon.html", "icon.html", standardSubstitution);
+            updateIfMissing("apphtml/preview.html", "preview.html", standardSubstitution);
+
 
             // add jquery to lib folder
             fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
