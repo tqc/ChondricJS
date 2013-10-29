@@ -149,9 +149,10 @@ $.extend(Chondric.View.prototype, {
         view.getViewTemplate(function(content, controllerName) {
 
 
-
             var ind = view.id.indexOf("_");
-            var templateId = view.id.substr(0, ind) || view.id;
+            var templateId = view.templateId || view.id.substr(0, ind) || view.id;
+            view.dataId = view.id.substr(ind+1) || "";
+            view.params = view.dataId.split("_");
 
             controllerName = controllerName || view.controllerName || templateId + "Ctrl";
 
