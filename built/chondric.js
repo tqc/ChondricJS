@@ -1097,9 +1097,10 @@ $.extend(Chondric.View.prototype, {
         view.getViewTemplate(function(content, controllerName) {
 
 
-
             var ind = view.id.indexOf("_");
-            var templateId = view.id.substr(0, ind) || view.id;
+            var templateId = view.templateId || view.id.substr(0, ind) || view.id;
+            view.dataId = view.id.substr(ind+1) || "";
+            view.params = view.dataId.split("_");
 
             controllerName = controllerName || view.controllerName || templateId + "Ctrl";
 
@@ -1122,14 +1123,23 @@ $.extend(Chondric.View.prototype, {
 
             // todo: add data loading view to template content
 
-            view.element.html(content);
-            if (controllerName) view.element.attr("ng-controller", controllerName);
+            var fullcontent = "";
+            if (controllerName) {
+                fullcontent = "<div ng-controller='"+controllerName+"'>"+content+"</div>";
+            }
+            else {
+                fullcontent = "<div ng-scope>"+content+"</div>";
+            }
 
 
-            view.scope = app.rootScope.$new();
+            var newelement = app.compile(fullcontent)(app.rootScope);
+            view.element.append(newelement);
 
 
-            app.compile(view.element)(view.scope);
+
+           view.scope = newelement.scope();
+
+
 
 
             if (view.isActivating) {
