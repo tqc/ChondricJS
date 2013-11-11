@@ -776,7 +776,7 @@ Chondric.App = function(options) {
 
     app.splashScreenHidden = false;
     app.hideSplashScreen = function() {
-        if (!app.splashScreenHidden) return;
+        if (app.splashScreenHidden) return;
         if (app.platform == "cordova" && navigator && navigator.splashscreen) {
             navigator.splashscreen.hide();
         }
