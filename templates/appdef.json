@@ -1,0 +1,18 @@
+{
+  "htmlPath": "apphtml",
+  "title": "App Title",
+  "useAngular": true,
+  "appHost": "apphost",
+  "pages": [
+    {
+      "id": "start",
+      "title": "Start"
+    },
+    {
+      "id": "staticpage",
+      "title": "Scriptless Content Page",
+      "scriptless": true
+    }
+  ],
+  "pageTemplate": "pagetemplate.html"
+}

@@ -3,25 +3,6 @@ var fs = require('fs');
 var mkdirp = require("mkdirp");
 //var bower = require("bower");
 
-exports.init = function() {
-    var chondricdir = __dirname;
-    var apphostdir = process.cwd();
-    var appdefpath = path.resolve(apphostdir, "appdef.js");
-
-    console.log("init in " + apphostdir);
-
-    if (fs.existsSync(appdefpath)) {
-        console.log("appdef.js already exists");
-    } else {
-        var template = fs.readFileSync(path.resolve(chondricdir, "templates/appdef.js"));
-        fs.writeFileSync(appdefpath, template);
-        console.log("Created appdef.js");
-    }
-    console.log("Edit settings in appdef.js then run");
-    console.log("node appdef.js");
-};
-
-
 exports.buildFramework = function(chondricdir, callback) {
     var frameworkjs = "";
     var frameworkcss = "";
@@ -51,13 +32,11 @@ exports.buildFramework = function(chondricdir, callback) {
 
 };
 
-exports.update = function(appdef) {
+exports.update = function(apphostdir, appdef) {
 
     var chondricdir = __dirname;
+    var appdir = path.resolve(apphostdir, appdef.htmlPath);
 
-    var appdir = path.resolve(path.dirname(require.main.filename), appdef.htmlPath);
-
-    var apphostdir = path.dirname(require.main.filename);
 
     console.log("updating app in " + appdir);
 
