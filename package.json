@@ -2,11 +2,14 @@
   "author": "Tom Clarkson ",
   "name": "chondric-tools",
   "description": "Tools for setting up a ChondricJS client app",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "repository": {
     "url": "http://github.com/tqc/ChondricJS"
   },
   "main": "./chondric-tools",
+   "bin": {
+    "chondric": "chondric-bin.js"
+  },
   "dependencies": {
     "mkdirp": "*",
     "express": ">=3.2",

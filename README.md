@@ -1,30 +1,21 @@
 ChondricJS
 ==========
 
-Chondric is a lightweight JavaScript MVC framework. 
+Chondric is a lightweight JavaScript MVC framework.
 
 It provides the structure necessary for a single page app, but leaves the app pages behaving as much like standard html as possible.
 
 A node.js update script handles the initial setup of a new app. Install with
 
-    npm install chondric-tools
+    npm install -g chondric-tools
 
 To start building a new app, create an app definition file (appdef.js). This can be created from a template with:
 
-    node
-    require("chondric-tools").init()
-
-To use a local instance:
-
-    node
-    require("../../ChondricJS/chondric-tools").init()
-
+    chondric
 
 The app definition should look something like:
 
-    var chondric = require("chondric-tools");
-    
-    var settings = {
+    {
         htmlPath: "apphtml",
         title: "App Name",
         appHost: "apphost",
@@ -38,19 +29,22 @@ The app definition should look something like:
                 title: "Second Page"
             }
         ],
-        pageTemplate: "pagetemplate.html" // optional - a default template will be used if omitted
+        pageTemplate: "pagetemplate.html"
     }
-    
-    chondric.update(settings);
 
 
-run with
 
-    node appdef.js
+To create the app from the definition, run
+
+    chondric
 
 This script can be run at any time to add new pages to the app - any files that already exist will be skipped, except for index.html which will be partially updated to keep page script references up to date.
 
-If apphost is specified, an express based web server will be set up to make the contents of apphtml available in a browser. Settings are taken from a .env file. Run it with 
+To update referenced scripts, run
+
+    bower install
+
+If apphost is specified, an express based web server will be set up to make the contents of apphtml available in a browser. Settings are taken from a .env file. Run it with
 
     node apphost.js
 

@@ -182,36 +182,6 @@ Chondric.App = function(options) {
     }
 
     function attachEvents(callback) {
-        $('div[data-role="page"], div[data-role="dialog"]').live('pagecreate', PageCreated);
-
-        $('div[data-role="dialog"]').live('pagebeforeshow', function(e, ui) {
-            ui.prevPage.addClass("ui-dialog-background ");
-            ui.prevPage.one("pageremove", function(e) {
-                e.preventDefault();
-            })
-        });
-
-        $('div[data-role="dialog"]').live('pagehide', function(e, ui) {
-            $(".ui-dialog-background").removeClass("ui-dialog-background ");
-        });
-
-
-
-        $('a[href]').live('vclick', ButtonClick);
-
-        $('div[data-role="page"], div[data-role="dialog"]').live('pagebeforeshow', PageBeforeShow);
-        $('div[data-role="page"], div[data-role="dialog"]').live('pageshow', PageShown);
-
-        $('a[data-iconpos="notext"]').live('taphold', function(event) {
-            //alert("taphold");
-            event.preventDefault();
-            return false;
-        });
-
-        $('input, textarea').live('focus', function(event) {
-            // disable horizontal scrolling when showing onscreen keyboard
-            window.scrollTo(0, window.scrollY);
-        });
         callback();
     }
 
@@ -256,18 +226,6 @@ Chondric.App = function(options) {
 
         // TODO: this probably goes better elsewhere
         // converts a link with data-role help to a standard popup button
-        $("[data-role='help']", pagediv).each(function() {
-            // simple properties can be handled declaratively
-            var element = $(this);
-            element.html("Help");
-            element.attr("data-role", "button");
-            element.attr("data-icon", "info");
-            element.attr("data-iconpos", "notext");
-            element.attr("data-inline", "true");
-            element.attr("data-transition", "pop");
-            element.attr("data-rel", "dialog");
-
-        });
         // ensure page script is loaded and call setup method of page
         if (app.Pages[pageid]) {
             app.Pages[pageid].attachEvents.call(app.Pages[pageid], pagediv);

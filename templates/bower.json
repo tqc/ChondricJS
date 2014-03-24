@@ -1,0 +1,12 @@
+{
+    "name": "__APPTITLE__",
+    "version": "0.0.1",
+    "dependencies": {
+        "angular": "*",
+        "angular-sanitize": "*",
+        "angular-ui-utils": "*",
+        "angular-ui-bootstrap": "*",
+        "pure": "*",
+        "jquery": "1.11.0"
+    }
+}
