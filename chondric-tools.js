@@ -3,35 +3,6 @@ var fs = require('fs');
 var mkdirp = require("mkdirp");
 //var bower = require("bower");
 
-exports.buildFramework = function(chondricdir, callback) {
-    var frameworkjs = "";
-    var frameworkcss = "";
-
-    fs.readFile(path.resolve(chondricdir, "src/app.js"), "utf8", function(err, data) {
-        frameworkjs += data + "\n\n";
-        fs.readFile(path.resolve(chondricdir, "src/view.js"), "utf8", function(err, data) {
-            frameworkjs += data + "\n\n";
-            fs.readFile(path.resolve(chondricdir, "src/listsync.js"), "utf8", function(err, data) {
-                frameworkjs += data + "\n\n";
-                fs.readFile(path.resolve(chondricdir, "src/versioneddatabase.js"), "utf8", function(err, data) {
-                    frameworkjs += data + "\n\n";
-                    fs.readFile(path.resolve(chondricdir, "src/module.js"), "utf8", function(err, data) {
-                        frameworkjs += data + "\n\n";
-                        fs.readFile(path.resolve(chondricdir, "src/genericsync.js"), "utf8", function(err, data) {
-                            frameworkjs += data + "\n\n";
-                            fs.readFile(path.resolve(chondricdir, "src/app.css"), "utf8", function(err, data) {
-                                frameworkcss += data + "\n\n";
-                                callback(frameworkjs, frameworkcss);
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
-
-};
-
 exports.update = function(apphostdir, appdef) {
 
     var chondricdir = __dirname;
@@ -110,7 +81,7 @@ exports.update = function(apphostdir, appdef) {
 
             // add jquery to lib folder
 //            fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
-            fs.createReadStream(path.resolve(chondricdir, "lib/pure.min.css")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/pure.min.css")));
+//            fs.createReadStream(path.resolve(chondricdir, "lib/pure.min.css")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/pure.min.css")));
 
             if (fs.existsSync(path.resolve(appdir, "app.css"))) {
                 console.log("app.css already exists - skipping");
@@ -212,10 +183,9 @@ exports.update = function(apphostdir, appdef) {
 
 
 
-                                    exports.buildFramework(chondricdir, function(frameworkjs, frameworkcss) {
-                                        fs.writeFile(path.resolve(appdir, "lib/chondric.js"), frameworkjs);
-                                        fs.writeFile(path.resolve(appdir, "lib/chondric.css"), frameworkcss);
-                                    });
+                                        fs.writeFile(path.resolve(appdir, "lib/chondric.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.js")));
+                                        fs.writeFile(path.resolve(appdir, "lib/chondric.min.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.js")));
+                                        fs.writeFile(path.resolve(appdir, "lib/chondric.min.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.css")));
 
 
                                 });
