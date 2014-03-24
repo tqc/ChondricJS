@@ -1,7 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require("mkdirp");
-
+//var bower = require("bower");
 
 exports.init = function() {
     var chondricdir = __dirname;
@@ -105,6 +105,8 @@ exports.update = function(appdef) {
         updateIfMissing("package.json", "package.jsontemplate", standardSubstitution);
         updateIfMissing(".env", "template.env", noSubstitution);
         updateIfMissing(".gitignore", "template.gitignore", noSubstitution);
+        updateIfMissing(".bowerrc", "bowerrc.json", standardSubstitution);
+        updateIfMissing("bower.json", "bower.json", standardSubstitution);
     }
 
 
@@ -125,9 +127,10 @@ exports.update = function(appdef) {
             updateIfMissing("apphtml/preview.html", "preview.html", standardSubstitution);
 
 
-            // add jquery to lib folder
-            fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
 
+
+            // add jquery to lib folder
+//            fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
             fs.createReadStream(path.resolve(chondricdir, "lib/pure.min.css")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/pure.min.css")));
 
             if (fs.existsSync(path.resolve(appdir, "app.css"))) {
@@ -141,7 +144,12 @@ exports.update = function(appdef) {
 
             var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
 
-            var frameworkscriptrefs = "<script src=\"lib/jquery-1.7.1.js\"></script>\n";
+            var frameworkscriptrefs = "<script src=\"bower_components/jquery/dist/jquery.min.js\"></script>\n";
+                frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";
+                frameworkscriptrefs += "<script src=\"bower_components/angular-sanitize/angular-sanitize.min.js\"></script>\n";
+                frameworkscriptrefs += "<script src=\"bower_components/angular-ui-utils/ui-utils.min.js\"></script>\n";
+                frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
+
             var angularUsed = appdef.useAngular;
 
             // load templates
@@ -206,11 +214,6 @@ exports.update = function(appdef) {
                                     }
 
 
-                                    if (angularUsed) {
-                                        frameworkscriptrefs += "<script src=\"lib/angular.min.js\"></script>\n";
-                                        fs.createReadStream(path.resolve(chondricdir, "lib/angular.min.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/angular.min.js")));
-
-                                    }
 
 
                                     var html = apphtmltemplate.replace(/__TITLE__/g, appdef.title)
