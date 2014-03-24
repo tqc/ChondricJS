@@ -165,7 +165,9 @@ $.extend(Chondric.View.prototype, {
                 app.controllerProvider.register(controllerName, view.controller);
             } else if (!controller && view.controllers && view.controllers[controllerName]) {
                 // look for a controller in view.controllers array
-                app.controllerProvider.register(controllerName, view.controllers[controllerName]);
+                for (var cn in view.controllers) {
+                    app.controllerProvider.register(cn, view.controllers[cn]);
+                }
             } else {
                 // no defined controller - don't use one
                 controllerName = null;

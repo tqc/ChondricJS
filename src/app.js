@@ -119,6 +119,7 @@ Chondric.App = function(options) {
     var settings = {
         name: "Base App",
         mightBePhoneGap: true,
+        loadPageFromHash: true,
         scriptGroups: [],
         angularModules: [],
         contexts: {},
@@ -141,6 +142,7 @@ Chondric.App = function(options) {
 
 
     $.extend(settings, options);
+    app.settings = settings;
     app.debugMode = settings.debugMode;
     app.angularModules = settings.angularModules;
     app.notificationReceived = settings.notificationReceived;
@@ -491,7 +493,7 @@ Chondric.App = function(options) {
                 //              $("."+outPageClass).removeClass(outPageClass);
                 thisPage.element.addClass(outPageClass).removeClass("active");
                 nextPage.element.addClass("active").removeClass(inPageClass);
-
+                if (outPageClass== "behinddlg") nextPage.dlgbg = thisPage.id;
 
                 app.activeView = nextPage;
 
@@ -539,6 +541,7 @@ Chondric.App = function(options) {
 
     this.changePage = function(pageId, transitionId) {
         var transition = app.transitions[transitionId] || app.transitions.crossfade;
+        if (pageId == "dlgbg") pageId = app.activeView.dlgbg;
         if (pageId == "prev") pageId = app.activeView.prev;
         if (pageId == "next") pageId = app.activeView.next;
         if (!pageId) return;
@@ -760,7 +763,7 @@ Chondric.App = function(options) {
     var loadFirstPage = function(callback) {
         // if first page is not specified in settings or hash, custominit is responsible for loading it
 
-        if (location.hash.length > 1) {
+        if (settings.loadPageFromHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
             app.changePage(location.hash.substr(1));
         } else {
             if (settings.firstPageTemplate) {
