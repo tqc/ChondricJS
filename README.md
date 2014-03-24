@@ -11,7 +11,7 @@ A node.js update script handles the initial setup of a new app. Install with
 
 To start building a new app, create an app definition file (appdef.js). This can be created from a template with:
 
-    chondric
+    chondric create
 
 The app definition should look something like:
 
