@@ -860,10 +860,7 @@ Chondric.App = function(options) {
             });
         };
 
-        if (window.WinJS) {
-            app.platform = "windows";
-            $(initInternal);
-        } else if (settings.mightBePhoneGap && document.location.protocol == "file:") {
+        if (settings.mightBePhoneGap && document.location.protocol == "file:") {
             // file protocol indicates phonegap
             app.isPhonegap = true;
             app.platform = "cordova";
