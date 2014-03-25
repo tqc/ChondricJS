@@ -151,7 +151,7 @@ $.extend(Chondric.View.prototype, {
 
             var ind = view.id.indexOf("_");
             var templateId = view.templateId || view.id.substr(0, ind) || view.id;
-            view.dataId = view.id.substr(ind+1) || "";
+            view.dataId = view.id.substr(ind + 1) || "";
             view.params = view.dataId.split("_");
 
             controllerName = controllerName || view.controllerName || templateId + "Ctrl";
@@ -179,10 +179,9 @@ $.extend(Chondric.View.prototype, {
 
             var fullcontent = "";
             if (controllerName) {
-                fullcontent = "<div ng-controller='"+controllerName+"'>"+content+"</div>";
-            }
-            else {
-                fullcontent = "<div ng-scope>"+content+"</div>";
+                fullcontent = "<div ng-controller='" + controllerName + "'>" + content + "</div>";
+            } else {
+                fullcontent = "<div ng-scope>" + content + "</div>";
             }
 
 
@@ -191,7 +190,7 @@ $.extend(Chondric.View.prototype, {
 
 
 
-           view.scope = newelement.scope();
+            view.scope = newelement.scope();
 
 
 
@@ -292,60 +291,4 @@ $.extend(Chondric.View.prototype, {
         app.changePage(this.prev, "prev");
     }
 
-});
-
-
-Chondric.SampleSubviewTemplate = function(options) {
-    var settings = {
-        template: "subview.html"
-    };
-    $.extend(settings, options)
-    Chondric.View.call(this, settings);
-}
-$.extend(Chondric.SampleSubviewTemplate.prototype, Chondric.View.prototype, {
-    getDefaultModel: function() {
-        return {};
-    },
-    updateModel: function(dataId, callback) {
-        if (!this.model) this.model = this.getDefaultModel();
-        var m = this.model;
-
-        callback();
-    },
-    updateView: function() {
-        // update elements directly
-    }
-});
-
-
-
-Chondric.SampleViewTemplate = function(options) {
-    var settings = {
-        template: "index.html"
-    };
-    $.extend(settings, options)
-    Chondric.View.call(this, settings);
-}
-$.extend(Chondric.SampleViewTemplate.prototype, Chondric.View.prototype, {
-    getDefaultModel: function() {
-        return {};
-    },
-    updateModel: function(dataId, callback) {
-        if (!this.model) this.model = this.getDefaultModel();
-        var m = this.model;
-
-        this.subViews["firstSubView"].setModel(m.subviewmodel);
-        callback();
-    },
-    updateView: function() {
-        this.subViews["firstSubView"].updateView();
-    },
-    attachSubviews: function() {
-        var page = this;
-        this.subViews["firstSubView"] = new Chondric.SampleSubviewTemplate({
-            id: page.id + "_subview1",
-            element: $(".subview", page.element)
-        });
-
-    }
 });
