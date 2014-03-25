@@ -14,6 +14,8 @@ $(document).bind("mobileinit", function() {
 });
 
 Chondric = {};
+var Chondric = angular.module('chondric', [])
+
 
 Chondric.App = function(options) {
     var app = this;
@@ -451,7 +453,7 @@ Chondric.App = function(options) {
                 //              $("."+outPageClass).removeClass(outPageClass);
                 thisPage.element.addClass(outPageClass).removeClass("active");
                 nextPage.element.addClass("active").removeClass(inPageClass);
-                if (outPageClass== "behinddlg") nextPage.dlgbg = thisPage.id;
+                if (outPageClass == "behinddlg") nextPage.dlgbg = thisPage.id;
 
                 app.activeView = nextPage;
 
@@ -795,30 +797,29 @@ Chondric.App = function(options) {
             app.rootScope.$apply();
 
             var sizeChanged = function() {
-            // on ios 7 we need to leave space for the status bar
-            // for now just check if height matches the full screen
-            var w = $(window).width();
-            var h = $(window).height();
-            console.log(w+","+h);
-            if(h == 1024 || h == 768 || h == 320 || h==568 || h == 480) {
-               $(".viewport").addClass("hasstatusbar");
+                // on ios 7 we need to leave space for the status bar
+                // for now just check if height matches the full screen
+                var w = $(window).width();
+                var h = $(window).height();
+                console.log(w + "," + h);
+                if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
+                    $(".viewport").addClass("hasstatusbar");
                 } else {
-               $(".viewport").removeClass("hasstatusbar");
-            }
+                    $(".viewport").removeClass("hasstatusbar");
+                }
 
-            // for phone screens a multicolumn layout doesn't make sense
-            if (w < 768 && app.rootScope.maxColumns != 1) {
-                console.log("setting singlecolumn")
-                app.rootScope.maxColumns = 1;
-               $(".viewport").addClass("singlecolumn");
-               app.rootScope.$apply();
-            }
-            else if (w >= 768 && app.rootScope.maxColumns != 3) {
-                console.log("setting multicolumn")
-                app.rootScope.maxColumns = 3;
-               $(".viewport").removeClass("singlecolumn");
-               app.rootScope.$apply();
-            }
+                // for phone screens a multicolumn layout doesn't make sense
+                if (w < 768 && app.rootScope.maxColumns != 1) {
+                    console.log("setting singlecolumn")
+                    app.rootScope.maxColumns = 1;
+                    $(".viewport").addClass("singlecolumn");
+                    app.rootScope.$apply();
+                } else if (w >= 768 && app.rootScope.maxColumns != 3) {
+                    console.log("setting multicolumn")
+                    app.rootScope.maxColumns = 3;
+                    $(".viewport").removeClass("singlecolumn");
+                    app.rootScope.$apply();
+                }
 
 
             }
