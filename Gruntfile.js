@@ -22,7 +22,7 @@ module.exports = function(grunt) {
                     mangle: false
                 },
                 files: {
-                    "built/chondric.min.js": ["src/app.js", "src/view.js", "src/versioneddatabase.js", "src/directives/ng-tap.js", "src/directives/preview-controls.js", "src/directives/chondric-viewport.js", "src/genericsync.js"],
+                    "built/chondric.js": ["src/app.js", "src/view.js", "src/versioneddatabase.js", "src/directives/ng-tap.js", "src/directives/preview-controls.js", "src/directives/chondric-viewport.js", "src/genericsync.js"],
                 }
             }
         },

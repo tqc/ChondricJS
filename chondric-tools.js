@@ -16,7 +16,7 @@ exports.update = function(apphostdir, appdef) {
     };
     var standardSubstitution = function(template, appdef, pagedef) {
         var result = template.replace(/__APPHOST_NAME__/g, appdef.appHost)
-                .replace(/__APPTITLE__/g, appdef.title);
+            .replace(/__APPTITLE__/g, appdef.title);
 
         if (pagedef) {
             result = result.replace(/__PAGEID__/g, pagedef.id)
@@ -80,8 +80,8 @@ exports.update = function(apphostdir, appdef) {
 
 
             // add jquery to lib folder
-//            fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
-//            fs.createReadStream(path.resolve(chondricdir, "lib/pure.min.css")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/pure.min.css")));
+            //            fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
+            //            fs.createReadStream(path.resolve(chondricdir, "lib/pure.min.css")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/pure.min.css")));
 
             if (fs.existsSync(path.resolve(appdir, "app.css"))) {
                 console.log("app.css already exists - skipping");
@@ -95,10 +95,10 @@ exports.update = function(apphostdir, appdef) {
             var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
 
             var frameworkscriptrefs = "<script src=\"bower_components/jquery/dist/jquery.min.js\"></script>\n";
-                frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";
-                frameworkscriptrefs += "<script src=\"bower_components/angular-sanitize/angular-sanitize.min.js\"></script>\n";
-                frameworkscriptrefs += "<script src=\"bower_components/angular-ui-utils/ui-utils.min.js\"></script>\n";
-                frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
+            frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";
+            frameworkscriptrefs += "<script src=\"bower_components/angular-sanitize/angular-sanitize.min.js\"></script>\n";
+            frameworkscriptrefs += "<script src=\"bower_components/angular-ui-utils/ui-utils.min.js\"></script>\n";
+            frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
 
             var angularUsed = appdef.useAngular;
 
@@ -135,7 +135,7 @@ exports.update = function(apphostdir, appdef) {
 
                                         if (fs.existsSync(jspath)) {
                                             console.log(appdef.pages[i].id + ".js already exists - skipping");
-                                        } else if(!scriptless) {
+                                        } else if (!scriptless) {
                                             var pagejs = standardSubstitution(template, appdef, pagedef);
 
                                             fs.writeFile(jspath, pagejs);
@@ -183,9 +183,10 @@ exports.update = function(apphostdir, appdef) {
 
 
 
-                                        fs.writeFile(path.resolve(appdir, "lib/chondric.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.js")));
-                                        fs.writeFile(path.resolve(appdir, "lib/chondric.min.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.js")));
-                                        fs.writeFile(path.resolve(appdir, "lib/chondric.min.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.css")));
+                                    fs.writeFile(path.resolve(appdir, "lib/chondric.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.js")));
+                                    fs.writeFile(path.resolve(appdir, "lib/chondric.min.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.js")));
+                                    fs.writeFile(path.resolve(appdir, "lib/chondric.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.css")));
+                                    fs.writeFile(path.resolve(appdir, "lib/chondric.min.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.css")));
 
 
                                 });

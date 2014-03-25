@@ -4,6 +4,7 @@ Chondric.directive('chondricViewport', function($compile) {
         //    terminal: true,
         //scope: { val: '=', parentData:'=' },
         link: function(scope, element, attrs) {
+            console.log("viewport directive");
             var rk = scope.$parent.rk;
             var rv = scope.$parent.rv;
             var template = "";

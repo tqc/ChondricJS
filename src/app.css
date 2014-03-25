@@ -2,55 +2,93 @@ body {
     font-family: helvetica;
 }
 
-.viewport {
+
+.chondric-viewport {
+    background-color: #888;
     position: absolute;
-    top:0;
-    bottom:0;
-    left:0;
-    right:0;
-    width:auto;
-    height: auto;
-    border: none;
-    overflow: hidden;
-}
-
-.page {
-display: none;
-background-color: white;
-position: absolute;
 top:0;
-bottom:0;
 left:0;
-right:0;
--webkit-transition: -webkit-transform 0.2s linear, opacity 0.2s ease-in-out, z-index 0s linear;
-pointer-events:none;
-opacity:1;
+bottom:0;
+right: 0;
+overflow:hidden;
+z-index: 1;
 }
-
-.page.active {
+.chondric-section {
+}
+ 
+.chondric-page {
+    background-color: white;
+position: absolute;
+width: 100%;
+height: 100%;
+top:0;
+left: 0;
+overflow: auto;
+display: none;
+}
+ 
+.chondric-page.active {
 display: block;
--webkit-transform: translateX(0) scale(1,1);
-opacity:1;
-pointer-events:all;
-z-index: 10;
-
-}
-
-.page.notransition {
-    -webkit-transition: none !important;
-}
-
-.page.prev {
-display: block;
--webkit-transform: translateX(-103%);
-z-index: 10;
-}
-
-.page.next {
-display: block;
--webkit-transform: translateX(103%);
+opacity: 1;
 z-index: 10;
 }
+ 
+.chondric-page.prev {
+    pointer-events:none;
+}
+.chondric-page.next {
+    pointer-events:none;
+}
+ 
+.chondric-page.notransition {
+-webkit-transition: none !important;
+}
+ 
+ 
+.chondric-page.next.crossfade {
+    pointer-events:none;
+display: block;
+opacity: 1;
+z-index: 1;
+}
+ 
+.chondric-page.prev.crossfade {
+    pointer-events:none;
+display: block;
+opacity: 0;
+-webkit-transition: opacity 1s ease-in-out;
+z-index: 11;
+}
+ 
+.chondric-page.slideleft, .chondric-page.slideright {
+    -webkit-transition: -webkit-transform 0.3s ease-in-out;
+}
+ 
+.chondric-page.next.slideleft {
+    display: block;
+    -webkit-transform: translate(-100%, 0);
+}
+ 
+.chondric-page.prev.slideleft {
+    display: block;
+    -webkit-transform: translate(100%, 0);
+}
+ 
+.chondric-page.next.slideright {
+    display: block;
+    -webkit-transform: translate(100%, 0);
+}
+ 
+.chondric-page.prev.slideright {
+    display: block;
+    -webkit-transform: translate(-100%, 0);
+}
+ 
+ 
+
+
+/* Old styles */
+
 
 
 .page.behindfull {

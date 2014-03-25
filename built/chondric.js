@@ -1,10 +1,14 @@
-/*! chondric-tools 2014-03-24 */
+/*! chondric-tools 2014-03-26 */
 window.console || (window.console = {
     log: function() {},
     error: alert
-}), $(document).bind("mobileinit", function() {
-    $.mobile.autoInitializePage = !1;
-}), Chondric = {}, Chondric.App = function(options) {
+});
+
+var Chondric = angular.module("chondric", []);
+
+Chondric.App = function() {
+    return this;
+}, Chondric.initApp = function(options) {
     function loadScripts(scriptGroupNum, callback) {
         return console.log("starting loadscripts"), scriptGroupNum >= settings.scriptGroups.length ? callback() : (console.log("calling require"), 
         void require(settings.scriptGroups[scriptGroupNum], function() {
@@ -22,42 +26,72 @@ window.console || (window.console = {
     function complete(callback) {
         app.debugMode && $("body").addClass("debugmode"), app.ready = !0, callback();
     }
-    var app = this;
-    this.ready = !1, this.autohidesplashscreen = !1, this.Pages = {}, this.Actions = {}, 
-    app.startTime = new Date().getTime(), app.Views = {}, app.ViewTemplates = {}, app.createViewTemplate = function(baseView, templateId, templateFile, options) {
-        "string" == typeof templateId ? (options.baseView = baseView, options.templateId = templateId, 
-        options.templateFile = templateFile) : options = baseView;
-        var templateSettings = {
-            templateId: options.templateId,
-            templateFile: options.templateFile || options.templateId + ".html",
-            baseView: options.baseView || Chondric.View
+    var app = {}, allRoutes = (app.module = angular.module(options.name || "appModule", [ "chondric" ].concat(options.angularModules || [])), 
+    app.allRoutes = {});
+    app.createViewTemplate = function(baseView, templateId, templateFile, viewOptions) {
+        "string" == typeof templateId ? (viewOptions.baseView = baseView, viewOptions.templateId = templateId, 
+        viewOptions.templateFile = templateFile) : viewOptions = baseView;
+        var page = {};
+        viewOptions.initAngular && viewOptions.initAngular.call(page);
+        var pageController = null;
+        viewOptions.controller;
+        for (var cn in page.controllers) pageController || (pageController = page.controllers[cn]);
+        var route = viewOptions.route || "/" + viewOptions.templateId + "/$p1/$p2";
+        allRoutes[route] = {
+            isSection: !1,
+            controller: pageController,
+            templateUrl: viewOptions.templateId + ".html"
         };
-        (options.initAngular || options.angularModules) && (options.useAngular = !0);
-        var template = function(viewoptions) {
-            var settings = {};
-            $.extend(settings, templateSettings, viewoptions), templateSettings.baseView.call(this, settings), 
-            this.settings = settings;
-        }, functions = {};
-        for (var k in options) {
-            var v = options[k];
-            "baseView" != k && "templateId" != k && "templateFile" != k && ("controller" == k ? templateSettings[k] = v : "function" == typeof v ? functions[k] = v : templateSettings[k] = v);
+    };
+    app.controller = function($scope) {
+        function loadView(url) {
+            if (!url) return void console.log("default route");
+            var matchingRoutes = [], parts = url.split("/");
+            routeLoop: for (var r in allRoutes) {
+                for (var rparts = r.split("/"), i = 0; i < rparts.length; i++) if (rparts[i] != parts[i] && "$" != rparts[i][0]) continue routeLoop;
+                matchingRoutes.push(r);
+            }
+            matchingRoutes.sort(function(a, b) {
+                return a.length - b.length;
+            });
+            for (var openViews = $scope.openViews, i = 0; i < matchingRoutes.length; i++) {
+                for (var template = $scope.allRoutes[matchingRoutes[i]], mrp = matchingRoutes[i].split("/"), ar = "", params = {}, j = 0; j < mrp.length; j++) "$" == mrp[j][0] && (params[mrp[j].substr(1)] = decodeURIComponent(parts[j])), 
+                parts[j] && (ar += "/" + parts[j]);
+                if (console.log(params), !template.isSection) {
+                    console.log("Get page with route " + ar);
+                    var page = openViews[ar];
+                    return void (page || (page = openViews[ar] = {
+                        controller: template.controller,
+                        templateUrl: template.templateUrl,
+                        params: params
+                    }));
+                }
+                console.log("Get section with route " + ar);
+                var section = openViews[ar];
+                section || (section = openViews[ar] = {
+                    controller: template.controller,
+                    isSection: !0,
+                    params: params,
+                    subsections: {}
+                }), openViews = section.subsections;
+            }
         }
-        $.extend(template.prototype, templateSettings.baseView.prototype, functions), app.ViewTemplates[options.templateId] = template;
-    }, app.createViewTemplate(Chondric.View, "AppLoadTemplate", "index.html", {
-        getDefaultModel: function() {
-            return {};
-        },
-        updateModel: function(dataId, existingData, callback) {
-            this.model || (this.model = this.getDefaultModel());
-            this.model;
-            callback();
-        },
-        updateView: function() {},
-        attachSubviews: function() {
-        }
-    }), app.Views.appLoadPage = new app.ViewTemplates.AppLoadTemplate({
-        id: "appLoadPage"
-    }), app.activeView = app.Views.appLoadPage, app.platform = "web", app.isSimulator = !1;
+        app.scope = $scope, $scope.allRoutes = allRoutes, $scope.route = null, $scope.nextRoute = null, 
+        $scope.lastRoute = null, $scope.transition = "crossfade", $scope.openViews = {}, 
+        $scope.changePage = app.changePage = function(r, transition) {
+            return !r || r.indexOf("/") < 0 ? void console.error("changePage syntax has changed - the first parameter is a route url instead of an id") : void ($scope.route != r && ($scope.lastRoute == r && ($scope.lastRoute = null), 
+            $scope.transition = transition || "crossfade", $scope.noTransition = !0, loadView(r), 
+            $scope.nextRoute = r, window.setTimeout(function() {
+                $scope.noTransition = !1, $scope.route = r, $scope.$apply();
+            }, 100)));
+        }, $scope.$watch("route", function(url, oldVal) {
+            $scope.nextRoute = null, $scope.lastRoute = oldVal, console.log("Route changed to " + url + " from " + oldVal), 
+            loadView(url);
+        }), options.appCtrl && options.appCtrl($scope);
+    };
+    app.ready = !1, app.autohidesplashscreen = !1, app.Pages = {}, app.Actions = {}, 
+    app.startTime = new Date().getTime(), app.Views = {}, app.ViewTemplates = {}, app.platform = "web", 
+    app.isSimulator = !1;
     var settings = {
         name: "Base App",
         mightBePhoneGap: !0,
@@ -162,74 +196,11 @@ window.console || (window.console = {
             inPageClass: "behindfull",
             outPageClass: "behindfull"
         }
-    }, this.changePage = function(pageId, transitionId) {
-        var transition = app.transitions[transitionId] || app.transitions.crossfade;
-        "dlgbg" == pageId && (pageId = app.activeView.dlgbg), "prev" == pageId && (pageId = app.activeView.prev), 
-        "next" == pageId && (pageId = app.activeView.next), pageId && app.transition(pageId, transition.inPageClass, transition.outPageClass);
     };
     var initEvents = function(callback) {
-        app.touchevents = {
-            touchstart: "touchstart",
-            touchend: "touchend",
-            touchmove: "touchmove"
-        }, void 0 === document.ontouchend && (app.touchevents = {
-            touchstart: "mousedown",
-            touchend: "mouseup mouseleave",
-            touchmove: "mousemove"
-        }), app.appLoadLog("Setting up event handlers");
-        var nextPage = app.activeView;
-        nextPage.ensureLoaded("active", function() {}), nextPage.next && app.Views[nextPage.next].ensureLoaded("next", function() {}), 
-        nextPage.prev && app.Views[nextPage.prev].ensureLoaded("prev", function() {});
-        var activePage, nextPage, prevPage, swiping = !1, startX = 0, startY = 0, dx = 0, dy = 0, horizontal = !1, vertical = !1, canSwipeLeft = !1, canSwipeRight = !1;
-        $(document).on(app.touchevents.touchstart, ".page.active.swipe", function(e) {
-            app.transitioning || swiping || (swiping = !0, e.originalEvent.changedTouches ? (startX = e.originalEvent.changedTouches[0].clientX, 
-            startY = e.originalEvent.changedTouches[0].clientY) : (startX = e.clientX, startY = e.clientY, 
-            dx = 0, dy = 0, horizontal = !1, vertical = !1), activePage = app.activeView.element, 
-            nextPage = app.activeView.next && app.getView(app.activeView.next).element, prevPage = app.activeView.prev && app.getView(app.activeView.prev).element, 
-            app.viewportWidth = $(".viewport").width(), canSwipeRight = prevPage && prevPage.length > 0 || activePage.hasClass("swipetoblank"), 
-            canSwipeLeft = nextPage && nextPage.length > 0 || activePage.hasClass("swipetoblank"));
-        }), $(document).on(app.touchevents.touchmove, ".page.active.swipe", function(e) {
-            if (!app.transitioning && swiping && !vertical) if (e.originalEvent.changedTouches ? (dx = e.originalEvent.changedTouches[0].clientX - startX, 
-            dy = e.originalEvent.changedTouches[0].clientY - startY) : (dx = e.clientX - startX, 
-            dy = e.clientY - startY), (dx > 20 || -20 > dx && 20 > dy && dy > -20) && (horizontal = !0), 
-            !horizontal && (dy > 20 || -20 > dy)) vertical = !0, dx = 0, app.activeView.setSwipePosition(prevPage, nextPage, dx, 0); else if (horizontal) return 0 > dx && canSwipeLeft && app.activeView.setSwipePosition(prevPage, nextPage, dx, 0), 
-            dx > 0 && canSwipeRight && app.activeView.setSwipePosition(prevPage, nextPage, dx, 0), 
-            !1;
-        }), $(document).on(app.touchevents.touchend, ".page.active.swipe", function() {
-            app.transitioning || swiping && (swiping = !1, app.activeView.setSwipePosition(prevPage, nextPage, void 0, null), 
-            $(".page.active .page.next .page.prev").attr("style", ""), swiping = !1, -100 > dx && app.activeView.next ? app.activeView.showNextPage() : dx > 100 && app.activeView.prev ? app.activeView.showPreviousPage() : app.activeView.setSwipePosition(prevPage, nextPage, null, null), 
-            dx = 0, dy = 0, horizontal = !1, vertical = !1);
-        }), $(document).on("tap click", "a.pop", function() {
-            var link = $(this), id = link.attr("href").replace("#", "");
-            return console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'pop')"), 
-            app.changePage(id, "pop"), !1;
-        }), $(document).on("tap click", "a.dlgpop", function() {
-            var link = $(this), id = link.attr("href").replace("#", "");
-            return console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'dlgpop')"), 
-            app.changePage(id, "dlgpop"), !1;
-        }), $(document).on("tap click", "a.dlgclose", function() {
-            var link = $(this), id = link.attr("href").replace("#", "");
-            return console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'dlgclose')"), 
-            app.changePage(id, "dlgclose"), !1;
-        }), $(document).on("tap click", "a.close", function() {
-            var link = $(this), id = link.attr("href").replace("#", "");
-            return console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'close')"), 
-            app.changePage(id, "close"), !1;
-        }), $(document).on("tap click", "a.next", function() {
-            var link = $(this), id = link.attr("href").replace("#", "");
-            return "next" == id && (id = app.activeView.next), console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'next')"), 
-            app.changePage(id, "next"), !1;
-        }), $(document).on("tap click", "a.prev", function() {
-            var link = $(this), id = link.attr("href").replace("#", "");
-            return "prev" == id && (id = app.activeView.prev), console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'prev')"), 
-            app.changePage(id, "prev"), !1;
-        }), callback();
-    }, loadFirstPage = function(callback) {
-        if (settings.loadPageFromHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) app.changePage(location.hash.substr(1)); else if (settings.firstPageTemplate) {
-            var vid = settings.firstPageTemplate + "_" + settings.firstPageDataId;
-            vid.indexOf("_") == vid.length - 1 && (vid = settings.firstPageTemplate), app.changePage(vid, "crossfade");
-        }
         callback();
+    }, loadFirstPage = function(callback) {
+        app.scope.route = "/start", callback();
     };
     app.splashScreenHidden = !1, app.hideSplashScreen = function() {
         app.splashScreenHidden || ("cordova" == app.platform && navigator && navigator.splashscreen && navigator.splashscreen.hide(), 
@@ -265,13 +236,13 @@ window.console || (window.console = {
     var init = function(callback) {
         console.log("beginning app initialization");
         var initInternal = function() {
-            app.rootScope.platform = app.platform, app.rootScope.$apply();
+            app.scope.platform = app.platform, app.scope.$apply();
             var sizeChanged = function() {
                 var w = $(window).width(), h = $(window).height();
                 console.log(w + "," + h), 1024 == h || 768 == h || 320 == h || 568 == h || 480 == h ? $(".viewport").addClass("hasstatusbar") : $(".viewport").removeClass("hasstatusbar"), 
-                768 > w && 1 != app.rootScope.maxColumns ? (console.log("setting singlecolumn"), 
-                app.rootScope.maxColumns = 1, $(".viewport").addClass("singlecolumn"), app.rootScope.$apply()) : w >= 768 && 3 != app.rootScope.maxColumns && (console.log("setting multicolumn"), 
-                app.rootScope.maxColumns = 3, $(".viewport").removeClass("singlecolumn"), app.rootScope.$apply());
+                768 > w && 1 != app.scope.maxColumns ? (console.log("setting singlecolumn"), app.scope.maxColumns = 1, 
+                $(".viewport").addClass("singlecolumn"), app.scope.$apply()) : w >= 768 && 3 != app.scope.maxColumns && (console.log("setting multicolumn"), 
+                app.scope.maxColumns = 3, $(".viewport").removeClass("singlecolumn"), app.scope.$apply());
             };
             sizeChanged(), $(window).on("resize", sizeChanged), console.log("begin internal init"), 
             loadScripts(0, function() {
@@ -296,18 +267,17 @@ window.console || (window.console = {
                 });
             });
         };
-        window.WinJS ? (app.platform = "windows", $(initInternal)) : settings.mightBePhoneGap && "file:" == document.location.protocol ? (app.isPhonegap = !0, 
+        settings.mightBePhoneGap && "file:" == document.location.protocol ? (app.isPhonegap = !0, 
         app.platform = "cordova", document.addEventListener("deviceready", function() {
             console.log("appframework deviceready"), console.log(device.platform), app.isSimulator = device.platform.indexOf("Simulator") > 0, 
             $(initInternal);
         }, !1)) : (app.platform = "web", $(initInternal));
     };
-    return app.angularAppModule.run([ "$rootScope", "$compile", "$controller", function($rootScope, $compile, $controller) {
-        app.compile = $compile, app.$controller = $controller, app.rootScope = $rootScope, 
-        console.log("angular app module run"), init();
+    return app.module.run([ "$rootScope", "$compile", "$controller", function($rootScope) {
+        app.rootScope = $rootScope, console.log("angular app module run"), init();
     } ]), angular.element(document).ready(function() {
-        angular.bootstrap(document, [ "AppModule" ]);
-    }), this;
+        angular.bootstrap(document, [ app.module.name ]);
+    }), app;
 }, Chondric.View = function(options) {
     var settings = {
         id: null,
@@ -428,45 +398,6 @@ window.console || (window.console = {
     showPreviousPage: function() {
         this.prev && app.changePage(this.prev, "prev");
     }
-}), Chondric.SampleSubviewTemplate = function(options) {
-    var settings = {
-        template: "subview.html"
-    };
-    $.extend(settings, options), Chondric.View.call(this, settings);
-}, $.extend(Chondric.SampleSubviewTemplate.prototype, Chondric.View.prototype, {
-    getDefaultModel: function() {
-        return {};
-    },
-    updateModel: function(dataId, callback) {
-        this.model || (this.model = this.getDefaultModel());
-        this.model;
-        callback();
-    },
-    updateView: function() {}
-}), Chondric.SampleViewTemplate = function(options) {
-    var settings = {
-        template: "index.html"
-    };
-    $.extend(settings, options), Chondric.View.call(this, settings);
-}, $.extend(Chondric.SampleViewTemplate.prototype, Chondric.View.prototype, {
-    getDefaultModel: function() {
-        return {};
-    },
-    updateModel: function(dataId, callback) {
-        this.model || (this.model = this.getDefaultModel());
-        var m = this.model;
-        this.subViews.firstSubView.setModel(m.subviewmodel), callback();
-    },
-    updateView: function() {
-        this.subViews.firstSubView.updateView();
-    },
-    attachSubviews: function() {
-        var page = this;
-        this.subViews.firstSubView = new Chondric.SampleSubviewTemplate({
-            id: page.id + "_subview1",
-            element: $(".subview", page.element)
-        });
-    }
 }), Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
     this.sqlerror = function(t, err) {
         err && err.message ? console.error(err.message) : t && t.message ? console.error(t.message) : err ? console.error(err) : t ? console.error(t) : console.log("sql error");
@@ -520,7 +451,7 @@ window.console || (window.console = {
             that.updateDatabase(callback);
         });
     };
-}, angular.module("chondric", []).directive("ngTap", function() {
+}, Chondric.directive("ngTap", function() {
     return function(scope, element, attrs) {
         element.addClass("tappable"), attrs.ngTap && 0 == attrs.ngTap.indexOf("app.") && !scope.app && (scope.app = app);
         var tapping = !1, touching = !1, clicking = !1, touchstart = function() {
@@ -540,7 +471,7 @@ window.console || (window.console = {
             !touching && clicking && (touchend(e), clicking = !1);
         }), element.bind("tap click", function() {});
     };
-}).directive("previewcontrols", function() {
+}), Chondric.directive("previewcontrols", function() {
     return {
         restrict: "E",
         template: "<div id='previewcontrols'><button ng-tap='updatePreviewSettings(1024,768, true)'>iPad landscape</button><button ng-tap='updatePreviewSettings(768, 1024, true)'>iPad portrait</button><button ng-tap='updatePreviewSettings(568,320, true)'>iPhone5 landscape</button><button ng-tap='updatePreviewSettings(320, 568, true)'>iPhone5 portrait</button><button ng-tap='updatePreviewSettings(1024,748, false)'>iPad landscape iOS6</button><button ng-tap='updatePreviewSettings(768, 1004, false)'>iPad portrait iOS6</button><button ng-tap='updatePreviewSettings(568,300, false)'>iPhone5 landscape iOS6</button><button ng-tap='updatePreviewSettings(320,548, false)'>iPhone5 portrait iOS6</button><button ng-tap='reloadPreview()'>Reload</button></div>",
@@ -558,6 +489,18 @@ window.console || (window.console = {
                     overlayStatusBar: overlayStatusBar
                 };
             };
+        }
+    };
+}), Chondric.directive("chondricViewport", function($compile) {
+    return {
+        link: function(scope, element) {
+            console.log("viewport directive");
+            var rv = (scope.$parent.rk, scope.$parent.rv), template = "";
+            rv ? rv.isSection ? (scope.pageParams = rv.params || {}, template = '<div chondric-viewport class="{{transition}}" ng-class="{\'chondric-section\': rv.isSection, \'chondric-page\': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute, notransition: noTransition}" ng-repeat="(rk, rv) in rv.subsections" route="{{rk}}" ng-controller="rv.controller"></div>') : rv.templateUrl ? (scope.pageParams = rv.params || {}, 
+            template = '<div ng-include src="rv.templateUrl"></div>') : template = "<span>Template not set</span>" : (element.addClass("chondric-viewport"), 
+            template = '<div chondric-viewport class="{{transition}}" ng-class="{\'chondric-section\': rv.isSection, \'chondric-page\': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute, notransition: noTransition}" ng-repeat="(rk, rv) in openViews" route="{{rk}}" ng-controller="rv.controller"></div>');
+            var newElement = angular.element(template);
+            $compile(newElement)(scope), element.html(""), element.append(newElement);
         }
     };
 }), Chondric.Syncable = function(options) {

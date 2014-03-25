@@ -9,17 +9,161 @@ if (!window.console) {
 
 var Chondric = angular.module('chondric', [])
 
-
-
-
-
 Chondric.App = function(options) {
-    var app = this;
-    //    angular.module('chondric', [])
+    return this;
+};
 
-    var appCtrl = function() {
+Chondric.initApp = function(options) {
+    var app = {};
+    var appModule = app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []));
+
+    var allRoutes = app.allRoutes = {}
+
+
+    // these options are defined in the 
+    var initialOptions = {
 
     }
+
+
+
+    app.createViewTemplate = function(baseView, templateId, templateFile, viewOptions) {
+
+        if (typeof templateId == "string") {
+            // old format
+            viewOptions.baseView = baseView;
+            viewOptions.templateId = templateId;
+            viewOptions.templateFile = templateFile;
+        } else {
+            viewOptions = baseView;
+        }
+
+        var allControllers = [];
+        var page = {};
+        if (viewOptions.initAngular) viewOptions.initAngular.call(page);
+        var pageController = null;
+        if (viewOptions.controller) {
+            // use this controller with name based on id or random
+        }
+        for (var cn in page.controllers) {
+            if (!pageController) {
+                pageController = page.controllers[cn];
+                continue;
+            };
+            // todo: register other controllers
+        }
+
+        var route = viewOptions.route || ("/" + viewOptions.templateId + "/$p1/$p2");
+
+        allRoutes[route] = {
+            isSection: false,
+            controller: pageController,
+            templateUrl: viewOptions.templateId + ".html"
+        }
+    }
+
+
+
+    var appCtrl = app.controller = function($scope) {
+        app.scope = $scope;
+        $scope.allRoutes = allRoutes;
+        $scope.route = null;
+        $scope.nextRoute = null;
+        $scope.lastRoute = null;
+        $scope.transition = "crossfade";
+
+        $scope.openViews = {}
+
+        function loadView(url) {
+            if (!url) {
+                // first run - load start page
+                console.log("default route")
+                return;
+            }
+            var matchingRoutes = [];
+            var parts = url.split("/");
+            routeLoop: for (var r in allRoutes) {
+                var rparts = r.split("/");
+                for (var i = 0; i < rparts.length; i++) {
+                    if (rparts[i] == parts[i]) continue;
+                    if (rparts[i][0] == "$") continue;
+                    continue routeLoop;
+                }
+                matchingRoutes.push(r);
+            }
+            matchingRoutes.sort(function(a, b) {
+                return a.length - b.length
+            })
+
+            // matching routes list should be section heirarchy
+
+            var openViews = $scope.openViews;
+            for (var i = 0; i < matchingRoutes.length; i++) {
+                var template = $scope.allRoutes[matchingRoutes[i]];
+                var mrp = matchingRoutes[i].split("/");
+                var ar = "";
+                var params = {};
+                for (var j = 0; j < mrp.length; j++) {
+                    if (mrp[j][0] == "$") params[mrp[j].substr(1)] = decodeURIComponent(parts[j]);
+                    if (parts[j]) ar += "/" + parts[j];
+                }
+                console.log(params);
+                if (template.isSection) {
+                    console.log("Get section with route " + ar);
+                    var section = openViews[ar];
+                    if (!section) {
+                        section = openViews[ar] = {
+                            controller: template.controller,
+                            isSection: true,
+                            params: params,
+                            subsections: {}
+                        }
+                    }
+                    openViews = section.subsections;
+                } else {
+                    console.log("Get page with route " + ar);
+                    var page = openViews[ar];
+                    if (!page) {
+                        page = openViews[ar] = {
+                            controller: template.controller,
+                            templateUrl: template.templateUrl,
+                            params: params
+                        }
+                    }
+                    return;
+                }
+            }
+        }
+
+        $scope.changePage = app.changePage = function(r, transition) {
+            if (!r || r.indexOf("/") < 0) {
+                console.error("changePage syntax has changed - the first parameter is a route url instead of an id");
+                return;
+            }
+            if ($scope.route == r) return;
+            if ($scope.lastRoute == r) $scope.lastRoute = null;
+            $scope.transition = transition || "crossfade";
+            $scope.noTransition = true;
+            loadView(r);
+            $scope.nextRoute = r;
+            window.setTimeout(function() {
+                $scope.noTransition = false;
+                $scope.route = r;
+                $scope.$apply();
+            }, 100)
+
+        }
+
+        $scope.$watch("route", function(url, oldVal) {
+            $scope.nextRoute = null;
+            $scope.lastRoute = oldVal;
+            console.log("Route changed to " + url + " from " + oldVal);
+            loadView(url);
+        })
+        if (options.appCtrl) options.appCtrl($scope);
+    } // end appCtrl
+
+
 
 
     app.ready = false;
@@ -32,7 +176,7 @@ Chondric.App = function(options) {
     app.Views = {};
     app.ViewTemplates = {};
 
-
+    /*
     app.createViewTemplate = function(baseView, templateId, templateFile, options) {
 
         if (typeof templateId == "string") {
@@ -78,7 +222,8 @@ Chondric.App = function(options) {
         app.ViewTemplates[options.templateId] = template;
 
     };
-
+*/
+    /*
     app.createViewTemplate(
         Chondric.View,
         "AppLoadTemplate",
@@ -109,7 +254,7 @@ Chondric.App = function(options) {
     });
 
     app.activeView = app.Views.appLoadPage;
-
+*/
 
     app.platform = "web";
     app.isSimulator = false;
@@ -384,7 +529,7 @@ Chondric.App = function(options) {
             outPageClass: "behindfull"
         }
     };
-
+    /*
     app.changePage = function(pageId, transitionId) {
         var transition = app.transitions[transitionId] || app.transitions.crossfade;
         if (pageId == "dlgbg") pageId = app.activeView.dlgbg;
@@ -393,7 +538,7 @@ Chondric.App = function(options) {
         if (!pageId) return;
         app.transition(pageId, transition.inPageClass, transition.outPageClass);
     };
-
+*/
 
     var initEvents = function(callback) {
         callback();
@@ -401,7 +546,8 @@ Chondric.App = function(options) {
 
     var loadFirstPage = function(callback) {
         // if first page is not specified in settings or hash, custominit is responsible for loading it
-
+        app.scope.route = "/start";
+        /*
         if (settings.loadPageFromHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
             app.changePage(location.hash.substr(1));
         } else {
@@ -411,7 +557,7 @@ Chondric.App = function(options) {
                 app.changePage(vid, "crossfade");
             }
         }
-
+*/
         callback();
 
     };
@@ -472,8 +618,8 @@ Chondric.App = function(options) {
         console.log("beginning app initialization");
 
         var initInternal = function() {
-            app.rootScope.platform = app.platform;
-            app.rootScope.$apply();
+            app.scope.platform = app.platform;
+            app.scope.$apply();
 
             var sizeChanged = function() {
                 // on ios 7 we need to leave space for the status bar
@@ -488,16 +634,16 @@ Chondric.App = function(options) {
                 }
 
                 // for phone screens a multicolumn layout doesn't make sense
-                if (w < 768 && app.rootScope.maxColumns != 1) {
+                if (w < 768 && app.scope.maxColumns != 1) {
                     console.log("setting singlecolumn")
-                    app.rootScope.maxColumns = 1;
+                    app.scope.maxColumns = 1;
                     $(".viewport").addClass("singlecolumn");
-                    app.rootScope.$apply();
-                } else if (w >= 768 && app.rootScope.maxColumns != 3) {
+                    app.scope.$apply();
+                } else if (w >= 768 && app.scope.maxColumns != 3) {
                     console.log("setting multicolumn")
-                    app.rootScope.maxColumns = 3;
+                    app.scope.maxColumns = 3;
                     $(".viewport").removeClass("singlecolumn");
-                    app.rootScope.$apply();
+                    app.scope.$apply();
                 }
 
 
@@ -561,25 +707,20 @@ Chondric.App = function(options) {
     };
 
 
-    app.angularAppModule.run(["$rootScope", "$compile", "$controller",
+    app.module.run(["$rootScope", "$compile", "$controller",
         function($rootScope, $compile, $controller) {
-            app.compile = $compile;
-            app.$controller = $controller;
+            //          app.compile = $compile;
+            //          app.$controller = $controller;
             app.rootScope = $rootScope;
             console.log("angular app module run");
             init();
         }
     ]);
 
-    // settings and all functions are loaded, now initialize angular
-    // This won't do much, but lets us use angular on the loading page
-    // for example to display root scope values as they are loaded
-
     angular.element(document).ready(function() {
-        angular.bootstrap(document, ["AppModule"]);
+        angular.bootstrap(document, [app.module.name]);
     });
 
 
-
-    return this;
+    return app;
 };
