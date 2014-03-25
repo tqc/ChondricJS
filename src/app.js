@@ -7,23 +7,25 @@ if (!window.console) {
     };
 }
 
-// jqm autoinit doesn't work for dynamic pages
-$(document).bind("mobileinit", function() {
-    $.mobile.autoInitializePage = false;
-
-});
-
-Chondric = {};
 var Chondric = angular.module('chondric', [])
+
+
+
 
 
 Chondric.App = function(options) {
     var app = this;
+    //    angular.module('chondric', [])
 
-    this.ready = false;
-    this.autohidesplashscreen = false;
-    this.Pages = {};
-    this.Actions = {};
+    var appCtrl = function() {
+
+    }
+
+
+    app.ready = false;
+    app.autohidesplashscreen = false;
+    app.Pages = {};
+    app.Actions = {};
 
     app.startTime = new Date().getTime();
 
@@ -200,122 +202,6 @@ Chondric.App = function(options) {
         return $(pagediv).attr("data-scriptless") != undefined;
     }
 
-    function PageCreated(event) {
-        var pageid = this.id;
-        var pagediv = this;
-
-
-
-        console.log("created page " + pageid);
-        //    $(pagediv).attr("style", "")
-        if (isScriptless(pagediv)) {
-
-            // TODO: allow this on scripted dialogs with data-autoclose attribute
-            // scriptless dialogs can be closed by clicking outside
-            // TODO: should this be vclick?
-            if ($(pagediv).attr("data-role") == "dialog") {
-                $(pagediv).click(function() {
-                    $('.ui-dialog').dialog('close');
-                });
-                $("[data-role=content], [data-role=header]", pagediv).click(function(e) {
-                    e.stopPropagation();
-                });
-            }
-
-            return;
-
-        }
-
-        // TODO: this probably goes better elsewhere
-        // converts a link with data-role help to a standard popup button
-        // ensure page script is loaded and call setup method of page
-        if (app.Pages[pageid]) {
-            app.Pages[pageid].attachEvents.call(app.Pages[pageid], pagediv);
-            app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, true);
-        } else {
-            require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
-                app.Pages[pageid].attachEvents.call(app.Pages[pageid], pagediv);
-                app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, true);
-            });
-        }
-
-    };
-
-    function PageBeforeShow(event) {
-
-        var pagediv = this;
-        var pageid = this.id;
-
-        console.log("shown page " + pageid);
-        console.log("data-url = " + $(pagediv).attr("data-url"));
-
-
-        //  $(pagediv).attr("style", "")
-        if (isScriptless(pagediv)) return;
-
-        if (app.Pages[pageid]) {
-            app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, false);
-        } else {
-            require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
-                app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, true, false);
-            });
-        }
-    };
-
-    function PageShown(event) {
-
-        var pagediv = this;
-        var pageid = this.id;
-
-        console.log("shown page " + pageid);
-        console.log("data-url = " + $(pagediv).attr("data-url"));
-
-
-        //      $(pagediv).attr("style", "")
-        if (isScriptless(pagediv)) return;
-
-        if (app.Pages[pageid]) {
-            app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, false, false);
-        } else {
-            require(["pages/" + pageid.toLowerCase().replace(/page$/, "") + ".js"], function() {
-                app.Pages[pageid].updateView.call(app.Pages[pageid], pagediv, null, false, false);
-            });
-        }
-
-    };
-
-
-    function ButtonClick(event) {
-        //alert("vclick");
-        var link = $(this);
-
-        if (link.attr("data-animate-click") && app.animateClick) {
-            app.animateClick(link);
-
-        }
-
-        var action = app.Actions[link.attr("data-action")];
-        if (link.attr("data-prepopulate")) {
-            app.prepopulate = JSON.parse(link.attr("data-prepopulate"));
-        }
-        for (var cn in settings.contexts) {
-
-            // TODO: need a way to handle custom context like file/version
-            if (link.attr("data-context-" + cn)) {
-                app.context[cn](link.attr("data-context-" + cn));
-            }
-
-        }
-
-        if (action) {
-            action.execute();
-        } else {
-            return true;
-            //var href = link.attr("href");
-            //if (href) $.mobile.changePage(href, {});
-        }
-        return false;
-    };
 
     this.appLoadLog = function(msg) {
         console.log(msg);
@@ -499,7 +385,7 @@ Chondric.App = function(options) {
         }
     };
 
-    this.changePage = function(pageId, transitionId) {
+    app.changePage = function(pageId, transitionId) {
         var transition = app.transitions[transitionId] || app.transitions.crossfade;
         if (pageId == "dlgbg") pageId = app.activeView.dlgbg;
         if (pageId == "prev") pageId = app.activeView.prev;
@@ -510,213 +396,6 @@ Chondric.App = function(options) {
 
 
     var initEvents = function(callback) {
-
-        app.touchevents = {
-            touchstart: "touchstart",
-            touchend: "touchend",
-            touchmove: "touchmove"
-        };
-
-
-        if (document.ontouchend === undefined) {
-            // touch not supported - use mouse events for swipe
-            app.touchevents = {
-                touchstart: "mousedown",
-                touchend: "mouseup mouseleave",
-                touchmove: "mousemove"
-            };
-        }
-
-        app.appLoadLog("Setting up event handlers");
-
-
-
-        var nextPage = app.activeView;
-        nextPage.ensureLoaded("active", function() {});
-        if (nextPage.next) app.Views[nextPage.next].ensureLoaded("next", function() {});
-        if (nextPage.prev) app.Views[nextPage.prev].ensureLoaded("prev", function() {});
-
-
-
-        var swiping = false;
-
-        var startX = 0;
-        var startY = 0;
-        var dx = 0;
-        var dy = 0;
-
-        var activePage;
-        var nextPage;
-        var prevPage;
-
-        var viewportWidth;
-        var horizontal = false;
-        var vertical = false;
-
-        var canSwipeLeft = false;
-        var canSwipeRight = false;
-
-
-        $(document).on(app.touchevents.touchstart, ".page.active.swipe", function(e) {
-            //                alert("1");
-            if (app.transitioning) return;
-            if (swiping) return;
-            swiping = true;
-
-            //            console.log("start swipe");
-
-            if (e.originalEvent.changedTouches) {
-                startX = e.originalEvent.changedTouches[0].clientX;
-                startY = e.originalEvent.changedTouches[0].clientY;
-
-            } else {
-                startX = e.clientX;
-                startY = e.clientY;
-                dx = 0;
-                dy = 0;
-                horizontal = false;
-                vertical = false;
-            }
-
-            activePage = app.activeView.element;
-            nextPage = app.activeView.next && app.getView(app.activeView.next).element;
-            prevPage = app.activeView.prev && app.getView(app.activeView.prev).element;
-
-            app.viewportWidth = $(".viewport").width();
-
-            canSwipeRight = prevPage && prevPage.length > 0 || activePage.hasClass("swipetoblank");
-            canSwipeLeft = nextPage && nextPage.length > 0 || activePage.hasClass("swipetoblank");
-
-
-        });
-
-
-        $(document).on(app.touchevents.touchmove, ".page.active.swipe", function(e) {
-            if (app.transitioning) return;
-            if (!swiping) return;
-            if (vertical) return;
-            //            console.log("continue swipe");
-
-            if (e.originalEvent.changedTouches) {
-                dx = e.originalEvent.changedTouches[0].clientX - startX;
-                dy = e.originalEvent.changedTouches[0].clientY - startY;
-            } else {
-
-                dx = e.clientX - startX;
-                dy = e.clientY - startY;
-            }
-            if (dx > 20 || dx < -20 && (dy < 20 && dy > -20)) {
-                horizontal = true;
-            }
-
-            if (!horizontal && (dy > 20 || dy < -20)) {
-                vertical = true;
-                dx = 0;
-                app.activeView.setSwipePosition(prevPage, nextPage, dx, 0);
-
-            } else if (horizontal) {
-
-                if (dx < 0 && canSwipeLeft) {
-                    app.activeView.setSwipePosition(prevPage, nextPage, dx, 0);
-                }
-                if (dx > 0 && canSwipeRight) {
-                    app.activeView.setSwipePosition(prevPage, nextPage, dx, 0);
-
-                }
-                return false;
-
-            }
-
-            //   e.stopPropagation();
-            //                return false;
-
-        });
-        $(document).on(app.touchevents.touchend, ".page.active.swipe", function(e) {
-            if (app.transitioning) return;
-            if (!swiping) return;
-            swiping = false;
-            //   console.log("end swipe");
-
-            app.activeView.setSwipePosition(prevPage, nextPage, undefined, null);
-
-            $(".page.active .page.next .page.prev").attr("style", "");
-
-            swiping = false;
-            if (dx < -100 && app.activeView.next) app.activeView.showNextPage();
-            else if (dx > 100 && app.activeView.prev) app.activeView.showPreviousPage();
-            else {
-
-                app.activeView.setSwipePosition(prevPage, nextPage, null, null);
-
-            }
-
-            dx = 0;
-            dy = 0;
-            horizontal = false;
-            vertical = false;
-
-
-
-        });
-
-
-
-        $(document).on("tap click", "a.pop", function() {
-            var link = $(this);
-            var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'pop')");
-
-            app.changePage(id, "pop");
-            return false;
-        });
-        $(document).on("tap click", "a.dlgpop", function() {
-            var link = $(this);
-            var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'dlgpop')");
-            app.changePage(id, "dlgpop");
-            return false;
-        });
-        $(document).on("tap click", "a.dlgclose", function() {
-            var link = $(this);
-            var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'dlgclose')");
-            app.changePage(id, "dlgclose");
-            return false;
-        });
-
-
-        $(document).on("tap click", "a.close", function() {
-            var link = $(this);
-            var id = link.attr("href").replace("#", "");
-            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'close')");
-            app.changePage(id, "close");
-            return false;
-
-        });
-
-        $(document).on("tap click", "a.next", function() {
-            var link = $(this);
-            var id = link.attr("href").replace("#", "");
-            if (id == "next") id = app.activeView.next;
-            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'next')");
-            app.changePage(id, "next");
-            return false;
-
-        });
-
-
-        $(document).on("tap click", "a.prev", function() {
-            var link = $(this);
-            var id = link.attr("href").replace("#", "");
-            if (id == "prev") id = app.activeView.prev;
-            console.warn("obsolete - use ng-tap=\"app.changePage('" + id + "', 'prev')");
-            app.changePage(id, "prev");
-            return false;
-
-        });
-
-
-
         callback();
     };
 
