@@ -2,24 +2,89 @@ var path = require('path');
 var fs = require('fs');
 var mkdirp = require("mkdirp");
 //var bower = require("bower");
-
+var crypto = require('crypto');
 exports.update = function(apphostdir, appdef) {
 
     var chondricdir = __dirname;
     var appdir = path.resolve(apphostdir, appdef.htmlPath);
-
+    var generatorLogPath = apphostdir + "/chondric-generator.json";
 
     console.log("updating app in " + appdir);
+
+    var genlog = {};
+    if (fs.existsSync(generatorLogPath)) genlog = JSON.parse(fs.readFileSync(generatorLogPath, "utf8"));
+
+    var generateIfSafe = function(targetPath, generator) {
+        var relativePath = path.relative(apphostdir, targetPath);
+
+        // create any folders necessary
+        var targetdir = path.dirname(targetPath);
+        if (!fs.existsSync(targetdir)) {
+            mkdirp.sync(targetdir);
+        }
+
+        var targetExists = fs.existsSync(targetPath);
+        var previouslyGenerated = genlog[relativePath];
+
+        var resulthash;
+        var filehash;
+
+        if (!targetExists || previouslyGenerated) {
+            var result = generator();
+            resulthash = crypto.createHash('sha1').update(result).digest('hex');
+
+        }
+
+        if (targetExists && !previouslyGenerated) {
+            console.log(relativePath + " was created manually - not updating");
+            return;
+        }
+
+        if (targetExists && previouslyGenerated == resulthash) {
+            // templates haven't changed - no need to continue
+            return;
+        }
+
+        if (targetExists && previouslyGenerated) {
+            filehash = crypto.createHash('sha1').update(fs.readFileSync(targetPath, "utf8")).digest('hex');
+            if (filehash != previouslyGenerated) {
+                if (resulthash != previouslyGenerated) {
+                    // only report this if the template or appdef has caused a change
+                    console.log(relativePath + " was changed - not updating");
+                }
+                return;
+            }
+        }
+
+        // to get to here, file must equal previously generated version
+        if (targetExists && filehash != previouslyGenerated) {
+            throw ("This should not be possible");
+        }
+
+        if (targetExists) {
+            console.log(relativePath + " found - updating");
+        } else {
+            console.log(relativePath + " not found - creating");
+        }
+
+        fs.writeFileSync(targetPath, result);
+        genlog[relativePath] = resulthash;
+        return true;
+    }
 
     var noSubstitution = function(s) {
         return s;
     };
     var standardSubstitution = function(template, appdef, pagedef) {
-        var result = template.replace(/__APPHOST_NAME__/g, appdef.appHost)
-            .replace(/__APPTITLE__/g, appdef.title);
+        var result = template
+            .replace(/__APPHOST_NAME__/g, appdef.appHost)
+            .replace(/__APPTITLE__/g, appdef.title)
+            .replace(/__FIRSTPAGETEMPLATE__/g, appdef.route || appdef.pages[0].route || ("/" + appdef.pages[0].id));
 
         if (pagedef) {
-            result = result.replace(/__PAGEID__/g, pagedef.id)
+            result = result
+                .replace(/__PAGEID__/g, pagedef.id)
+                .replace(/__PAGEROUTE__/g, pagedef.route || ("/" + pagedef.id))
                 .replace(/__PREVPAGEID__/g, pagedef.prev)
                 .replace(/__NEXTPAGEID__/g, pagedef.next)
                 .replace(/__ANGULARMODULES__/g, JSON.stringify(pagedef.angularModules || []))
@@ -29,177 +94,117 @@ exports.update = function(apphostdir, appdef) {
         return result;
     };
 
-    var updateIfMissing = function(destination, templatePath, substitute, pagedef, userTemplatePath) {
-        var fulldest = path.resolve(apphostdir, destination);
-        if (fs.existsSync(fulldest)) return false;
 
+    var updateFile = function(targetDir, relTarget, templatePath, substitute, pagedef) {
+
+        // todo: look for a templates folder in app folder first
         var fullTemplatePath = path.resolve(path.resolve(chondricdir, "templates"), templatePath);
 
-        if (userTemplatePath) {
-            // if a template was specified in appdef but does not exist, create it
-            updateIfMissing(userTemplatePath, templatePath, noSubstitution);
-        }
+        generateIfSafe(path.resolve(targetDir, relTarget), function() {
+            var template = fs.readFileSync(fullTemplatePath, "utf8");
+            return substitute(template, appdef, pagedef || {});
+        });
 
-        var template = fs.readFileSync(fullTemplatePath).toString();
-        var result = substitute(template, appdef, pagedef || {});
-
-        fs.writeFileSync(fulldest, result);
-
-        return true;
-    };
-
-
-    if (appdef.appHost) {
-        updateIfMissing("Procfile", "Procfile", standardSubstitution);
-        updateIfMissing(appdef.appHost + ".js", "apphost.js", standardSubstitution);
-        updateIfMissing("package.json", "package.jsontemplate", standardSubstitution);
-        updateIfMissing(".env", "template.env", noSubstitution);
-        updateIfMissing(".gitignore", "template.gitignore", noSubstitution);
-        updateIfMissing(".bowerrc", "bowerrc.json", standardSubstitution);
-        updateIfMissing("bower.json", "bower.json", standardSubstitution);
     }
 
 
+    if (appdef.appHost) {
+        updateFile(apphostdir, "Procfile", "Procfile", standardSubstitution);
+        updateFile(apphostdir, appdef.appHost + ".js", "apphost.js", standardSubstitution);
+        updateFile(apphostdir, "package.json", "package.jsontemplate", standardSubstitution);
+        updateFile(apphostdir, ".env", "template.env", noSubstitution);
+        updateFile(apphostdir, ".gitignore", "template.gitignore", noSubstitution);
+        updateFile(apphostdir, ".bowerrc", "bowerrc.json", standardSubstitution);
+        updateFile(apphostdir, "bower.json", "bower.json", standardSubstitution);
+        updateFile(apphostdir, "app.js", "app.js", standardSubstitution);
+        updateFile(apphostdir, "db.js", "db.js", standardSubstitution);
+    }
 
+
+    // todo: replace this with a more flexible custom template system
+    /*
     if (appdef.pageTemplate) {
-        if (updateIfMissing(appdef.pageTemplate, "page.html", noSubstitution)) {
+        if (updateFile(apphostdir, appdef.pageTemplate, "page.html", noSubstitution)) {
             console.log("Custom page template created. Edit it before continuing to create pages.");
             return;
         }
     }
-
-    mkdirp(path.resolve(apphostdir, "platformscripts"), function() {
-
-        mkdirp(path.resolve(appdir, "lib"), function() {
-
-            updateIfMissing("apphtml/splash.html", "splash.html", standardSubstitution);
-            updateIfMissing("apphtml/icon.html", "icon.html", standardSubstitution);
-            updateIfMissing("apphtml/preview.html", "preview.html", standardSubstitution);
+*/
 
 
 
+    mkdirp.sync(path.resolve(appdir, "lib"));
 
-            // add jquery to lib folder
-            //            fs.createReadStream(path.resolve(chondricdir, "lib/jquery-1.7.1.js")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/jquery-1.7.1.js")));
-            //            fs.createReadStream(path.resolve(chondricdir, "lib/pure.min.css")).pipe(fs.createWriteStream(path.resolve(appdir, "lib/pure.min.css")));
-
-            if (fs.existsSync(path.resolve(appdir, "app.css"))) {
-                console.log("app.css already exists - skipping");
-            } else {
-                // create app css
-                fs.writeFile(path.resolve(appdir, "app.css"), "");
-            }
-
-            var pagetemplatepath = appdef.pageTemplate ? path.resolve(path.dirname(require.main.filename), appdef.pageTemplate) : path.resolve(chondricdir, "templates/page.html");
-
-            var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
-
-            var frameworkscriptrefs = "<script src=\"bower_components/jquery/dist/jquery.min.js\"></script>\n";
-            frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";
-            frameworkscriptrefs += "<script src=\"bower_components/angular-sanitize/angular-sanitize.min.js\"></script>\n";
-            frameworkscriptrefs += "<script src=\"bower_components/angular-ui-utils/ui-utils.min.js\"></script>\n";
-            frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
-
-            var angularUsed = appdef.useAngular;
-
-            // load templates
+    updateFile(appdir, "splash.html", "splash.html", standardSubstitution);
+    updateFile(appdir, "icon.html", "icon.html", standardSubstitution);
+    updateFile(appdir, "preview.html", "preview.html", standardSubstitution);
+    updateFile(appdir, "app.css", "app.css", standardSubstitution);
 
 
-
-            fs.readFile(pagetemplatepath, "utf8", function(err, pagehtmltemplate) {
-                fs.readFile(path.resolve(chondricdir, "templates/angularpage.js"), "utf8", function(err, angularpagejstemplate) {
-                    fs.readFile(path.resolve(chondricdir, "templates/page.js"), "utf8", function(err, pagejstemplate) {
-                        fs.readFile(apphtmltemplatepath, "utf8", function(err, apphtmltemplate) {
-                            fs.readFile(path.resolve(chondricdir, "templates/app.js"), "utf8", function(err, appjstemplate) {
-                                fs.readFile(path.resolve(chondricdir, "templates/db.js"), "utf8", function(err, dbjstemplate) {
-
-                                    var scriptrefs = "";
-                                    // create pages
-                                    for (var i = 0; i < appdef.pages.length; i++) {
-                                        var pagedef = appdef.pages[i];
-
-                                        if (!pagedef.prev) pagedef.prev = i > 0 ? appdef.pages[i - 1].id : "";
-
-                                        if (!pagedef.next) pagedef.next = i < appdef.pages.length - 1 ? appdef.pages[i + 1].id : "";
+    var pagetemplatepath = appdef.pageTemplate ? path.resolve(path.dirname(require.main.filename), appdef.pageTemplate) : path.resolve(chondricdir, "templates/page.html");
 
 
+    var frameworkscriptrefs = "<script src=\"bower_components/jquery/dist/jquery.min.js\"></script>\n";
+    frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";
+    frameworkscriptrefs += "<script src=\"bower_components/angular-sanitize/angular-sanitize.min.js\"></script>\n";
+    frameworkscriptrefs += "<script src=\"bower_components/angular-ui-utils/ui-utils.min.js\"></script>\n";
+    frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
 
-                                        angularUsed = angularUsed || pagedef.useAngular;
-                                        var jspath = path.resolve(appdir, appdef.pages[i].id + ".js");
-                                        var htmlpath = path.resolve(appdir, appdef.pages[i].id + ".html");
-                                        var template = pagejstemplate;
-                                        var scriptless = appdef.pages[i].scriptless;
-                                        var useAngular = pagedef.useAngular || (appdef.useAngular && pagedef.useAngular !== false);
-                                        var angularController = pagedef.angularController = pagedef.angularController || (pagedef.id + "Ctrl");
-                                        if (useAngular) template = angularpagejstemplate;
-
-                                        if (fs.existsSync(jspath)) {
-                                            console.log(appdef.pages[i].id + ".js already exists - skipping");
-                                        } else if (!scriptless) {
-                                            var pagejs = standardSubstitution(template, appdef, pagedef);
-
-                                            fs.writeFile(jspath, pagejs);
-                                        }
-
-                                        if (fs.existsSync(htmlpath)) {
-                                            console.log(appdef.pages[i].id + ".html already exists - skipping");
-                                        } else {
-                                            var pagehtml = pagehtmltemplate.replace(/__PAGEID__/g, appdef.pages[i].id)
-                                                .replace(/__TITLE__/g, appdef.pages[i].title)
-                                                .replace(/ng-controller="__ANGULARCONTROLLER__"/g, useAngular ? "ng-controller=\"" + angularController + "\"" : "");
-                                            fs.writeFile(htmlpath, pagehtml);
-                                        }
-                                        if (!scriptless) {
-                                            scriptrefs += "<script src=\"" + appdef.pages[i].id + ".js\"></script>\n";
-                                        }
-                                    }
-
-                                    if (fs.existsSync(path.resolve(appdir, "app.js"))) {
-                                        console.log("app.js already exists - skipping");
-                                    } else {
-                                        var appjs = appjstemplate.replace(/__TITLE__/g, appdef.title)
-                                            .replace(/__FIRSTPAGETEMPLATE__/g, appdef.pages[0].id);
-
-                                        fs.writeFile(path.resolve(appdir, "app.js"), appjs);
-                                    }
+    var angularUsed = appdef.useAngular;
 
 
+    // load templates
 
-
-                                    var html = apphtmltemplate.replace(/__TITLE__/g, appdef.title)
-                                        .replace(/<!--BEGIN PAGESCRIPTS-->[\s\S]*<!--END PAGESCRIPTS-->/g, "<!--BEGIN PAGESCRIPTS-->" + scriptrefs + "<!--END PAGESCRIPTS-->")
-                                        .replace(/<!--BEGIN FRAMEWORKSCRIPTS-->[\s\S]*<!--END FRAMEWORKSCRIPTS-->/g, "<!--BEGIN FRAMEWORKSCRIPTS-->" + frameworkscriptrefs + "<!--END FRAMEWORKSCRIPTS-->");
-
-                                    fs.writeFile(path.resolve(appdir, "index.html"), html);
-
-
-                                    if (fs.existsSync(path.resolve(appdir, "db.js"))) {
-                                        console.log("db.js already exists - skipping");
-                                    } else {
-                                        var js = dbjstemplate.replace(/__TITLE__/g, appdef.title);
-
-                                        fs.writeFile(path.resolve(appdir, "db.js"), js);
-                                    }
-
-
-
-                                    fs.writeFile(path.resolve(appdir, "lib/chondric.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.js")));
-                                    fs.writeFile(path.resolve(appdir, "lib/chondric.min.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.js")));
-                                    fs.writeFile(path.resolve(appdir, "lib/chondric.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.css")));
-                                    fs.writeFile(path.resolve(appdir, "lib/chondric.min.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.css")));
-
-
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-
-
-
+    fs.readFile(pagetemplatepath, "utf8", function(err, pagehtmltemplate) {
+        fs.readFile(path.resolve(chondricdir, "templates/page.js"), "utf8", function(err, pagejstemplate) {});
     });
+
+
+    var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
+    var apphtmltemplate = fs.readFileSync(apphtmltemplatepath, "utf8");
+
+    var scriptrefs = "";
+    // create pages
+    for (var i = 0; i < appdef.pages.length; i++) {
+        var pagedef = appdef.pages[i];
+
+        var angularController = pagedef.angularController = pagedef.angularController || (pagedef.id + "Ctrl");
+
+
+        if (!pagedef.scriptless) {
+            var jspath = pagedef.id + ".js";
+            if (pagedef.folder) jspath = pagedef.folder + "/" + jspath;
+            updateFile(appdir, jspath, "page.js", standardSubstitution, pagedef);
+            scriptrefs += "<script src=\"" + jspath + "\"></script>\n";
+        }
+
+        var htmlpath = pagedef.id + ".html";
+        if (pagedef.folder) htmlpath = pagedef.folder + "/" + htmlpath;
+        updateFile(appdir, htmlpath, "page.html", standardSubstitution, pagedef);
+
+    }
+
+
+
+    var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
+    var apphtmltemplate = fs.readFileSync(apphtmltemplatepath, "utf8");
+    var html =
+        standardSubstitution(apphtmltemplate, appdef)
+        .replace(/<!--BEGIN PAGESCRIPTS-->[\s\S]*<!--END PAGESCRIPTS-->/g, "<!--BEGIN PAGESCRIPTS-->" + scriptrefs + "<!--END PAGESCRIPTS-->")
+        .replace(/<!--BEGIN FRAMEWORKSCRIPTS-->[\s\S]*<!--END FRAMEWORKSCRIPTS-->/g, "<!--BEGIN FRAMEWORKSCRIPTS-->" + frameworkscriptrefs + "<!--END FRAMEWORKSCRIPTS-->");
+
+    fs.writeFileSync(path.resolve(appdir, "index.html"), html);
+
+
+
+    fs.writeFile(path.resolve(appdir, "lib/chondric.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.js")));
+    fs.writeFile(path.resolve(appdir, "lib/chondric.min.js"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.js")));
+    fs.writeFile(path.resolve(appdir, "lib/chondric.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.css")));
+    fs.writeFile(path.resolve(appdir, "lib/chondric.min.css"), fs.readFileSync(path.resolve(chondricdir, "built/chondric.min.css")));
+
+
+    fs.writeFileSync(generatorLogPath, JSON.stringify(genlog, null, 4));
+
 
 };
 

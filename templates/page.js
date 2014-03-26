@@ -1,24 +1,14 @@
-app.createViewTemplate(
-    {
+app.createViewTemplate({
     templateId: "__PAGEID__",
-    getDefaultModel: function() {
-        return {};
+    route: "__PAGEROUTE__"
+    controller: function($scope) {
+        page.scope = $scope;
+        var m = $scope.m = page.model;
+        $scope.exampleValue = "Example";
+
+        $scope.exampleFunction = function() {
+            $scope.exampleValue = '';
+        };
     },
-    updateModel: function(dataId, existingData, callback) {
-        if (!this.model) this.model = this.getDefaultModel();
-        var m = this.model;
-
-        this.prev = "__PREVPAGEID__";
-        this.next = "__NEXTPAGEID__";
-
-        callback();
-    },
-    attachEvents: function() {
-
-    },
-    updateView: function() {
-
-    },
-
-}
-   );
+    controllers: {}
+});

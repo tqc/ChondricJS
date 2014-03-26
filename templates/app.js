@@ -1,5 +1,5 @@
 var app = new Chondric.App({
-    name: "__TITLE__",
+    name: "__APPTITLE__",
     mightBePhoneGap: true,
     scriptGroups: [],
     angularModules: [],
@@ -23,7 +23,7 @@ var app = new Chondric.App({
     notificationReceived: function(event) {
         if (event.foreground) {
             // app is already open
-        } else {        
+        } else {
             // user opened the app with a notification
         }
     },
