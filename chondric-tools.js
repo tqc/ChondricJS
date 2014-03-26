@@ -89,7 +89,11 @@ exports.update = function(apphostdir, appdef) {
                 .replace(/__NEXTPAGEID__/g, pagedef.next)
                 .replace(/__ANGULARMODULES__/g, JSON.stringify(pagedef.angularModules || []))
                 .replace(/__ANGULARCONTROLLER__/g, pagedef.angularController)
-                .replace(/__PAGETITLE__/g, pagedef.title);
+                .replace(/__PAGETITLE__/g, pagedef.title)
+                .replace(/__TEMPLATEFOLDER__/g, pagedef.folder ? "templateFolder: \"subfolder\"," : "");
+
+
+
         }
         return result;
     };
