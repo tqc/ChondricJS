@@ -9,10 +9,7 @@ if (!window.console) {
 
 var Chondric = angular.module('chondric', [])
 
-Chondric.App = function(options) {
-    return this;
-};
-
+Chondric.App =
 Chondric.initApp = function(options) {
     var app = {};
     var appModule = app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []));
@@ -20,7 +17,7 @@ Chondric.initApp = function(options) {
     var allRoutes = app.allRoutes = {}
 
 
-    // these options are defined in the 
+    // these options are defined in the
     var initialOptions = {
 
     }
@@ -44,6 +41,7 @@ Chondric.initApp = function(options) {
         var pageController = null;
         if (viewOptions.controller) {
             // use this controller with name based on id or random
+            pageController = viewOptions.controller;
         }
         for (var cn in page.controllers) {
             if (!pageController) {
@@ -58,9 +56,36 @@ Chondric.initApp = function(options) {
         allRoutes[route] = {
             isSection: false,
             controller: pageController,
-            templateUrl: viewOptions.templateId + ".html"
+            templateUrl: viewOptions.templateId + ".html",
+            templateId: viewOptions.templateId,
         }
     }
+
+    app.createSection = function(viewOptions) {
+        var pageController = null;
+        if (viewOptions.controller) {
+            // use this controller with name based on id or random
+            pageController = viewOptions.controller;
+        }
+
+        for (var cn in viewOptions.controllers || {}) {
+            if (!pageController) {
+                pageController = page.controllers[cn];
+                continue;
+            };
+            // todo: register other controllers
+        }
+
+        var route = viewOptions.route;
+
+        allRoutes[route] = {
+            isSection: true,
+            controller: pageController,
+//            templateUrl: viewOptions.templateUrl,
+//            templateId: viewOptions.templateId,
+        }
+    }
+
 
 
 
@@ -127,6 +152,7 @@ Chondric.initApp = function(options) {
                         page = openViews[ar] = {
                             controller: template.controller,
                             templateUrl: template.templateUrl,
+                            templateId: template.templateId,
                             params: params
                         }
                     }

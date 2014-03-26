@@ -26,6 +26,16 @@ module.exports = function(grunt) {
                 }
             }
         },
+        concat: {
+            options: {
+                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+            },
+            max: {
+                files: {
+                    "built/chondric.js": ["src/app.js", "src/view.js", "src/versioneddatabase.js", "src/directives/ng-tap.js", "src/directives/preview-controls.js", "src/directives/chondric-viewport.js", "src/genericsync.js"],
+                }
+            }
+        },
         cssmin: {
             combine: {
                 files: {
@@ -45,8 +55,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-copy');
-
+    grunt.loadNpmTasks('grunt-contrib-concat');
     // Default task(s).
-    grunt.registerTask('default', ['uglify:min', "uglify:max", "cssmin", "copy"]);
+    grunt.registerTask('default', ['uglify:min', "concat", "cssmin", "copy"]);
 
 };
