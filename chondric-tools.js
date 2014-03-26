@@ -116,8 +116,8 @@ exports.update = function(apphostdir, appdef) {
         updateFile(apphostdir, ".gitignore", "template.gitignore", noSubstitution);
         updateFile(apphostdir, ".bowerrc", "bowerrc.json", standardSubstitution);
         updateFile(apphostdir, "bower.json", "bower.json", standardSubstitution);
-        updateFile(apphostdir, "app.js", "app.js", standardSubstitution);
-        updateFile(apphostdir, "db.js", "db.js", standardSubstitution);
+        updateFile(appdir, "app.js", "app.js", standardSubstitution);
+        updateFile(appdir, "db.js", "db.js", standardSubstitution);
     }
 
 

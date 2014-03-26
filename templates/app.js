@@ -34,8 +34,3 @@ var app = new Chondric.App({
 });
 
 app.items = {};
-
-
-$(function() {
-    app.init();
-});
