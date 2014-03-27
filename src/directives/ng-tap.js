@@ -29,6 +29,13 @@ Chondric.directive('ngTap', function() {
             element.removeClass('active');
             if (tapping) {
                 tapping = false;
+
+
+                scope.lastTap = {
+                    element: element,
+                    x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageX : e.pageX,
+                    y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageY : e.pageY
+                }
                 scope.$apply(attrs['ngTap'], element);
             }
             clicking = false;

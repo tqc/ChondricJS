@@ -3,11 +3,12 @@ font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
 color: #000;
 font-size: 14px;
 line-height: 1.4;
+    background-color: #888;
+
 }
 
 
 .chondric-viewport {
-    background-color: #888;
     position: absolute;
 top:0;
 left:0;
@@ -22,11 +23,11 @@ z-index: 1;
 .chondric-page {
     background-color: white;
 position: absolute;
-width: 100%;
-height: 100%;
 top:0;
-left: 0;
-overflow: auto;
+left:0;
+bottom:0;
+right: 0;
+overflow: hidden;
 display: none;
 }
 
@@ -371,6 +372,36 @@ line-height: 1.4;
 }
 
 
+/* buttons */
+
+button {
+background-color: transparent;
+border: 1px solid #007aff;
+color: #007aff;
+text-decoration: none;
+text-align: center;
+display: block;
+border-radius: 5px;
+line-height: 27px;
+padding: 0 10px;
+height: 29px;
+white-space: nowrap;
+position: relative;
+overflow: hidden;
+text-overflow: ellipsis;
+font-size: 14px;
+margin: 10px;
+}
+
+button.fullwidth {
+    display: block;
+    width: 95%;
+}
+
+button.active {
+    background-color: rgba(0,122,255,.15);
+}
+
 button:focus {
 outline: none;
 }
@@ -407,9 +438,12 @@ border: none;
 padding: 0 10px;
 line-height: 44px;
 height: 44px;
+margin: 0;
+font-size: inherit;
 }
 
 .navbar button.active {
+    background: transparent;
     opacity: 0.3;
 }
 
@@ -451,9 +485,10 @@ z-index: 10;
 background: transparent;
 border: none;
 color: rgb(111,111,116);
-font-family: "Helvetica Neue","Helvetica";
-font-weight: 300;
-font-size: 12pt;
+height: auto;
+display: inline-block;
+padding: 0 15px;
+margin: 0;
 }
 
 .tabbar button.active, .tabbar button.selected {
@@ -486,7 +521,6 @@ margin: 10px auto;
 /* Content sections */
 
 .page {
-    background-color:#efeff4;
     position:absolute;
     left:0;
     right:0;
@@ -495,6 +529,7 @@ margin: 10px auto;
 }
 
 .body {
+    background-color:#efeff4;
     overflow:auto;
     -webkit-overflow-scrolling: touch;
     position: absolute;
@@ -648,11 +683,16 @@ right: 50%;
 }
 
 
+/* Grid layout */
+
+.col2 {
+    width: 49%;
+    display: inline-block;
+}
+
 /* Content Styles */
 
 .body {
-font-size: 12pt;
-font-weight: 100;
 }
 
 .body p {
@@ -660,10 +700,23 @@ font-weight: 100;
 }
 
 .body h2 {
-margin: 10px;
-font-size: 14pt;
-font-weight: 100;
+white-space: nowrap;
+text-overflow: ellipsis;
+font-size: 14px;
+text-transform: uppercase;
+color: #6d6d72;
+margin: 20px 15px 9px;
+font-weight: normal;
 }
+
+.contentblock {
+background: #fff;
+padding: 10px 15px;
+border-bottom: 1px solid #c8c7cc;
+border-top: 1px solid #c8c7cc;
+color: #000;
+}
+
 
 /* Collapsing sections */
 .collapsible {
@@ -704,95 +757,158 @@ margin:50px auto 0 auto;
     text-align: center;
 }
 
+
+
 /* Icons */
 
-.icon {
-    position: relative;
+/*
+ * A button has class icon-top, icon-left, or icon-right to add an icon.
+ * An additional class, eg icon-default determines the actual icon used.
+ * Since ::before and ::after pseudo elements are used, an icon may need to be defined twice
+ */
+
+/* Left icon */
+
+.icon-left::before {
+    content: "?";
+    display: inline-block;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: bottom;
+    margin-right: 5px;
+    line-height: 44px;
+    height: 100%;
+
 }
 
-.icon::after {
-    font-family: Helvetica;
-    font-size: 20pt;
-    position: absolute;
-    padding: 0 9px;
-    text-align: center;
+/* Right icon */
+
+.icon-right::after {
+    content: "?";
+    display: inline-block;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: bottom;
+    margin-left: 5px;
+    line-height: 44px;
+    height: 100%;
+}
+
+/* Top icon */
+
+.icon-top::before {
+    content: "?";
+    background-position: center;
+    background-repeat: no-repeat;
+    display: block;
     line-height: 40px;
 }
 
-.navbar .icon {
-padding-left:30px;
+
+
+
+.icon-top.icon-default::before,
+.icon-left.icon-default::before, 
+.icon-right.icon-default::after {
+    content: "\2610";
+    font-size: 200%
 }
 
-.navbar .icon::after {
-left:0;
-top:0;
+.icon-top.icon-leftarrow::before,
+.icon-left.icon-leftarrow::before, 
+.icon-right.icon-leftarrow::after {
+    content: "";
+    width: 18px;
+    background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='0 0 90 120' xmlns='http://www.w3.org/2000/svg'><path d='m63.75 11.25 10 10-40 40 40 40-10 10-50-50z' fill='%23007aff'/></svg>");
 }
 
-
-.navbar .right.icon-rightarrow {
-padding-left: 0;
-padding-right:30px;
+.icon-top.icon-rightarrow::before,
+.icon-left.icon-rightarrow::before, 
+.icon-right.icon-rightarrow::after {
+    content: "";
+    width: 18px;
+    background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='0 0 90 120' xmlns='http://www.w3.org/2000/svg'><path d='m63.75 11.25 10 10-40 40 40 40-10 10-50-50z' fill='%23007aff'/></svg>");
 }
 
+/* Modals */
 
-.navbar .right.icon-rightarrow::after {
-right: -30px;
-top:0;
+.modal-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000;
+    opacity: 0;
+    pointer-events:none;
+    visibility: hidden;
+    z-index: 1000;
+    -webkit-transition: opacity 0.3s ease-in-out;
 }
 
-
-.tabbar .icon {
-padding-top:40px;
+.popover.active ~ .modal-overlay,
+.popup.active ~ .modal-overlay {
+    visibility: visible;
+    pointer-events: all;
+    opacity: 0.4;
 }
 
-.tabbar .icon::after {
-top:0;
-left: 0;
-right: 0;
-text-align: center;
+/* popover */
+
+.popover {
+    position: absolute;
+    width: 280px;
+    height: auto;
+    background-color: white;
+    border-radius: 7px;
+    z-index: 1100;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-transition: opacity 0.3s ease-in-out;
 }
 
-
-.icon::after {
-    content: "X";
+.popover.active {
+    position: absolute;
+    opacity: 1;
+    pointer-events: all;
 }
 
-.icon-leftarrow::after {
-    font-weight: bold;
-    content: "<";
+.popover button {
+    display: block;
+    width: 280px;
+    border: none;
+    border-bottom: 1px solid #c8c7cc;
+    margin:0;
+    padding: 10px;
+    height: auto;
+}
+.popover button:last-child {
+    border: none;
 }
 
-.icon-rightarrow::after {
-    font-weight: bold;
-    content: ">";
+/* popup */
+
+
+.popup {
+    position: absolute;
+background-color: #efeff4;
+    width: 630px;
+height: 630px;
+left: 50%;
+top: 50%;
+margin-left: -315px;
+margin-top: -315px;
+z-index: 1100;
+   -webkit-transition: -webkit-transform 0.3s ease-in-out;
+    -webkit-transform: translate(0, 150%);
 }
 
-.icon-left.icon {
-padding-left:30px;
+.popup.active {
+    display: block;
+    position: absolute;
+    -webkit-transform: translate(0, 0);
 }
 
-.icon-left.icon::after {
-left:0;
-top:0;
-}
-
-.icon-right.icon {
-padding-right:30px;
-}
-
-.icon-right.icon::after {
-right:-30px;
-top:0;
-}
-
-.icon-top.icon {
-padding-top:40px;
-}
-
-.icon-top.icon::after {
-top:0;
-left: 0;
-right: 0;
-text-align: center;
-}
 

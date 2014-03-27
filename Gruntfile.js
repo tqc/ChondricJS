@@ -1,5 +1,17 @@
 module.exports = function(grunt) {
 
+    var jsfiles = [
+        "src/app.js",
+        "src/view.js",
+        "src/versioneddatabase.js",
+        "src/directives/ng-tap.js",
+        "src/directives/cjs-popover.js",
+        "src/directives/cjs-popup.js",
+        "src/directives/preview-controls.js",
+        "src/directives/chondric-viewport.js",
+        "src/genericsync.js"
+    ]
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -13,7 +25,7 @@ module.exports = function(grunt) {
                     mangle: false
                 },
                 files: {
-                    "built/chondric.min.js": ["src/app.js", "src/view.js", "src/versioneddatabase.js", "src/directives/ng-tap.js", "src/directives/preview-controls.js", "src/directives/chondric-viewport.js", "src/genericsync.js"],
+                    "built/chondric.min.js": jsfiles
                 }
             },
             max: {
@@ -22,7 +34,7 @@ module.exports = function(grunt) {
                     mangle: false
                 },
                 files: {
-                    "built/chondric.js": ["src/app.js", "src/view.js", "src/versioneddatabase.js", "src/directives/ng-tap.js", "src/directives/preview-controls.js", "src/directives/chondric-viewport.js", "src/genericsync.js"],
+                    "built/chondric.js": jsfiles
                 }
             }
         },
@@ -32,7 +44,7 @@ module.exports = function(grunt) {
             },
             max: {
                 files: {
-                    "built/chondric.js": ["src/app.js", "src/view.js", "src/versioneddatabase.js", "src/directives/ng-tap.js", "src/directives/preview-controls.js", "src/directives/chondric-viewport.js", "src/genericsync.js"],
+                    "built/chondric.js": jsfiles
                 }
             }
         },
