@@ -90,7 +90,7 @@ exports.update = function(apphostdir, appdef) {
                 .replace(/__ANGULARMODULES__/g, JSON.stringify(pagedef.angularModules || []))
                 .replace(/__ANGULARCONTROLLER__/g, pagedef.angularController)
                 .replace(/__PAGETITLE__/g, pagedef.title)
-                .replace(/__TEMPLATEFOLDER__/g, pagedef.folder ? "templateFolder: \"subfolder\"," : "");
+                .replace(/__TEMPLATEFOLDER__/g, pagedef.folder ? "templateFolder: \""+pagedef.folder+"\"," : "");
 
 
 
@@ -102,7 +102,13 @@ exports.update = function(apphostdir, appdef) {
     var updateFile = function(targetDir, relTarget, templatePath, substitute, pagedef) {
 
         // todo: look for a templates folder in app folder first
-        var fullTemplatePath = path.resolve(path.resolve(chondricdir, "templates"), templatePath);
+        var appTemplatePath = path.resolve(path.resolve(apphostdir, "templates"), templatePath);
+        var frameworkTemplatePath = path.resolve(path.resolve(chondricdir, "templates"), templatePath);
+        var fullTemplatePath = fs.existsSync(appTemplatePath) ? appTemplatePath : frameworkTemplatePath;
+        if (!fs.existsSync(fullTemplatePath)) {
+            console.error("Unable to find template "+templatePath);
+            return;
+        }
 
         generateIfSafe(path.resolve(targetDir, relTarget), function() {
             var template = fs.readFileSync(fullTemplatePath, "utf8");
@@ -157,12 +163,6 @@ exports.update = function(apphostdir, appdef) {
     var angularUsed = appdef.useAngular;
 
 
-    // load templates
-
-    fs.readFile(pagetemplatepath, "utf8", function(err, pagehtmltemplate) {
-        fs.readFile(path.resolve(chondricdir, "templates/page.js"), "utf8", function(err, pagejstemplate) {});
-    });
-
 
     var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
     var apphtmltemplate = fs.readFileSync(apphtmltemplatepath, "utf8");
@@ -174,17 +174,18 @@ exports.update = function(apphostdir, appdef) {
 
         var angularController = pagedef.angularController = pagedef.angularController || (pagedef.id + "Ctrl");
 
+        pagedef.type = pagedef.type || "page";
 
         if (!pagedef.scriptless) {
             var jspath = pagedef.id + ".js";
             if (pagedef.folder) jspath = pagedef.folder + "/" + jspath;
-            updateFile(appdir, jspath, "page.js", standardSubstitution, pagedef);
+            updateFile(appdir, jspath, pagedef.type+".js", standardSubstitution, pagedef);
             scriptrefs += "<script src=\"" + jspath + "\"></script>\n";
         }
 
         var htmlpath = pagedef.id + ".html";
         if (pagedef.folder) htmlpath = pagedef.folder + "/" + htmlpath;
-        updateFile(appdir, htmlpath, "page.html", standardSubstitution, pagedef);
+        updateFile(appdir, htmlpath, pagedef.type+".html", standardSubstitution, pagedef);
 
     }
 
