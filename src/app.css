@@ -18,7 +18,7 @@ z-index: 1;
 }
 .chondric-section {
 }
- 
+
 .chondric-page {
     background-color: white;
 position: absolute;
@@ -29,20 +29,20 @@ left: 0;
 overflow: auto;
 display: none;
 }
- 
+
 .chondric-page.active {
 display: block;
 opacity: 1;
 z-index: 10;
 }
- 
+
 .chondric-page.prev {
     pointer-events:none;
 }
 .chondric-page.next {
     pointer-events:none;
 }
- 
+
 .chondric-page.notransition {
 -webkit-transition: none !important;
 }
@@ -54,15 +54,15 @@ z-index: 10;
 .chondric-page.notransition .navbar {
 -webkit-transition: none !important;
 }
- 
- 
+
+
 .chondric-page.next.crossfade {
     pointer-events:none;
 display: block;
 opacity: 1;
 z-index: 1;
 }
- 
+
 .chondric-page.prev.crossfade {
     pointer-events:none;
 display: block;
@@ -75,39 +75,39 @@ z-index: 11;
 .chondric-page.next.slideleft {
     display: block;
 }
- 
+
 .chondric-page.prev.slideleft {
     display: block;
 }
- 
+
 .chondric-page.next.slideright {
     display: block;
 }
- 
+
 .chondric-page.prev.slideright {
     display: block;
 }
 
- 
+
 .chondric-page.slideleft .page, .chondric-page.slideright .page {
     -webkit-transition: -webkit-transform 0.3s ease-in-out;
 }
- 
+
 .chondric-page.next.slideleft .page {
     display: block;
     -webkit-transform: translate(-100%, 0);
 }
- 
+
 .chondric-page.prev.slideleft .page {
     display: block;
     -webkit-transform: translate(100%, 0);
 }
- 
+
 .chondric-page.next.slideright .page {
     display: block;
     -webkit-transform: translate(100%, 0);
 }
- 
+
 .chondric-page.prev.slideright .page {
     display: block;
     -webkit-transform: translate(-100%, 0);
@@ -116,7 +116,7 @@ z-index: 11;
 .chondric-page.slideright .navbar {
 display: none;
 }
- 
+
 .chondric-page.active.slideright .navbar {
     display: block;
 opacity: 1;
@@ -127,7 +127,7 @@ display: block;
 opacity: 0;
 z-index: 1;
 }
- 
+
 .chondric-page.prev.slideright .navbar {
    pointer-events:none;
 display: block;
@@ -404,14 +404,13 @@ outline: none;
 color: #007aff;
 background: transparent;
 border: none;
-padding: 9px;
+padding: 0 10px;
 line-height: 44px;
 height: 44px;
-padding: 0;
 }
 
 .navbar button.active {
-    opacity: 0.3;    
+    opacity: 0.3;
 }
 
 .navbar button.left {
