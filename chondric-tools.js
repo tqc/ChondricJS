@@ -90,7 +90,7 @@ exports.update = function(apphostdir, appdef) {
                 .replace(/__ANGULARMODULES__/g, JSON.stringify(pagedef.angularModules || []))
                 .replace(/__ANGULARCONTROLLER__/g, pagedef.angularController)
                 .replace(/__PAGETITLE__/g, pagedef.title)
-                .replace(/__TEMPLATEFOLDER__/g, pagedef.folder ? "templateFolder: \""+pagedef.folder+"\"," : "");
+                .replace(/__TEMPLATEFOLDER__/g, pagedef.folder ? "templateFolder: \"" + pagedef.folder + "\"," : "");
 
 
 
@@ -106,7 +106,7 @@ exports.update = function(apphostdir, appdef) {
         var frameworkTemplatePath = path.resolve(path.resolve(chondricdir, "templates"), templatePath);
         var fullTemplatePath = fs.existsSync(appTemplatePath) ? appTemplatePath : frameworkTemplatePath;
         if (!fs.existsSync(fullTemplatePath)) {
-            console.error("Unable to find template "+templatePath);
+            console.error("Unable to find template " + templatePath);
             return;
         }
 
@@ -179,13 +179,13 @@ exports.update = function(apphostdir, appdef) {
         if (!pagedef.scriptless) {
             var jspath = pagedef.id + ".js";
             if (pagedef.folder) jspath = pagedef.folder + "/" + jspath;
-            updateFile(appdir, jspath, pagedef.type+".js", standardSubstitution, pagedef);
+            updateFile(appdir, jspath, pagedef.type + ".js", standardSubstitution, pagedef);
             scriptrefs += "<script src=\"" + jspath + "\"></script>\n";
         }
 
         var htmlpath = pagedef.id + ".html";
         if (pagedef.folder) htmlpath = pagedef.folder + "/" + htmlpath;
-        updateFile(appdir, htmlpath, pagedef.type+".html", standardSubstitution, pagedef);
+        updateFile(appdir, htmlpath, pagedef.type + ".html", standardSubstitution, pagedef);
 
     }
 
@@ -244,6 +244,29 @@ exports.hostApp = function(options) {
     app.use("/platformscripts", express.static(process.cwd() + '/platformscripts'));
     var staticMiddleware = express.static(process.cwd() + '/apphtml');
 
+    if (options.frameworkDebug) {
+        console.log("Framework debug mode - chondric scripts will be served from module folder")
+        var builtDir = path.resolve(__dirname, "built");
+
+        app.get('/demo/lib/chondric.js', ensureAuthenticated,
+            function(req, res) {
+                console.log("serving framework script")
+                fs.readFile(path.resolve(builtDir, "chondric.js"), "utf8", function(err, d) {
+                    res.type("application/javascript");
+                    res.send(d);
+                })
+            });
+        app.get('/demo/lib/chondric.css', ensureAuthenticated,
+            function(req, res) {
+                console.log("serving framework css")
+                fs.readFile(path.resolve(builtDir, "chondric.css"), "utf8", function(err, d) {
+                    res.type("text/css");
+                    res.send(d);
+                })
+            });
+    }
+
+
 
     app.get('/demo*', ensureAuthenticated, function(req, res, next) {
         if (req.path == "/demo") return res.redirect("/demo/index.html");
@@ -254,6 +277,10 @@ exports.hostApp = function(options) {
     if (options.settingsJson) {
         app.get('/settings.json', ensureAuthenticated, options.settingsJson);
     }
+
+
+
+
 
     exports.listen = function() {
         var port = process.env.PORT || 5000;

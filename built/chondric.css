@@ -469,6 +469,26 @@ float:right;
     text-overflow: ellipsis;
 }
 
+/* Menu bar */
+/* A bar with text buttons like the nav bar but that can appear anywhere */
+
+.menubar button {
+display: inline-block;
+color: #007aff;
+background: transparent;
+border: none;
+padding: 0 10px;
+line-height: 44px;
+height: 44px;
+margin: 0;
+font-size: inherit;
+}
+
+.menubar button.active {
+    background: transparent;
+    opacity: 0.3;
+}
+
 /* tabbar */
 
 .tabbar {
@@ -810,14 +830,14 @@ margin:50px auto 0 auto;
 
 
 .icon-top.icon-default::before,
-.icon-left.icon-default::before, 
+.icon-left.icon-default::before,
 .icon-right.icon-default::after {
     content: "\2610";
     font-size: 200%
 }
 
 .icon-top.icon-leftarrow::before,
-.icon-left.icon-leftarrow::before, 
+.icon-left.icon-leftarrow::before,
 .icon-right.icon-leftarrow::after {
     content: "";
     width: 18px;
@@ -825,7 +845,7 @@ margin:50px auto 0 auto;
 }
 
 .icon-top.icon-rightarrow::before,
-.icon-left.icon-rightarrow::before, 
+.icon-left.icon-rightarrow::before,
 .icon-right.icon-rightarrow::after {
     content: "";
     width: 18px;

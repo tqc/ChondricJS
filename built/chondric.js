@@ -186,6 +186,7 @@ Chondric.App =
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 console.log("Route changed to " + url + " from " + oldVal);
+                document.location.hash = url;
                 loadView(url);
             })
             if (options.appCtrl) options.appCtrl($scope);
@@ -1290,7 +1291,7 @@ Chondric.directive('chondricViewport', function($compile) {
     return {
         scope: true,
         link: function(scope, element, attrs) {
-//            console.log("viewport directive");
+            //            console.log("viewport directive");
             var rk = scope.$eval("rk");
             var rv = scope.$eval("rv");
             if (rv) scope.pageParams = rv.params || {};
@@ -1301,10 +1302,10 @@ Chondric.directive('chondricViewport', function($compile) {
             if (!rv) {
                 // first level
                 element.addClass("chondric-viewport");
-//                template = "<div class=\"chondric-viewport\">"
+                //                template = "<div class=\"chondric-viewport\">"
                 template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{transition}} {{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute, notransition: noTransition}\" route=\"{{rk}}\">"
                 template += "</div>"
-//                template += "</div>"
+                //                template += "</div>"
 
             } else if (rv.isSection) {
                 template = "<div ng-controller=\"rv.controller\" >"
@@ -1326,7 +1327,6 @@ Chondric.directive('chondricViewport', function($compile) {
         }
     }
 });
-
 Chondric.Syncable = function(options) {
     var syncable = this;
 
