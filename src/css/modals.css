@@ -1,0 +1,79 @@
+/* Modals */
+
+.modal-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000;
+    opacity: 0;
+    pointer-events:none;
+    visibility: hidden;
+    z-index: 1000;
+    -webkit-transition: opacity 0.3s ease-in-out;
+}
+
+.popover.active ~ .modal-overlay,
+.popup.active ~ .modal-overlay {
+    visibility: visible;
+    pointer-events: all;
+    opacity: 0.4;
+}
+
+/* popover */
+
+.popover {
+    position: absolute;
+    width: 280px;
+    height: auto;
+    background-color: white;
+    border-radius: 7px;
+    z-index: 1100;
+    opacity: 0;
+    pointer-events: none;
+    -webkit-transition: opacity 0.3s ease-in-out;
+}
+
+.popover.active {
+    position: absolute;
+    opacity: 1;
+    pointer-events: all;
+}
+
+.popover button {
+    display: block;
+    width: 280px;
+    border: none;
+    border-bottom: 1px solid #c8c7cc;
+    margin:0;
+    padding: 10px;
+    height: auto;
+}
+.popover button:last-child {
+    border: none;
+}
+
+/* popup */
+
+
+.popup {
+    position: absolute;
+background-color: #efeff4;
+    width: 630px;
+height: 630px;
+left: 50%;
+top: 50%;
+margin-left: -315px;
+margin-top: -315px;
+z-index: 1100;
+   -webkit-transition: -webkit-transform 0.3s ease-in-out;
+    -webkit-transform: translate(0, 150%);
+}
+
+.popup.active {
+    display: block;
+    position: absolute;
+    -webkit-transform: translate(0, 0);
+}
+

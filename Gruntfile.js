@@ -10,6 +10,15 @@ module.exports = function(grunt) {
         "src/directives/preview-controls.js",
         "src/directives/chondric-viewport.js",
         "src/genericsync.js"
+    ];
+
+    var cssfiles = [
+        "src/css/core.css",
+        "src/css/icons.css",
+        "src/css/modals.css",
+        "src/css/transitions/crossfade.css",
+        "src/css/transitions/slideleft.css",
+        "src/css/transitions/slideright.css",
     ]
 
     // Project configuration.
@@ -44,21 +53,16 @@ module.exports = function(grunt) {
             },
             max: {
                 files: {
-                    "built/chondric.js": jsfiles
+                    "built/chondric.js": jsfiles,
+                    "built/chondric.css": cssfiles
                 }
             }
         },
         cssmin: {
             combine: {
                 files: {
-                    'built/chondric.min.css': ['src/app.css']
+                    'built/chondric.min.css': cssfiles
                 }
-            }
-        },
-        copy: {
-            main: {
-                src: 'src/app.css',
-                dest: 'built/chondric.css',
             }
         }
     });
@@ -66,9 +70,9 @@ module.exports = function(grunt) {
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-contrib-copy');
+    //    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-concat');
     // Default task(s).
-    grunt.registerTask('default', ['uglify:min', "concat", "cssmin", "copy"]);
+    grunt.registerTask('default', ['uglify:min', "concat", "cssmin"]);
 
 };
