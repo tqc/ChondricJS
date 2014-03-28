@@ -38,6 +38,10 @@
     display: block;
     line-height: 40px;
 }
+
+/* Standard icons */
+
+
 .icon-top.icon-default::before, .icon-left.icon-default::before, .icon-right.icon-default::after {
     content:"\2610";
     font-size: 200%
@@ -52,3 +56,4 @@
     width: 18px;
     background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='0 0 90 120' xmlns='http://www.w3.org/2000/svg'><path d='m63.75 11.25 10 10-40 40 40 40-10 10-50-50z' fill='%23007aff'/></svg>");
 }
+

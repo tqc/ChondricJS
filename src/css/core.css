@@ -229,7 +229,7 @@ body.debugmode::after {
     color: #007aff;
     text-decoration: none;
     text-align: center;
-    display: block;
+    display: inline-block;
     border-radius: 5px;
     line-height: 27px;
     padding: 0 10px;
@@ -251,6 +251,13 @@ button.active {
 button:focus {
     outline: none;
 }
+
+button.icon-only {
+    width: 27px;
+    overflow: hidden;
+    padding: 0 5px;
+}
+
 /* Header */
  .navbar {
     position: absolute;

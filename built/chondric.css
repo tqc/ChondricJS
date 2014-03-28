@@ -230,7 +230,7 @@ body.debugmode::after {
     color: #007aff;
     text-decoration: none;
     text-align: center;
-    display: block;
+    display: inline-block;
     border-radius: 5px;
     line-height: 27px;
     padding: 0 10px;
@@ -252,6 +252,13 @@ button.active {
 button:focus {
     outline: none;
 }
+
+button.icon-only {
+    width: 27px;
+    overflow: hidden;
+    padding: 0 5px;
+}
+
 /* Header */
  .navbar {
     position: absolute;
@@ -585,6 +592,10 @@ button:focus {
     display: block;
     line-height: 40px;
 }
+
+/* Standard icons */
+
+
 .icon-top.icon-default::before, .icon-left.icon-default::before, .icon-right.icon-default::after {
     content:"\2610";
     font-size: 200%
@@ -599,6 +610,7 @@ button:focus {
     width: 18px;
     background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='0 0 90 120' xmlns='http://www.w3.org/2000/svg'><path d='m63.75 11.25 10 10-40 40 40 40-10 10-50-50z' fill='%23007aff'/></svg>");
 }
+
 
 /* Modals */
  .modal-overlay {
@@ -619,6 +631,12 @@ button:focus {
     pointer-events: all;
     opacity: 0.4;
 }
+
+.nofade.active ~ .modal-overlay {
+    background-color: transparent;
+}
+
+
 /* popover */
  .popover {
     position: absolute;
@@ -629,7 +647,7 @@ button:focus {
     z-index: 1100;
     opacity: 0;
     pointer-events: none;
-    -webkit-transition: opacity 0.3s ease-in-out;
+    -webkit-transition: opacity 0.1s ease-in-out;
 }
 .popover.active {
     position: absolute;
