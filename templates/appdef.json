@@ -28,13 +28,8 @@
         "title": "Scriptless Content Page",
         "scriptless": true
     }, {
+        "type": "custompage",
         "id": "customtemplate",
-        "title": "Scriptless Content Page",
-        "scriptless": true,
-        "pageTemplate": "templates/pagetemplate2.html",
-        "pageScriptTemplate": "templates/pagetemplate2.js"
-    }],
-    "pageTemplate": "templates/pagetemplate.html",
-    "pageScriptTemplate": "templates/pagetemplate.js"
-
+        "title": "Custom Content Page",
+    }]
 }

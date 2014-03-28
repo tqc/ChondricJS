@@ -121,7 +121,7 @@ exports.update = function(apphostdir, appdef) {
     if (appdef.appHost) {
         updateFile(apphostdir, "Procfile", "Procfile", standardSubstitution);
         updateFile(apphostdir, appdef.appHost + ".js", "apphost.js", standardSubstitution);
-        updateFile(apphostdir, "package.json", "package.jsontemplate", standardSubstitution);
+        updateFile(apphostdir, "package.json", "package.json", standardSubstitution);
         updateFile(apphostdir, ".env", "template.env", noSubstitution);
         updateFile(apphostdir, ".gitignore", "template.gitignore", noSubstitution);
         updateFile(apphostdir, ".bowerrc", "bowerrc.json", standardSubstitution);
@@ -129,18 +129,6 @@ exports.update = function(apphostdir, appdef) {
         updateFile(appdir, "app.js", "app.js", standardSubstitution);
         updateFile(appdir, "db.js", "db.js", standardSubstitution);
     }
-
-
-    // todo: replace this with a more flexible custom template system
-    /*
-    if (appdef.pageTemplate) {
-        if (updateFile(apphostdir, appdef.pageTemplate, "page.html", noSubstitution)) {
-            console.log("Custom page template created. Edit it before continuing to create pages.");
-            return;
-        }
-    }
-*/
-
 
 
     mkdirp.sync(path.resolve(appdir, "lib"));
