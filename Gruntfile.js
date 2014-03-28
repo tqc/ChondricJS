@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
 
     var jsfiles = [
-        "src/app.js",
+        "src/core.js",
         "src/view.js",
         "src/versioneddatabase.js",
         "src/directives/ng-tap.js",

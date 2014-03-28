@@ -242,13 +242,40 @@ exports.hostApp = function(options) {
 
 
     app.use("/platformscripts", express.static(process.cwd() + '/platformscripts'));
-    var staticMiddleware = express.static(process.cwd() + '/apphtml');
+
 
     if (options.frameworkDebug) {
         console.log("Framework debug mode - chondric scripts will be served from module folder")
         var builtDir = path.resolve(__dirname, "built");
+        var srcDir = path.resolve(__dirname, "src");
 
-        app.get('/demo/lib/chondric.js', ensureAuthenticated,
+        app.use("/chondric-source", express.static(srcDir));
+
+
+
+        app.get('/demo/index.html',
+            function(req, res) {
+                console.log("serving framework script")
+                fs.readFile(path.resolve(process.cwd(), "apphtml/index.html"), "utf8", function(err, d) {
+                    var allscripts = "";
+
+                    allscripts += '<script src="/chondric-source/core.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/view.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/versioneddatabase.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/genericsync.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/directives/ng-tap.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/directives/cjs-popover.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/directives/cjs-popup.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/directives/preview-controls.js" type="text/javascript"></script>\n';
+                    allscripts += '<script src="/chondric-source/directives/chondric-viewport.js" type="text/javascript"></script>\n';
+                    d = d.replace('<script src="lib/chondric.js" type="text/javascript"></script>', allscripts)
+                    res.type("text/html");
+                    res.send(d);
+                })
+            });
+
+
+        app.get('/demo/lib/chondric.js',
             function(req, res) {
                 console.log("serving framework script")
                 fs.readFile(path.resolve(builtDir, "chondric.js"), "utf8", function(err, d) {
@@ -256,10 +283,11 @@ exports.hostApp = function(options) {
                     res.send(d);
                 })
             });
-        app.get('/demo/lib/chondric.css', ensureAuthenticated,
+        app.get('/demo/lib/chondric.css',
             function(req, res) {
                 console.log("serving framework css")
-                fs.readFile(path.resolve(builtDir, "chondric.css"), "utf8", function(err, d) {
+                // fs.readFile(path.resolve(builtDir, "chondric.css"), "utf8", function(err, d) {
+                fs.readFile(path.resolve(srcDir, "css/include.css"), "utf8", function(err, d) {
                     res.type("text/css");
                     res.send(d);
                 })
@@ -267,7 +295,7 @@ exports.hostApp = function(options) {
     }
 
 
-
+    var staticMiddleware = express.static(process.cwd() + '/apphtml');
     app.get('/demo*', ensureAuthenticated, function(req, res, next) {
         if (req.path == "/demo") return res.redirect("/demo/index.html");
         req.url = req.url.replace(/^\/demo/, '');

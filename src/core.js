@@ -185,7 +185,7 @@ Chondric.App =
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 console.log("Route changed to " + url + " from " + oldVal);
-                document.location.hash = url;
+                if (url) document.location.hash = url;
                 loadView(url);
             })
             if (options.appCtrl) options.appCtrl($scope);
