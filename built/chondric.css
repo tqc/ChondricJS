@@ -329,8 +329,10 @@ button:focus {
     right:0;
     bottom:0;
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.7);
     z-index: 10;
+    background-color: #f7f7f8;
+    border-top: 1px solid #c4c4c4;
+    padding-top: 10px;
 }
 .tabbar button {
     background: transparent;
@@ -352,6 +354,8 @@ button:focus {
     right:auto;
     bottom:0;
     width:80px;
+    border-top: none;
+    border-right: 1px solid #c4c4c4;
 }
 .hasstatusbar .tabbar.left {
     top:60px;
