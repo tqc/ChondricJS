@@ -2,7 +2,7 @@
     "author": "Tom Clarkson ",
     "name": "chondric-tools",
     "description": "Tools for setting up a ChondricJS client app",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "repository": {
         "url": "http://github.com/tqc/ChondricJS"
     },

@@ -243,7 +243,7 @@ exports.hostApp = function(options) {
 
         app.get('/demo/index.html',
             function(req, res) {
-                console.log("serving framework script")
+                //console.log("serving framework script")
                 fs.readFile(path.resolve(process.cwd(), "apphtml/index.html"), "utf8", function(err, d) {
                     var allscripts = "";
 
@@ -265,7 +265,7 @@ exports.hostApp = function(options) {
 
         app.get('/demo/lib/chondric.js',
             function(req, res) {
-                console.log("serving framework script")
+                //console.log("serving framework script")
                 fs.readFile(path.resolve(builtDir, "chondric.js"), "utf8", function(err, d) {
                     res.type("application/javascript");
                     res.send(d);
@@ -273,7 +273,7 @@ exports.hostApp = function(options) {
             });
         app.get('/demo/lib/chondric.css',
             function(req, res) {
-                console.log("serving framework css")
+                //console.log("serving framework css")
                 // fs.readFile(path.resolve(builtDir, "chondric.css"), "utf8", function(err, d) {
                 fs.readFile(path.resolve(srcDir, "css/include.css"), "utf8", function(err, d) {
                     res.type("text/css");
