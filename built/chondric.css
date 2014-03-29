@@ -682,7 +682,7 @@ button:focus {
     pointer-events:none;
     display: block;
     opacity: 0;
-    -webkit-transition: opacity 1s ease-in-out;
+    -webkit-transition: opacity 0.3s ease-in-out;
     z-index: 11;
 }
 

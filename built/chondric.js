@@ -181,7 +181,15 @@ Chondric.App =
                 }
             }
 
-            $scope.changePage = app.changePage = function(r, transition) {
+            $scope.changePage = app.changePage = function(p, transition) {
+                if (p instanceof Array) {
+                    var r = "";
+                    for (var i = 0; i < p.length; i++) {
+                        r += "/" + p[i];
+                    }
+                } else {
+                    var r = p;
+                }
                 if (!r || r.indexOf("/") < 0) {
                     console.error("changePage syntax has changed - the first parameter is a route url instead of an id");
                     return;
