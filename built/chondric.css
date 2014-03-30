@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-03-29 */
+/*! chondric-tools 2014-03-30 */
 body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
@@ -249,6 +249,12 @@ button.fullwidth {
 button.active {
     background-color: rgba(0, 122, 255, .15);
 }
+
+button.selected {
+    color:white;
+    background-color: #007aff;
+}
+
 button:focus {
     outline: none;
 }

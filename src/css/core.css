@@ -248,6 +248,12 @@ button.fullwidth {
 button.active {
     background-color: rgba(0, 122, 255, .15);
 }
+
+button.selected {
+    color:white;
+    background-color: #007aff;
+}
+
 button:focus {
     outline: none;
 }
