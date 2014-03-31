@@ -3,6 +3,8 @@ var fs = require('fs');
 var mkdirp = require("mkdirp");
 //var bower = require("bower");
 var crypto = require('crypto');
+var https = require('https');
+
 exports.update = function(apphostdir, appdef) {
 
     var chondricdir = __dirname;
@@ -300,9 +302,15 @@ exports.hostApp = function(options) {
 
     exports.listen = function() {
         var port = process.env.PORT || 5000;
-        app.listen(port, function() {
-            console.log("Listening on " + port);
-        });
+        if (options.sslOptions) {
+            var server = https.createServer(options.sslOptions, app).listen(port, function() {
+                console.log("https server listening on port " + port);
+            });
+        } else {
+            app.listen(port, function() {
+                console.log("http server listening on " + port);
+            });
+        }
     };
 
     if (newapp && !options.delayListen) {
