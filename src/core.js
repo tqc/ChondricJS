@@ -12,7 +12,23 @@ var Chondric = angular.module('chondric', [])
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
-        var appModule = app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []));
+        var controllerPreload = {};
+        var appModule = app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []),
+            function($controllerProvider) {
+                app.controllerProvider = $controllerProvider;
+                for (var cn in controllerPreload || {}) {
+                    registerController(cn, controllerPreload[cn]);
+                }
+            });
+
+        function registerController(name, func) {
+            if (app.controllerProvider) {
+                app.controllerProvider.register(name, func);
+                delete controllerPreload[name];
+            } else {
+                controllerPreload[name] = func;
+            }
+        }
 
         var allRoutes = app.allRoutes = {}
 
@@ -37,20 +53,23 @@ Chondric.App =
 
             var allControllers = [];
             var page = {};
-            if (viewOptions.initAngular) viewOptions.initAngular.call(page);
+            if (viewOptions.initAngular) {
+                viewOptions.initAngular.call(page);
+                viewOptions.controllers = viewOptions.controllers || page.controllers;
+            }
             var pageController = null;
             if (viewOptions.controller) {
-                // use this controller with name based on id or random
                 pageController = viewOptions.controller;
             }
-            for (var cn in page.controllers) {
+            for (var cn in viewOptions.controllers || {}) {
                 if (!pageController) {
-                    pageController = page.controllers[cn];
-                    continue;
-                };
-                // todo: register other controllers
+                    pageController = viewOptions.controllers[cn];
+                }
+                registerController(cn, viewOptions.controllers[cn]);
             }
-
+            if (!pageController) {
+                console.error("View " + (viewOptions.templateId || viewOptions.route) + " has no controller");
+            }
             var route = viewOptions.route || ("/" + viewOptions.templateId + "/$p1/$p2");
             var templateUrl = viewOptions.templateId + ".html";
             if (viewOptions.templateFolder) templateUrl = viewOptions.templateFolder + "/" + templateUrl;
@@ -71,10 +90,9 @@ Chondric.App =
 
             for (var cn in viewOptions.controllers || {}) {
                 if (!pageController) {
-                    pageController = page.controllers[cn];
-                    continue;
+                    pageController = viewOptions.controllers[cn];
                 };
-                // todo: register other controllers
+                registerController(cn, viewOptions.controllers[cn]);
             }
 
             var route = viewOptions.route;
@@ -162,7 +180,15 @@ Chondric.App =
                 }
             }
 
-            $scope.changePage = app.changePage = function(r, transition) {
+            $scope.changePage = app.changePage = function(p, transition) {
+                if (p instanceof Array) {
+                    var r = "";
+                    for (var i = 0; i < p.length; i++) {
+                        r += "/" + p[i];
+                    }
+                } else {
+                    var r = p;
+                }
                 if (!r || r.indexOf("/") < 0) {
                     console.error("changePage syntax has changed - the first parameter is a route url instead of an id");
                     return;

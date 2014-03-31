@@ -48,4 +48,27 @@ If apphost is specified, an express based web server will be set up to make the 
 
     node apphost.js
 
+
+## Development
+
+Link the dev folder globally
+
+    cd /git/ChondricJS/framework
+    npm link
+    
+Link it in the app also
+
+    cd /git/ChondricJS/example
+    npm link chondric-tools
+
+Add an environment variable to have scripts and css served directly from the chondric source rather than from the built version copied to the app folder.
+
+    FRAMEWORK_DEBUG=true
+
+Use node-dev to automatically restart the server if the code is changed
+
+    node-dev apphost
+
+## Client script
+
 See the wiki for details of the browser development.

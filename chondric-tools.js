@@ -121,7 +121,7 @@ exports.update = function(apphostdir, appdef) {
     if (appdef.appHost) {
         updateFile(apphostdir, "Procfile", "Procfile", standardSubstitution);
         updateFile(apphostdir, appdef.appHost + ".js", "apphost.js", standardSubstitution);
-        updateFile(apphostdir, "package.json", "package.jsontemplate", standardSubstitution);
+        updateFile(apphostdir, "package.json", "package.json", standardSubstitution);
         updateFile(apphostdir, ".env", "template.env", noSubstitution);
         updateFile(apphostdir, ".gitignore", "template.gitignore", noSubstitution);
         updateFile(apphostdir, ".bowerrc", "bowerrc.json", standardSubstitution);
@@ -129,18 +129,6 @@ exports.update = function(apphostdir, appdef) {
         updateFile(appdir, "app.js", "app.js", standardSubstitution);
         updateFile(appdir, "db.js", "db.js", standardSubstitution);
     }
-
-
-    // todo: replace this with a more flexible custom template system
-    /*
-    if (appdef.pageTemplate) {
-        if (updateFile(apphostdir, appdef.pageTemplate, "page.html", noSubstitution)) {
-            console.log("Custom page template created. Edit it before continuing to create pages.");
-            return;
-        }
-    }
-*/
-
 
 
     mkdirp.sync(path.resolve(appdir, "lib"));
@@ -255,7 +243,7 @@ exports.hostApp = function(options) {
 
         app.get('/demo/index.html',
             function(req, res) {
-                console.log("serving framework script")
+                //console.log("serving framework script")
                 fs.readFile(path.resolve(process.cwd(), "apphtml/index.html"), "utf8", function(err, d) {
                     var allscripts = "";
 
@@ -277,7 +265,7 @@ exports.hostApp = function(options) {
 
         app.get('/demo/lib/chondric.js',
             function(req, res) {
-                console.log("serving framework script")
+                //console.log("serving framework script")
                 fs.readFile(path.resolve(builtDir, "chondric.js"), "utf8", function(err, d) {
                     res.type("application/javascript");
                     res.send(d);
@@ -285,7 +273,7 @@ exports.hostApp = function(options) {
             });
         app.get('/demo/lib/chondric.css',
             function(req, res) {
-                console.log("serving framework css")
+                //console.log("serving framework css")
                 // fs.readFile(path.resolve(builtDir, "chondric.css"), "utf8", function(err, d) {
                 fs.readFile(path.resolve(srcDir, "css/include.css"), "utf8", function(err, d) {
                     res.type("text/css");
