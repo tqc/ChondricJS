@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-03-31 */
+/*! chondric-tools 2014-04-03 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -1165,71 +1165,93 @@ Chondric.directive('ngTap', function() {
         element.addClass('tappable');
         // eanble use of app global in angular expression if necessary
         if (attrs.ngTap && attrs.ngTap.indexOf("app.") == 0 && !scope.app) scope.app = app;
-        var tapping = false;
+
+        var active = false;
         var touching = false;
-        var clicking = false;
 
+        // detect move and cancel tap if drag started
+        var move = function(e) {
+            cancel(e);
+            //touching = false;
+            //active = false;
+        }
 
-        var touchstart = function(e) {
-            element.addClass('active');
-            element.removeClass('deactivated');
-            tapping = true;
-        };
+        // called if the mouse moves too much or leaves the element
+        var cancel = function() {
+            if (touching) {
+                element.unbind('touchmove', move);
+                element.unbind('touchend', action);
+            } else {
+                element.unbind('mousemove', move);
+                element.unbind('mouseout', cancel);
+                element.unbind('mouseup', action);
+            }
 
-        var touchmove = function(e) {
             element.removeClass('active');
             element.addClass('deactivated');
-            if (tapping) {
-                tapping = false;
+
+            touching = false;
+            active = false;
+        }
+
+        // called when a tap is completed
+        var action = function(e) {
+
+            scope.lastTap = {
+                element: element,
+                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageX : e.pageX,
+                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageY : e.pageY
             }
-        };
-
-        var touchend = function(e) {
+            scope.$apply(attrs['ngTap'], element);
 
 
-            element.removeClass('active');
-            if (tapping) {
-                tapping = false;
+            if (touching) {
+                element.unbind('touchmove', move);
+                element.unbind('touchend', action);
+            } else {
+                element.unbind('mousemove', move);
+                element.unbind('mouseout', cancel);
+                element.unbind('mouseup', action);
+            }
+            touching = false;
+            active = false;
+        }
 
+            function start() {
 
-                scope.lastTap = {
-                    element: element,
-                    x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageX : e.pageX,
-                    y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageY : e.pageY
+                if (touching) {
+                    element.bind('touchmove', move);
+                    element.bind('touchend', action);
+
+                } else {
+                    element.bind('mousemove', move);
+                    element.bind('mouseout', cancel);
+                    element.bind('mouseup', action);
                 }
-                scope.$apply(attrs['ngTap'], element);
+
+                element.addClass('active');
+                element.removeClass('deactivated');
+                active = true;
             }
-            clicking = false;
-            //   touching = false;
-            tapping = false;
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        };
 
-        element.bind('mousedown', function(e) {
-            if (touching) return;
-            clicking = true;
-            touchstart(e);
-        });
+            // called on mousedown or touchstart. Multiple calls are ignored.
+        var mouseStart = function() {
+            if (active) return;
+            touching = false;
+            start();
+        }
 
-        element.bind('touchstart', function(e) {
+        var touchStart = function() {
+            if (active) return;
             touching = true;
-            touchstart(e)
-        });
-
-        element.bind('touchmove mousemove', touchmove);
-
-        element.bind('touchend', touchend);
-
-        element.bind('mouseup', function(e) {
-            if (touching || !clicking) return;
-            touchend(e);
-            clicking = false;
-        });
+            start();
+        }
 
 
-        element.bind('tap click', function(e) {});
+
+        element.bind('mousedown', mouseStart);
+        element.bind('touchstart', touchStart);
+
     };
 })
 Chondric.directive("cjsPopover", function() {
