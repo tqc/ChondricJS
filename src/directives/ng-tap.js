@@ -54,6 +54,11 @@ Chondric.directive('ngTap', function() {
             }
             touching = false;
             active = false;
+
+            element.removeClass('active');
+            element.addClass('deactivated');
+
+
         }
 
             function start() {
