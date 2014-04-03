@@ -235,30 +235,118 @@ exports.hostApp = function(options) {
 
 
     if (options.frameworkDebug) {
+        if (typeof(options.frameworkDebug) != "object") options.frameworkDebug = {};
         console.log("Framework debug mode - chondric scripts will be served from module folder")
         var builtDir = path.resolve(__dirname, "built");
         var srcDir = path.resolve(__dirname, "src");
 
         app.use("/chondric-source", express.static(srcDir));
+        /*
+        "/demo/lib/dragon-drop.js": "../../dragon-drop/dragon-drop.js",
+        "/demo/lib/chondric.js": ["../../chondric/src/core.js"];
+        "/demo/lib/chondric.css": ["../../chondric/src/css/core.css"];
+*/
+
+        options.frameworkDebug["/demo/lib/chondric.css"] = [
+            srcDir + "/css/core.css",
+            srcDir + "/css/icons.css",
+            srcDir + "/css/modals.css",
+            srcDir + "/css/transitions/crossfade.css",
+            srcDir + "/css/transitions/slideleft.css",
+            srcDir + "/css/transitions/slideright.css"
+        ];
+
+        options.frameworkDebug["/demo/lib/chondric.js"] = [
+            srcDir + "/core.js",
+            srcDir + "/view.js",
+            srcDir + "/versioneddatabase.js",
+            srcDir + "/genericsync.js",
+            srcDir + "/directives/ng-tap.js",
+            srcDir + "/directives/cjs-popover.js",
+            srcDir + "/directives/cjs-popup.js",
+            srcDir + "/directives/preview-controls.js",
+            srcDir + "/directives/chondric-viewport.js"
+        ]
+
+        app.use(function(req, res, next) {
+
+            for (var k in options.frameworkDebug) {
+                if (req.originalUrl.indexOf(k) == 0) {
+                    var mapping = options.frameworkDebug[k];
+                    if (typeof(mapping) == "string") {
+                        // just send the file
+                        console.log("Getting " + req.originalUrl);
+                        fs.readFile(path.resolve(process.cwd(), mapping), "utf8", function(err, d) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            if (mapping.indexOf(".css") > 0) res.type("text/css");
+                            else if (mapping.indexOf(".js") > 0) res.type("application/javascript");
+                            return res.send(d);
+                        });
+                        return;
+
+                    } else {
+                        var partial = req.originalUrl.substr();
+                        var rrel = path.basename(req.originalUrl);
+                        for (var i = 0; i < mapping.length; i++) {
+                            var mrel = path.basename(mapping[i]);
+                            if (rrel == mrel) {
+                                console.log("Getting " + req.originalUrl);
+                                fs.readFile(path.resolve(process.cwd(), mapping[i]), "utf8", function(err, d) {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                    if (mapping[i].indexOf(".css") > 0) res.type("text/css");
+                                    else if (mapping[i].indexOf(".js") > 0) res.type("application/javascript");
+                                    return res.send(d);
+                                });
+                                return;
+                            }
+                        }
+
+                    }
+                }
+            }
 
 
+            return next();
+        })
 
         app.get('/demo/index.html',
             function(req, res) {
                 //console.log("serving framework script")
                 fs.readFile(path.resolve(process.cwd(), "apphtml/index.html"), "utf8", function(err, d) {
-                    var allscripts = "";
 
-                    allscripts += '<script src="/chondric-source/core.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/view.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/versioneddatabase.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/genericsync.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/directives/ng-tap.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/directives/cjs-popover.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/directives/cjs-popup.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/directives/preview-controls.js" type="text/javascript"></script>\n';
-                    allscripts += '<script src="/chondric-source/directives/chondric-viewport.js" type="text/javascript"></script>\n';
-                    d = d.replace('<script src="lib/chondric.js" type="text/javascript"></script>', allscripts)
+                    for (var k in options.frameworkDebug) {
+                        var mapping = options.frameworkDebug[k];
+                        if (typeof(mapping) == "string") {
+                            // for a single file, no need to update the url
+                            continue;
+                        } else {
+                            var origPath = k;
+                            var relPath = path.relative(path.dirname("/demo/index.html"), origPath).replace('\\', '/');
+                            console.log(relPath);
+                            var allscripts = "";
+                            for (var i = 0; i < mapping.length; i++) {
+                                var rel = path.basename(mapping[i]);
+                                if (k.indexOf(".js") > 0) {
+                                    allscripts += '<script src="' + k + '/' + rel + '" type="text/javascript"></script>\n';
+                                } else if (k.indexOf(".css") > 0) {
+                                    allscripts += '<link rel="stylesheet" href="' + k + '/' + rel + '" />\n';
+                                }
+                            }
+
+                            d = d.replace('<script src="' + origPath + '" type="text/javascript"></script>', allscripts)
+                            d = d.replace('<script src="' + relPath + '" type="text/javascript"></script>', allscripts)
+
+                            d = d.replace('<link rel="stylesheet" href="' + origPath + '" />', allscripts)
+                            d = d.replace('<link rel="stylesheet" href="' + relPath + '" />', allscripts)
+
+
+                        }
+                    }
+
                     res.type("text/html");
                     res.send(d);
                 })
