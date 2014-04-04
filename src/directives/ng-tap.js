@@ -52,9 +52,9 @@ Chondric.directive('ngTap', function() {
                 element.unbind('mouseout', cancel);
                 element.unbind('mouseup', action);
             }
+
             touching = false;
             active = false;
-
             element.removeClass('active');
             element.addClass('deactivated');
 
@@ -80,21 +80,28 @@ Chondric.directive('ngTap', function() {
 
             // called on mousedown or touchstart. Multiple calls are ignored.
         var mouseStart = function() {
-            if (active) return;
+            if (active || touching) return;
             touching = false;
             start();
         }
 
         var touchStart = function() {
             if (active) return;
+            if (useMouse) {
+                element.unbind('mousedown', mouseStart);
+                useMouse = false;
+            }
             touching = true;
             start();
         }
 
+        var useMouse = true;
 
 
-        element.bind('mousedown', mouseStart);
-        element.bind('touchstart', touchStart);
-
+        if (window.Touch)
+            element.bind('touchstart', touchStart);
+        else {
+            element.bind('mousedown', mouseStart);
+        }
     };
 })
