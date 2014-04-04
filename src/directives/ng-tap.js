@@ -97,8 +97,9 @@ Chondric.directive('ngTap', function() {
 
         var useMouse = true;
 
+        var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
-        if (window.Touch)
+        if (iOS)
             element.bind('touchstart', touchStart);
         else {
             element.bind('mousedown', mouseStart);
