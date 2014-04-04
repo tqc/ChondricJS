@@ -12,7 +12,7 @@ Chondric.directive("cjsPopover", function() {
             }
             overlay.on("mousedown touchstart", function() {
                 console.log("overlay touch");
-                scope.$apply(attrs.cjsPopover + "=null");
+                scope.$apply("hideModal('" + attrs.cjsPopover + "')");
             });
             scope.$watch(attrs.cjsPopover, function(val) {
                 if (!val) {
