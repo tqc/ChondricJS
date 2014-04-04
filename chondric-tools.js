@@ -271,10 +271,11 @@ exports.hostApp = function(options) {
         app.use(function(req, res, next) {
 
             for (var k in options.frameworkDebug) {
-                if (req.originalUrl.indexOf(k) == 0) {
-                    var mapping = options.frameworkDebug[k];
-                    if (typeof(mapping) == "string") {
-                        // just send the file
+                var mapping = options.frameworkDebug[k];
+                if (typeof(mapping) == "string") {
+                    // just send the file
+                    if (req.originalUrl.indexOf(k) == 0) {
+
                         console.log("Getting " + req.originalUrl);
                         fs.readFile(path.resolve(process.cwd(), mapping), "utf8", function(err, d) {
                             if (err) {
@@ -285,8 +286,10 @@ exports.hostApp = function(options) {
                             return res.send(d);
                         });
                         return;
-
-                    } else {
+                    }
+                } else {
+                    var underscored = k.replace(".js", "_js").replace(".css", "_css");
+                    if (req.originalUrl.indexOf(underscored) == 0) {
                         var partial = req.originalUrl.substr();
                         var rrel = path.basename(req.originalUrl);
                         for (var i = 0; i < mapping.length; i++) {
@@ -313,43 +316,51 @@ exports.hostApp = function(options) {
             return next();
         })
 
+        function updatescripts(req, res, filename) {
+            //console.log("serving framework script")
+            fs.readFile(path.resolve(process.cwd(), "apphtml/" + filename), "utf8", function(err, d) {
+
+                for (var k in options.frameworkDebug) {
+                    var mapping = options.frameworkDebug[k];
+                    if (typeof(mapping) == "string") {
+                        // for a single file, no need to update the url
+                        continue;
+                    } else {
+                        var origPath = k;
+                        var relPath = path.relative(path.dirname("/demo/" + filename), origPath).replace('\\', '/');
+                        console.log(relPath);
+                        var allscripts = "";
+                        for (var i = 0; i < mapping.length; i++) {
+                            var rel = path.basename(mapping[i]);
+                            if (k.indexOf(".js") > 0) {
+                                allscripts += '<script src="' + k.replace(".js", "_js").replace(".css", "_css") + '/' + rel + '" type="text/javascript"></script>\n';
+                            } else if (k.indexOf(".css") > 0) {
+                                allscripts += '<link rel="stylesheet" href="' + k.replace(".js", "_js").replace(".css", "_css") + '/' + rel + '" />\n';
+                            }
+                        }
+
+                        d = d.replace('<script src="' + origPath + '" type="text/javascript"></script>', allscripts)
+                        d = d.replace('<script src="' + relPath + '" type="text/javascript"></script>', allscripts)
+
+                        d = d.replace('<link rel="stylesheet" href="' + origPath + '" />', allscripts)
+                        d = d.replace('<link rel="stylesheet" href="' + relPath + '" />', allscripts)
+
+
+                    }
+                }
+
+                res.type("text/html");
+                res.send(d);
+            })
+        };
+
         app.get('/demo/index.html',
             function(req, res) {
-                //console.log("serving framework script")
-                fs.readFile(path.resolve(process.cwd(), "apphtml/index.html"), "utf8", function(err, d) {
-
-                    for (var k in options.frameworkDebug) {
-                        var mapping = options.frameworkDebug[k];
-                        if (typeof(mapping) == "string") {
-                            // for a single file, no need to update the url
-                            continue;
-                        } else {
-                            var origPath = k;
-                            var relPath = path.relative(path.dirname("/demo/index.html"), origPath).replace('\\', '/');
-                            console.log(relPath);
-                            var allscripts = "";
-                            for (var i = 0; i < mapping.length; i++) {
-                                var rel = path.basename(mapping[i]);
-                                if (k.indexOf(".js") > 0) {
-                                    allscripts += '<script src="' + k + '/' + rel + '" type="text/javascript"></script>\n';
-                                } else if (k.indexOf(".css") > 0) {
-                                    allscripts += '<link rel="stylesheet" href="' + k + '/' + rel + '" />\n';
-                                }
-                            }
-
-                            d = d.replace('<script src="' + origPath + '" type="text/javascript"></script>', allscripts)
-                            d = d.replace('<script src="' + relPath + '" type="text/javascript"></script>', allscripts)
-
-                            d = d.replace('<link rel="stylesheet" href="' + origPath + '" />', allscripts)
-                            d = d.replace('<link rel="stylesheet" href="' + relPath + '" />', allscripts)
-
-
-                        }
-                    }
-
-                    res.type("text/html");
-                    res.send(d);
-                })
+                updatescripts(req, res, "index.html");
+            });
+        app.get('/demo/preview.html',
+            function(req, res) {
+                updatescripts(req, res, "preview.html");
             });
 
 
