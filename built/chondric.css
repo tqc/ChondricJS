@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-03 */
+/*! chondric-tools 2014-04-04 */
 body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
@@ -694,6 +694,19 @@ button.icon-only {
     display: block;
     position: absolute;
     -webkit-transform: translate(0, 0);
+}
+
+@media (max-width: 630px) {
+ .popup {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    margin-left: 0;
+    margin-top: 0;
+    -webkit-transform: translate(0, 101%);
+}
+
 }
 
 .chondric-page.next.crossfade {
