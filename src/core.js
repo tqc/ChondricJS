@@ -118,6 +118,16 @@ Chondric.App =
 
             $scope.openViews = {}
 
+            // these will usually get overridden on a child scope - otherwise names have to be globally unique
+            $scope.showModal = function(name, lastTap) {
+                $scope[name] = lastTap;
+            }
+
+            $scope.hideModal = function(name) {
+                $scope[name] = null;
+            }
+
+
             function loadView(url) {
                 if (!url) {
                     // first run - load start page

@@ -677,6 +677,48 @@ button.icon-only {
 .popover button:last-child {
     border: none;
 }
+
+.poparrow {
+width: 26px;
+height: 12px;
+position: absolute;
+left: 0px;
+top: 0;
+z-index: 100;
+overflow: hidden;
+}
+
+.up .poparrow {
+bottom: -12px;
+top:auto;
+}
+
+.down .poparrow {
+top:-12px;
+bottom: auto;
+}
+
+.poparrow:after {
+content: ' ';
+background: #fff;
+width: 26px;
+height: 26px;
+position: absolute;
+left: 0;
+top: 0;
+border-radius: 3px;
+-webkit-transform: rotate(45deg);
+}
+
+.up .poparrow:after {
+top:-19px;
+}
+
+.down .poparrow:after {
+top:5px;
+}
+
+
 /* popup */
  .popup {
     position: absolute;

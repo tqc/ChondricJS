@@ -38,8 +38,8 @@ Chondric.directive('ngTap', function() {
 
             scope.lastTap = {
                 element: element,
-                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageX : e.pageX,
-                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageY : e.pageY
+                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetX : e.offsetX,
+                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetY : e.offsetY
             }
             scope.$apply(attrs['ngTap'], element);
 

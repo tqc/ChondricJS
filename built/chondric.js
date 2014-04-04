@@ -119,6 +119,16 @@ Chondric.App =
 
             $scope.openViews = {}
 
+            // these will usually get overridden on a child scope - otherwise names have to be globally unique
+            $scope.showModal = function(name, lastTap) {
+                $scope[name] = lastTap;
+            }
+
+            $scope.hideModal = function(name) {
+                $scope[name] = null;
+            }
+
+
             function loadView(url) {
                 if (!url) {
                     // first run - load start page
@@ -1199,8 +1209,8 @@ Chondric.directive('ngTap', function() {
 
             scope.lastTap = {
                 element: element,
-                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageX : e.pageX,
-                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.pageY : e.pageY
+                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetX : e.offsetX,
+                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetY : e.offsetY
             }
             scope.$apply(attrs['ngTap'], element);
 
@@ -1287,11 +1297,45 @@ Chondric.directive("cjsPopover", function() {
                 if (!val) {
                     element.removeClass("active");
                 } else {
+                    var button = val.element[0];
+                    var menupos = {};
+                    // TODO: should get actual size of the element, but it is display:none at this point.
+                    var menuwidth = 280;
+
+                    var sw = element[0].offsetParent.offsetWidth;
+                    var sh = element[0].offsetParent.offsetHeight;
+                    var cr = button.getBoundingClientRect();
+
+                    if (cr.bottom > sh / 2) {
+                        menupos.bottom = (sh - cr.top + 12) + "px";
+                        menupos.top = "auto";
+                        element.addClass("up").removeClass("down");
+                    } else {
+                        menupos.top = (cr.bottom + 12) + "px";
+                        menupos.bottom = "auto";
+                        element.addClass("down").removeClass("up");
+                    }
+                    var left = ((button.offsetLeft + button.offsetWidth / 2) - menuwidth / 2);
+
+
+                    if (left < 10) {
+                        left = 10;
+                    }
+                    if (left + menuwidth > sw - 10) {
+                        left = (sw - menuwidth - 10);
+                    }
+                    menupos.left = left + "px"
+
+                    var indel = $(".poparrow", element);
+                    if (indel.length > 0) {
+                        var arrowleft = (cr.left + cr.width / 2) - 13 - left;
+                        if (arrowleft < 10) arrowleft = 10;
+                        if (arrowleft + 26 > menuwidth - 10) arrowleft = menuwidth - 10 - 26;
+                        indel.css("left", arrowleft + "px");
+                    }
+
                     element.addClass("active");
-                    element.css({
-                        top: val.y + "px",
-                        left: val.x + "px"
-                    })
+                    element.css(menupos);
                 }
             })
         }
