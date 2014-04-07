@@ -1,0 +1,80 @@
+/* Loading overlay */
+ .loadingoverlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 1000;
+    text-align: center;
+    font-size: large;
+}
+
+.loadingoverlay .error {
+    color:red;
+    margin-top: 270px;
+}
+
+.loadingoverlay button {
+    margin-top: 30px;
+    display: inline-block;
+}
+
+/* css spinner from http://lea.verou.me/2013/11/cleanest-css-spinner-ever/ */
+
+/**
+ * (C)Leanest CSS spinner ever
+ */
+ @-webkit-keyframes spin {
+    to {
+        -webkit-transform: rotate(1turn);
+    }
+}
+.loadingoverlay .progress {
+    position: relative;
+    display: block;
+    width: 5em;
+    height: 5em;
+    margin: 100px auto 50px auto;
+    font-size: 12px;
+    text-indent: 999em;
+    overflow: hidden;
+    -webkit-animation: spin 1s infinite steps(8);
+}
+.loadingoverlay .small.progress {
+    font-size: 6px;
+}
+.loadingoverlay .large.progress {
+    font-size: 24px;
+}
+.loadingoverlay .progress:before, .loadingoverlay .progress:after, .loadingoverlay .progress > div:before, .loadingoverlay .progress > div:after {
+    content:'';
+    position: absolute;
+    top: 0;
+    left: 2.25em;
+    /* (container width - part width)/2  */
+    width: .5em;
+    height: 1.5em;
+    border-radius: .2em;
+    background: #eee;
+    box-shadow: 0 3.5em #eee;
+    /* container height - part height */
+    -webkit-transform-origin: 50% 2.5em;
+    /* container height / 2 */
+}
+.loadingoverlay .progress:before {
+    background: #555;
+}
+.loadingoverlay .progress:after {
+    -webkit-transform: rotate(-45deg);
+    background: #777;
+}
+.loadingoverlay .progress > div:before {
+    -webkit-transform: rotate(-90deg);
+    background: #999;
+}
+.loadingoverlay .progress > div:after {
+    -webkit-transform: rotate(-135deg);
+    background: #bbb;
+}
