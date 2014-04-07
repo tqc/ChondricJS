@@ -5,6 +5,7 @@ module.exports = function(grunt) {
         "src/view.js",
         "src/versioneddatabase.js",
         "src/directives/ng-tap.js",
+        "src/directives/loading-overlay.js",
         "src/directives/cjs-popover.js",
         "src/directives/cjs-popup.js",
         "src/directives/preview-controls.js",
@@ -14,6 +15,7 @@ module.exports = function(grunt) {
 
     var cssfiles = [
         "src/css/core.css",
+        "src/css/loading-overlay.css",
         "src/css/icons.css",
         "src/css/modals.css",
         "src/css/transitions/crossfade.css",

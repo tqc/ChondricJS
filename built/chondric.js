@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-04 */
+/*! chondric-tools 2014-04-07 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -1277,6 +1277,12 @@ Chondric.directive('ngTap', function() {
         }
     };
 })
+Chondric.directive('loadingOverlay', function($compile) {
+    return {
+        replace: true,
+        template: '<div class="loadingoverlay" ng-show="waitingForData"><div class="progress large"><div></div></div><div>Loading</div></div>'
+    }
+});
 Chondric.directive("cjsPopover", function() {
 
     return {
@@ -1421,6 +1427,7 @@ Chondric.directive('chondricViewport', function($compile) {
 
             } else if (rv.templateUrl) {
                 template = "<div ng-include src=\"rv.templateUrl\" ng-controller=\"rv.controller\"></div>";
+                template += '<div loading-overlay></div>'
 
             } else {
                 template = "<span>Template not set</span>"

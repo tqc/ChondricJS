@@ -249,6 +249,7 @@ exports.hostApp = function(options) {
 
         options.frameworkDebug["/demo/lib/chondric.css"] = [
             srcDir + "/css/core.css",
+            srcDir + "/css/loading-overlay.css",
             srcDir + "/css/icons.css",
             srcDir + "/css/modals.css",
             srcDir + "/css/transitions/crossfade.css",
@@ -262,6 +263,7 @@ exports.hostApp = function(options) {
             srcDir + "/versioneddatabase.js",
             srcDir + "/genericsync.js",
             srcDir + "/directives/ng-tap.js",
+            srcDir + "/directives/loading-overlay.js",
             srcDir + "/directives/cjs-popover.js",
             srcDir + "/directives/cjs-popup.js",
             srcDir + "/directives/preview-controls.js",
