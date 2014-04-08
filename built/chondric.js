@@ -1213,7 +1213,7 @@ Chondric.directive('ngTap', function() {
 
         // called if the mouse moves too much or leaves the element
         var cancel = function() {
-            if (touching) {
+            if (!useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
             } else {
@@ -1240,7 +1240,7 @@ Chondric.directive('ngTap', function() {
             scope.$apply(attrs['ngTap'], element);
 
 
-            if (touching) {
+            if (!useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
             } else {
@@ -1259,7 +1259,7 @@ Chondric.directive('ngTap', function() {
 
             function start() {
 
-                if (touching) {
+                if (!useMouse) {
                     element.bind('touchmove', move);
                     element.bind('touchend', action);
 
@@ -1283,10 +1283,6 @@ Chondric.directive('ngTap', function() {
 
         var touchStart = function() {
             if (active) return;
-            if (useMouse) {
-                element.unbind('mousedown', mouseStart);
-                useMouse = false;
-            }
             touching = true;
             start();
         }
@@ -1295,9 +1291,10 @@ Chondric.directive('ngTap', function() {
 
         var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
-        if (iOS)
+        if (iOS) {
+            useMouse = false;
             element.bind('touchstart', touchStart);
-        else {
+        } else {
             element.bind('mousedown', mouseStart);
         }
     };
