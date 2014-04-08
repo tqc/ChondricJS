@@ -217,12 +217,37 @@ Chondric.App =
 
             }
 
+            function viewCleanup(viewCollection, preservedRoutes) {
+                for (var k in viewCollection) {
+                    if (k.indexOf("/") != 0) continue;
+                    var keep = false;
+                    for (var i = 0; i < preservedRoutes.length; i++) {
+                        var r = preservedRoutes[i];
+                        if (!r) continue;
+                        if (r.indexOf(k) == 0) {
+                            keep = true;
+                            break;
+                        }
+                    }
+                    if (!keep) {
+                        delete viewCollection[k]
+                        continue;
+                    }
+                    if (viewCollection[k].subsections) {
+                        viewCleanup(viewCollection[k].subsections, preservedRoutes)
+                    }
+
+                }
+            }
+
             $scope.$watch("route", function(url, oldVal) {
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 console.log("Route changed to " + url + " from " + oldVal);
                 if (url) document.location.hash = url;
                 loadView(url);
+                console.log($scope.openViews);
+                viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
             })
             if (options.appCtrl) options.appCtrl($scope);
         } // end appCtrl
