@@ -3,6 +3,16 @@ Chondric.directive("cjsPopover", function() {
     return {
         //        restrict: "E",
         link: function(scope, element, attrs) {
+
+            var useMouse = true;
+
+            var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+
+            if (iOS) {
+                useMouse = false;
+            }
+
+
             element.addClass("popover");
 
             var overlay = $(".modal-overlay", element.parent());
@@ -10,7 +20,7 @@ Chondric.directive("cjsPopover", function() {
                 overlay = angular.element('<div class="modal-overlay"></div>');
                 element.parent().append(overlay);
             }
-            overlay.on("mousedown touchstart", function() {
+            overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 console.log("overlay touch");
                 scope.$apply("hideModal('" + attrs.cjsPopover + "')");
             });
