@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-08 */
+/*! chondric-tools 2014-04-09 */
 body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
@@ -564,8 +564,13 @@ button.icon-only {
 }
 
 
-/* */
-
+/* angular ui-toggle - mostly used in conjunction with loading overlay */
+.ui-show {
+  -webkit-transition: opacity 0.3s ease; 
+}
+.ui-hide {
+  opacity: 0;
+}
 /* Loading overlay */
  .loadingoverlay {
     position: absolute;
@@ -573,7 +578,8 @@ button.icon-only {
     right: 0;
     top: 0;
     bottom: 0;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: transparent;
+    pointer-events:none;
     z-index: 1000;
     text-align: center;
     font-size: large;

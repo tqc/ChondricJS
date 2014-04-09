@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-08 */
+/*! chondric-tools 2014-04-09 */
 // ie doesn't like console.log
 
 if (!window.console) {

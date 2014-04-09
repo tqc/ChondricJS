@@ -563,4 +563,10 @@ button.icon-only {
 }
 
 
-/* */
+/* angular ui-toggle - mostly used in conjunction with loading overlay */
+.ui-show {
+  -webkit-transition: opacity 0.3s ease; 
+}
+.ui-hide {
+  opacity: 0;
+}
