@@ -1,4 +1,4 @@
-Chondric.directive("cjsPopup", function() {
+Chondric.directive("cjsSidepanel", function() {
 
     return {
         //        restrict: "E",
@@ -13,7 +13,10 @@ Chondric.directive("cjsPopup", function() {
             }
 
             element.addClass("modal");
-            element.addClass("popup");
+            element.addClass("sidepanel");
+            if (!element.hasClass("left")) {
+                element.addClass("right");
+            }
             var overlay = $(".modal-overlay", element.parent());
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
@@ -21,9 +24,9 @@ Chondric.directive("cjsPopup", function() {
             }
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 console.log("overlay touch");
-                scope.$apply("hideModal('" + attrs.cjsPopup + "')");
+                scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             });
-            scope.$watch(attrs.cjsPopup, function(val) {
+            scope.$watch(attrs.cjsSidepanel, function(val) {
                 if (!val) {
                     element.removeClass("active");
                 } else {

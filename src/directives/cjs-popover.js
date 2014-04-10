@@ -13,6 +13,7 @@ Chondric.directive("cjsPopover", function() {
             }
 
 
+            element.addClass("modal");
             element.addClass("popover");
 
             var overlay = $(".modal-overlay", element.parent());
