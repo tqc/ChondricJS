@@ -1336,10 +1336,11 @@ Chondric.directive("cjsPopover", function() {
             element.addClass("modal");
             element.addClass("popover");
 
-            var overlay = $(".modal-overlay", element.parent());
+            var parentPageElement = element.closest(".chondric-page");
+            var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
-                element.parent().append(overlay);
+                parentPageElement.append(overlay);
             }
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 console.log("overlay touch");
@@ -1347,6 +1348,7 @@ Chondric.directive("cjsPopover", function() {
             });
             scope.$watch(attrs.cjsPopover, function(val) {
                 if (!val) {
+                    overlay.removeClass("active");
                     element.removeClass("active");
                 } else {
                     var button = val.element[0];
@@ -1386,6 +1388,7 @@ Chondric.directive("cjsPopover", function() {
                         indel.css("left", arrowleft + "px");
                     }
 
+                    overlay.addClass("active");
                     element.addClass("active");
                     element.css(menupos);
                 }
@@ -1409,19 +1412,23 @@ Chondric.directive("cjsPopup", function() {
 
             element.addClass("modal");
             element.addClass("popup");
-            var overlay = $(".modal-overlay", element.parent());
+            var parentPageElement = element.closest(".chondric-page");
+            var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
-                element.parent().append(overlay);
+                parentPageElement.append(overlay);
             }
+
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 console.log("overlay touch");
                 scope.$apply("hideModal('" + attrs.cjsPopup + "')");
             });
             scope.$watch(attrs.cjsPopup, function(val) {
                 if (!val) {
+                    overlay.removeClass("active");
                     element.removeClass("active");
                 } else {
+                    overlay.addClass("active");
                     element.addClass("active");
                 }
             })
@@ -1444,22 +1451,46 @@ Chondric.directive("cjsSidepanel", function() {
 
             element.addClass("modal");
             element.addClass("sidepanel");
+
+            var pushmode;
+
             if (!element.hasClass("left")) {
                 element.addClass("right");
+                if (element.hasClass("push")) pushmode = "left";
+            } else {
+                if (element.hasClass("push")) pushmode = "right";
             }
-            var overlay = $(".modal-overlay", element.parent());
+
+
+
+            var parentPageElement = element.closest(".chondric-page");
+            var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
-                element.parent().append(overlay);
+                parentPageElement.append(overlay);
             }
+
+            if (pushmode) {
+                parentPageElement.addClass("haspushpanel");
+            }
+
+
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 console.log("overlay touch");
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             });
             scope.$watch(attrs.cjsSidepanel, function(val) {
                 if (!val) {
+                    if (pushmode) {
+                        parentPageElement.removeClass("pushed" + pushmode);
+                    }
+                    overlay.removeClass("active");
                     element.removeClass("active");
                 } else {
+                    if (pushmode) {
+                        parentPageElement.addClass("pushed" + pushmode);
+                    }
+                    overlay.addClass("active");
                     element.addClass("active");
                 }
             })

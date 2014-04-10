@@ -14,19 +14,23 @@ Chondric.directive("cjsPopup", function() {
 
             element.addClass("modal");
             element.addClass("popup");
-            var overlay = $(".modal-overlay", element.parent());
+            var parentPageElement = element.closest(".chondric-page");
+            var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
-                element.parent().append(overlay);
+                parentPageElement.append(overlay);
             }
+
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 console.log("overlay touch");
                 scope.$apply("hideModal('" + attrs.cjsPopup + "')");
             });
             scope.$watch(attrs.cjsPopup, function(val) {
                 if (!val) {
+                    overlay.removeClass("active");
                     element.removeClass("active");
                 } else {
+                    overlay.addClass("active");
                     element.addClass("active");
                 }
             })

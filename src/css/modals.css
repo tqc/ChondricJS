@@ -12,7 +12,8 @@
     z-index: 1000;
     -webkit-transition: opacity 0.3s ease-in-out;
 }
-.modal.active ~ .modal-overlay {
+
+.modal-overlay.active {
     visibility: visible;
     pointer-events: all;
     opacity: 0.4;
@@ -210,4 +211,32 @@ border-top: 1px solid #aaa;
 
 .sidepanel .body button.menuitem.selected {
     color: white;
+}
+
+.chondric-page.haspushpanel .body,
+.chondric-page.haspushpanel .navbar,
+.chondric-page.haspushpanel .tabbar
+{
+    -webkit-transition: -webkit-transform 0.3s ease-in-out;
+}
+
+.chondric-page.pushedleft .body,
+.chondric-page.pushedleft .navbar,
+.chondric-page.pushedleft .tabbar
+{
+    -webkit-transform: translate(-261px, 0);
+}
+
+.chondric-page.pushedright .body,
+.chondric-page.pushedright .navbar,
+.chondric-page.pushedright .tabbar
+{
+    -webkit-transform: translate(261px, 0);
+}
+
+.chondric-page.haspushpanel .sidepanel .body,
+.chondric-page.haspushpanel .sidepanel .navbar,
+.chondric-page.haspushpanel .sidepanel .tabbar
+{
+    -webkit-transform: translate(0, 0);
 }

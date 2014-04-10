@@ -16,10 +16,11 @@ Chondric.directive("cjsPopover", function() {
             element.addClass("modal");
             element.addClass("popover");
 
-            var overlay = $(".modal-overlay", element.parent());
+            var parentPageElement = element.closest(".chondric-page");
+            var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
-                element.parent().append(overlay);
+                parentPageElement.append(overlay);
             }
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 console.log("overlay touch");
@@ -27,6 +28,7 @@ Chondric.directive("cjsPopover", function() {
             });
             scope.$watch(attrs.cjsPopover, function(val) {
                 if (!val) {
+                    overlay.removeClass("active");
                     element.removeClass("active");
                 } else {
                     var button = val.element[0];
@@ -66,6 +68,7 @@ Chondric.directive("cjsPopover", function() {
                         indel.css("left", arrowleft + "px");
                     }
 
+                    overlay.addClass("active");
                     element.addClass("active");
                     element.css(menupos);
                 }
