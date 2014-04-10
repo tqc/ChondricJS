@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-09 */
+/*! chondric-tools 2014-04-10 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -80,6 +80,15 @@ Chondric.App =
                 templateUrl: templateUrl,
                 templateId: viewOptions.templateId,
             }
+            preloadTemplate(templateUrl);
+        }
+
+        function preloadTemplate(templateUrl) {
+            app.module.run(function($templateCache, $http) {
+                $http.get(templateUrl, {
+                    cache: $templateCache
+                });
+            });
         }
 
         app.createSection = function(viewOptions) {

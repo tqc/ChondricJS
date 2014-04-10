@@ -79,6 +79,15 @@ Chondric.App =
                 templateUrl: templateUrl,
                 templateId: viewOptions.templateId,
             }
+            preloadTemplate(templateUrl);
+        }
+
+        function preloadTemplate(templateUrl) {
+            app.module.run(function($templateCache, $http) {
+                $http.get(templateUrl, {
+                    cache: $templateCache
+                });
+            });
         }
 
         app.createSection = function(viewOptions) {
