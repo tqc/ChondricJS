@@ -34,7 +34,7 @@ Chondric.App =
 
         var allTransitions = app.allTransitions = {
             slideleft: {
-                setInProgress: function(element, progress) {
+                setInProgress: function(element, progress, prevProgress) {
                     if (!progress) {
                         $(".body", element).css({
                             "-webkit-transition": "",
@@ -47,7 +47,7 @@ Chondric.App =
                         })
                     }
                 },
-                setOutProgress: function(element, progress) {
+                setOutProgress: function(element, progress, prevProgress) {
                     if (!progress) {
                         $(".body", element).css({
                             "-webkit-transition": "",
@@ -62,7 +62,7 @@ Chondric.App =
                 }
             },
             slideright: {
-                setInProgress: function(element, progress) {
+                setInProgress: function(element, progress, prevProgress) {
                     if (!progress) {
                         $(".body", element).css({
                             "-webkit-transition": "",
@@ -75,7 +75,7 @@ Chondric.App =
                         })
                     }
                 },
-                setOutProgress: function(element, progress) {
+                setOutProgress: function(element, progress, prevProgress) {
                     if (!progress) {
                         $(".body", element).css({
                             "-webkit-transition": "",
@@ -84,7 +84,7 @@ Chondric.App =
                     } else {
                         $(".body", element).css({
                             "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
+                        "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
                         })
                     }
                 }

@@ -138,13 +138,14 @@ Chondric.directive("cjsTransitionStyle", function() {
     return {
         //        restrict: "E",
         link: function($scope, element, attrs) {
-            $scope.$watch('transition', function(transition) {
+            $scope.$watch('transition', function(transition, old) {
                 console.log("transition: ", transition);
+                console.log("old: ", old);
                 if (!transition) return;
                 var td = app.allTransitions[transition.type];
                 if (!td) return;
-                if (td.setInProgress && element.hasClass("next")) td.setInProgress(element, transition.progress);
-                if (td.setOutProgress && element.hasClass("active")) td.setOutProgress(element, transition.progress);
+                if (td.setInProgress && element.hasClass("next")) td.setInProgress(element, transition.progress, old && old.progress);
+                if (td.setOutProgress && element.hasClass("active")) td.setOutProgress(element, transition.progress, old && old.progress);
 
             }, true)
         }
