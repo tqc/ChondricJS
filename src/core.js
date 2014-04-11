@@ -32,7 +32,64 @@ Chondric.App =
 
         var allRoutes = app.allRoutes = {}
 
-
+        var allTransitions = app.allTransitions = {
+            slideleft: {
+                setInProgress: function(element, progress) {
+                    if (!progress) {
+                        $(".body", element).css({
+                            "-webkit-transition": "",
+                            "-webkit-transform": ""
+                        })
+                    } else {
+                        $(".body", element).css({
+                            "-webkit-transition": "none",
+                            "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
+                        })
+                    }
+                },
+                setOutProgress: function(element, progress) {
+                    if (!progress) {
+                        $(".body", element).css({
+                            "-webkit-transition": "",
+                            "-webkit-transform": ""
+                        })
+                    } else {
+                        $(".body", element).css({
+                            "-webkit-transition": "none",
+                            "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
+                        })
+                    }
+                }
+            },
+            slideright: {
+                setInProgress: function(element, progress) {
+                    if (!progress) {
+                        $(".body", element).css({
+                            "-webkit-transition": "",
+                            "-webkit-transform": ""
+                        })
+                    } else {
+                        $(".body", element).css({
+                            "-webkit-transition": "none",
+                            "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
+                        })
+                    }
+                },
+                setOutProgress: function(element, progress) {
+                    if (!progress) {
+                        $(".body", element).css({
+                            "-webkit-transition": "",
+                            "-webkit-transform": ""
+                        })
+                    } else {
+                        $(".body", element).css({
+                            "-webkit-transition": "none",
+                            "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
+                        })
+                    }
+                }
+            }
+        };
         // these options are defined in the
         var initialOptions = {
 
@@ -123,7 +180,10 @@ Chondric.App =
             $scope.route = null;
             $scope.nextRoute = null;
             $scope.lastRoute = null;
-            $scope.transition = "crossfade";
+            $scope.transition = {
+                type: "crossfade",
+                progress: 0
+            };
 
             $scope.openViews = {}
 
@@ -214,7 +274,7 @@ Chondric.App =
                 }
                 if ($scope.route == r) return;
                 if ($scope.lastRoute == r) $scope.lastRoute = null;
-                $scope.transition = transition || "crossfade";
+                $scope.transition.type = transition || "crossfade";
                 $scope.noTransition = true;
                 loadView(r);
                 $scope.nextRoute = r;
@@ -225,6 +285,68 @@ Chondric.App =
                 }, 100)
 
             }
+
+            $scope.updateSwipe = function(swipeState, leftRoute, rightRoute) {
+                // default handler covers left and right border swipe
+                if (swipeState.leftborder && leftRoute) {
+                    console.log("updating swipe - left border");
+                    $scope.noTransition = true;
+                    loadView(leftRoute);
+                    $scope.nextRoute = leftRoute;
+                    $scope.transition.type = "slideright";
+                    $scope.transition.progress = swipeState.leftborder;
+                    $scope.$apply();
+                } else if (swipeState.rightborder && rightRoute) {
+                    console.log("updating swipe - right border");
+                    $scope.noTransition = true;
+                    loadView(rightRoute);
+                    $scope.nextRoute = rightRoute;
+                    $scope.transition.type = "slideleft";
+                    $scope.transition.progress = swipeState.rightborder;
+                    $scope.$apply();
+                } else {
+
+                }
+
+            }
+
+            $scope.endSwipe = function(swipeState, leftRoute, rightRoute) {
+                console.log("ending swipe");
+                if (swipeState.leftborder && leftRoute) {
+                    console.log("ending swipe - left border");
+                    $scope.noTransition = false;
+
+                    if (swipeState.leftborder > 0.6) {
+                        // continue change to next page
+                        loadView(leftRoute);
+                        $scope.transition.progress = 0;
+                        $scope.lastRoute = $scope.route;
+                        $scope.route = leftRoute;
+                    } else {
+                        // cancel page change
+                        $scope.transition.progress = 0;
+                    }
+                    $scope.$apply();
+                } else if (swipeState.rightborder && rightRoute) {
+                    console.log("ending swipe - right border");
+                    $scope.noTransition = false;
+
+                    if (swipeState.rightborder > 0.6) {
+                        // continue change to next page
+                        loadView(rightRoute);
+                        $scope.transition.progress = 0;
+                        $scope.lastRoute = $scope.route;
+                        $scope.route = rightRoute;
+                    } else {
+                        // cancel page change
+                        $scope.transition.progress = 0;
+                    }
+                    $scope.$apply();
+                } else {
+
+                }
+            }
+
 
             function viewCleanup(viewCollection, preservedRoutes) {
                 for (var k in viewCollection) {

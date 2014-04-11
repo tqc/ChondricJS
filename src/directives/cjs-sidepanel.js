@@ -39,7 +39,6 @@ Chondric.directive("cjsSidepanel", function() {
 
 
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                console.log("overlay touch");
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             });
             scope.$watch(attrs.cjsSidepanel, function(val) {

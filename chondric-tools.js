@@ -267,6 +267,7 @@ exports.hostApp = function(options) {
             srcDir + "/directives/cjs-popover.js",
             srcDir + "/directives/cjs-popup.js",
             srcDir + "/directives/cjs-sidepanel.js",
+            srcDir + "/directives/cjs-swipe.js",
             srcDir + "/directives/preview-controls.js",
             srcDir + "/directives/chondric-viewport.js"
         ]

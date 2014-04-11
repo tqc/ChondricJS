@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-10 */
+/*! chondric-tools 2014-04-11 */
 body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
@@ -19,7 +19,6 @@ body {
 .chondric-section {
 }
 .chondric-page {
-    background-color: white;
     position: absolute;
     top:0;
     left:0;
@@ -982,18 +981,18 @@ border-top: 1px solid #aaa;
 }
 
 
-.chondric-page.slideleft .page {
+.chondric-page.slideleft .body {
     -webkit-transition: -webkit-transform 0.3s ease-in-out;
 }
 
-.chondric-page.next.slideleft .page {
-    display: block;
-    -webkit-transform: translate(-100%, 0);
-}
-
-.chondric-page.prev.slideleft .page {
+.chondric-page.next.slideleft .body {
     display: block;
     -webkit-transform: translate(100%, 0);
+}
+
+.chondric-page.prev.slideleft .body {
+    display: block;
+    -webkit-transform: translate(-100%, 0);
 }
 
 
@@ -1006,19 +1005,19 @@ border-top: 1px solid #aaa;
 }
 
 
-.chondric-page.slideright .page {
+.chondric-page.slideright .body {
     -webkit-transition: -webkit-transform 0.3s ease-in-out;
 }
 
 
-.chondric-page.next.slideright .page {
-    display: block;
-    -webkit-transform: translate(100%, 0);
-}
-
-.chondric-page.prev.slideright .page {
+.chondric-page.next.slideright .body {
     display: block;
     -webkit-transform: translate(-100%, 0);
+}
+
+.chondric-page.prev.slideright .body {
+    display: block;
+    -webkit-transform: translate(100%, 0);
 }
 
 .chondric-page.slideright .navbar {

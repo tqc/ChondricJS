@@ -9,6 +9,7 @@ module.exports = function(grunt) {
         "src/directives/cjs-popover.js",
         "src/directives/cjs-popup.js",
         "src/directives/cjs-sidepanel.js",
+        "src/directives/cjs-swipe.js",
         "src/directives/preview-controls.js",
         "src/directives/chondric-viewport.js",
         "src/genericsync.js"
