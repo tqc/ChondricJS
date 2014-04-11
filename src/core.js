@@ -35,7 +35,8 @@ Chondric.App =
         var allTransitions = app.allTransitions = {
             slideleft: {
                 setInProgress: function(element, progress, prevProgress) {
-                    if (!progress) {
+                    console.log("slideleft " + prevProgress + " => " + progress)
+                    if (!progress || progress == 1) {
                         $(".body", element).css({
                             "-webkit-transition": "",
                             "-webkit-transform": ""
@@ -48,7 +49,7 @@ Chondric.App =
                     }
                 },
                 setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress) {
+                    if (!progress || progress == 1) {
                         $(".body", element).css({
                             "-webkit-transition": "",
                             "-webkit-transform": ""
@@ -63,7 +64,8 @@ Chondric.App =
             },
             slideright: {
                 setInProgress: function(element, progress, prevProgress) {
-                    if (!progress) {
+                    console.log("slideright " + prevProgress + " => " + progress)
+                    if (!progress || progress == 1) {
                         $(".body", element).css({
                             "-webkit-transition": "",
                             "-webkit-transform": ""
@@ -76,7 +78,7 @@ Chondric.App =
                     }
                 },
                 setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress) {
+                    if (!progress || progress == 1) {
                         $(".body", element).css({
                             "-webkit-transition": "",
                             "-webkit-transform": ""
@@ -84,7 +86,7 @@ Chondric.App =
                     } else {
                         $(".body", element).css({
                             "-webkit-transition": "none",
-                        "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
+                            "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
                         })
                     }
                 }
@@ -278,9 +280,13 @@ Chondric.App =
                 $scope.noTransition = true;
                 loadView(r);
                 $scope.nextRoute = r;
+                $scope.transition.progress = 0;
+                $scope.transition.from = $scope.route;
+                $scope.transition.to = $scope.nextRoute;
                 window.setTimeout(function() {
                     $scope.noTransition = false;
                     $scope.route = r;
+                    $scope.transition.progress = 1;
                     $scope.$apply();
                 }, 100)
 
@@ -293,6 +299,8 @@ Chondric.App =
                     $scope.noTransition = true;
                     loadView(leftRoute);
                     $scope.nextRoute = leftRoute;
+                    $scope.transition.from = $scope.route;
+                    $scope.transition.to = $scope.nextRoute;
                     $scope.transition.type = "slideright";
                     $scope.transition.progress = swipeState.leftborder;
                     $scope.$apply();
@@ -301,6 +309,8 @@ Chondric.App =
                     $scope.noTransition = true;
                     loadView(rightRoute);
                     $scope.nextRoute = rightRoute;
+                    $scope.transition.from = $scope.route;
+                    $scope.transition.to = $scope.nextRoute;
                     $scope.transition.type = "slideleft";
                     $scope.transition.progress = swipeState.rightborder;
                     $scope.$apply();
@@ -319,7 +329,7 @@ Chondric.App =
                     if (swipeState.leftborder > 0.6) {
                         // continue change to next page
                         loadView(leftRoute);
-                        $scope.transition.progress = 0;
+                        $scope.transition.progress = 1;
                         $scope.lastRoute = $scope.route;
                         $scope.route = leftRoute;
                     } else {
@@ -334,7 +344,7 @@ Chondric.App =
                     if (swipeState.rightborder > 0.6) {
                         // continue change to next page
                         loadView(rightRoute);
-                        $scope.transition.progress = 0;
+                        $scope.transition.progress = 1;
                         $scope.lastRoute = $scope.route;
                         $scope.route = rightRoute;
                     } else {

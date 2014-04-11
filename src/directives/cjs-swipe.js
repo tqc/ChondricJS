@@ -144,8 +144,8 @@ Chondric.directive("cjsTransitionStyle", function() {
                 if (!transition) return;
                 var td = app.allTransitions[transition.type];
                 if (!td) return;
-                if (td.setInProgress && element.hasClass("next")) td.setInProgress(element, transition.progress, old && old.progress);
-                if (td.setOutProgress && element.hasClass("active")) td.setOutProgress(element, transition.progress, old && old.progress);
+                if (td.setInProgress && attrs["route"] == transition.to) td.setInProgress(element, transition.progress, old && old.progress);
+                if (td.setOutProgress && attrs["route"] == transition.from) td.setOutProgress(element, transition.progress, old && old.progress);
 
             }, true)
         }
