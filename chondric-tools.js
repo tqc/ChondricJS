@@ -205,18 +205,24 @@ exports.update = function(apphostdir, appdef) {
 
 exports.hostApp = function(options) {
     var express = exports.express = require('express');
+
+    var expressSession = require("express-session");
+    var expressCookieParser = require("cookie-parser");
+    var expressBodyParser = require("body-parser");
+    var expressStatic = require("serve-static");
+
     var newapp = false;
     var app = options.app;
     if (!app) {
         newapp = true;
         app = express();
 
-        app.use(express.cookieParser());
-        app.use(express.session(options.sessionOptions || {
+        app.use(expressCookieParser());
+        app.use(expressSession(options.sessionOptions || {
             secret: 'tW876DcNV4B5N33FmVDbBq8h3p8txp'
         }));
 
-        app.use(express.bodyParser());
+        app.use(expressBodyParser());
 
 
     }
@@ -231,7 +237,7 @@ exports.hostApp = function(options) {
     app.ensureAuthenticated = ensureAuthenticated;
 
 
-    app.use("/platformscripts", express.static(process.cwd() + '/platformscripts'));
+    app.use("/platformscripts", expressStatic(process.cwd() + '/platformscripts'));
 
 
     if (options.frameworkDebug) {
@@ -388,7 +394,7 @@ exports.hostApp = function(options) {
     }
 
 
-    var staticMiddleware = express.static(process.cwd() + '/apphtml');
+    var staticMiddleware = expressStatic(process.cwd() + '/apphtml');
     app.get('/demo*', ensureAuthenticated, function(req, res, next) {
         if (req.path == "/demo") return res.redirect("/demo/index.html");
         req.url = req.url.replace(/^\/demo/, '');
