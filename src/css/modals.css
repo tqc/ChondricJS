@@ -74,6 +74,21 @@ top:-12px;
 bottom: auto;
 }
 
+.left .poparrow {
+right: -12px;
+left:auto;
+width: 12px;
+height: 26px;
+}
+
+.right .poparrow {
+left:-12px;
+right: auto;
+width: 12px;
+height: 26px;
+}
+
+
 .poparrow:after {
 content: ' ';
 background: #fff;
@@ -86,13 +101,22 @@ border-radius: 3px;
 -webkit-transform: rotate(45deg);
 }
 
-.up .poparrow:after {
+.popover.up .poparrow:after {
 top:-19px;
 }
 
-.down .poparrow:after {
+.popover.down .poparrow:after {
 top:5px;
 }
+
+.popover.left .poparrow:after {
+left:-19px;
+}
+
+.popover.right .poparrow:after {
+left:5px;
+}
+
 
 
 /* popup */
