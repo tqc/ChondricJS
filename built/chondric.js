@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-11 */
+/*! chondric-tools 2014-04-16 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -1486,10 +1486,11 @@ Chondric.directive('loadingOverlay', function($compile) {
     }
 });
 Chondric.directive("cjsPopover", function() {
-
     return {
         //        restrict: "E",
         link: function(scope, element, attrs) {
+            var useOverlay = attrs.noOverlay === undefined;
+
 
             var useMouse = true;
 
@@ -1504,39 +1505,64 @@ Chondric.directive("cjsPopover", function() {
             element.addClass("popover");
 
             var parentPageElement = element.closest(".chondric-page");
-            var overlay = $(".modal-overlay", parentPageElement);
-            if (overlay.length == 0) {
-                overlay = angular.element('<div class="modal-overlay"></div>');
-                parentPageElement.append(overlay);
+            if (useOverlay) {
+                var overlay = $(".modal-overlay", parentPageElement);
+                if (overlay.length == 0) {
+                    overlay = angular.element('<div class="modal-overlay"></div>');
+                    parentPageElement.append(overlay);
+                }
+                overlay.on(useMouse ? "mousedown" : "touchstart", function() {
+                    console.log("overlay touch");
+                    scope.$apply("hideModal('" + attrs.cjsPopover + "')");
+                });
             }
-            overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                console.log("overlay touch");
-                scope.$apply("hideModal('" + attrs.cjsPopover + "')");
-            });
             scope.$watch(attrs.cjsPopover, function(val) {
                 if (!val) {
-                    overlay.removeClass("active");
+                    if (useOverlay) {
+                        overlay.removeClass("active");
+                    }
                     element.removeClass("active");
                 } else {
-                    var button = val.element[0];
+
                     var menupos = {};
                     // TODO: should get actual size of the element, but it is display:none at this point.
                     var menuwidth = 280;
 
                     var sw = element[0].offsetParent.offsetWidth;
                     var sh = element[0].offsetParent.offsetHeight;
-                    var cr = button.getBoundingClientRect();
 
-                    if (cr.bottom > sh / 2) {
-                        menupos.bottom = (sh - cr.top + 12) + "px";
-                        menupos.top = "auto";
-                        element.addClass("up").removeClass("down");
+
+                    if (val.element && val.element[0]) {
+                        var button = val.element[0];
+                        var cr = button.getBoundingClientRect();
+
+                        if (cr.bottom > sh / 2) {
+                            menupos.bottom = (sh - cr.top + 12) + "px";
+                            menupos.top = "auto";
+                            element.addClass("up").removeClass("down");
+                        } else {
+                            menupos.top = (cr.bottom + 12) + "px";
+                            menupos.bottom = "auto";
+                            element.addClass("down").removeClass("up");
+                        }
+                        var left = ((button.offsetLeft + button.offsetWidth / 2) - menuwidth / 2);
+                        var arrowleft = (cr.left + cr.width / 2) - 13 - left;
+
                     } else {
-                        menupos.top = (cr.bottom + 12) + "px";
-                        menupos.bottom = "auto";
-                        element.addClass("down").removeClass("up");
+
+                        if (val.y > sh / 2) {
+                            menupos.bottom = (sh - val.y + 12) + "px";
+                            menupos.top = "auto";
+                            element.addClass("up").removeClass("down");
+                        } else {
+                            menupos.top = (val.y + 12) + "px";
+                            menupos.bottom = "auto";
+                            element.addClass("down").removeClass("up");
+                        }
+                        var left = (val.x - menuwidth / 2);
+                        var arrowleft = (val.x) - 13 - left;
+
                     }
-                    var left = ((button.offsetLeft + button.offsetWidth / 2) - menuwidth / 2);
 
 
                     if (left < 10) {
@@ -1549,13 +1575,13 @@ Chondric.directive("cjsPopover", function() {
 
                     var indel = $(".poparrow", element);
                     if (indel.length > 0) {
-                        var arrowleft = (cr.left + cr.width / 2) - 13 - left;
                         if (arrowleft < 10) arrowleft = 10;
                         if (arrowleft + 26 > menuwidth - 10) arrowleft = menuwidth - 10 - 26;
                         indel.css("left", arrowleft + "px");
                     }
-
-                    overlay.addClass("active");
+                    if (useOverlay) {
+                        overlay.addClass("active");
+                    }
                     element.addClass("active");
                     element.css(menupos);
                 }
