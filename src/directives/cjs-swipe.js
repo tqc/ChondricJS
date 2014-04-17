@@ -31,8 +31,7 @@ Chondric.directive("cjsSwipe", function() {
             var updateSwipe = scope.$eval("updateSwipe");
             var endSwipe = scope.$eval("endSwipe");
 
-            var leftRoute;
-            var rightRoute;
+            var swipeNav;
 
             element.on(useMouse ? "mousedown" : "touchstart", function(e) {
                 if (tracking) return;
@@ -56,16 +55,16 @@ Chondric.directive("cjsSwipe", function() {
                     right: 0,
                     up: 0,
                     down: 0,
-                    leftborder: 0,
-                    rightborder: 0,
-                    topborder: 0,
-                    bottomborder: 0
+                    leftBorder: 0,
+                    rightBorder: 0,
+                    topBorder: 0,
+                    bottomBorder: 0
                 }
 
                 $(document).on(useMouse ? "mousemove" : "touchmove", move);
                 $(document).on(useMouse ? "mouseup" : "touchend", end);
-                leftRoute = scope.$eval("leftRoute");
-                rightRoute = scope.$eval("rightRoute");
+
+                swipeNav = scope.$eval("swipeNav");
 
             });
 
@@ -80,30 +79,30 @@ Chondric.directive("cjsSwipe", function() {
 
                 if (swipeState.left) swipeState.left = Math.max(0, -dx / width);
                 else if (swipeState.right) swipeState.right = Math.max(0, dx / width);
-                else if (swipeState.leftborder) swipeState.leftborder = Math.max(0, dx / width);
-                else if (swipeState.rightborder) swipeState.rightborder = Math.max(0, -dx / width);
+                else if (swipeState.leftBorder) swipeState.leftBorder = Math.max(0, dx / width);
+                else if (swipeState.rightBorder) swipeState.rightBorder = Math.max(0, -dx / width);
                 else if (swipeState.up) swipeState.up = Math.max(0, -dy / height);
                 else if (swipeState.down) swipeState.down = Math.max(0, dy / height);
-                else if (swipeState.topborder) swipeState.topborder = Math.max(0, dy / height);
-                else if (swipeState.bottomborder) swipeState.bottomborder = Math.max(0, -dy / height);
+                else if (swipeState.topBorder) swipeState.topBorder = Math.max(0, dy / height);
+                else if (swipeState.bottomBorder) swipeState.bottomBorder = Math.max(0, -dy / height);
                 else {
                     // starting a new swipe
                     if (dx > threshold && Math.abs(dy) < threshold) {
-                        if (startX < 10) swipeState.leftborder = dx / width;
+                        if (startX < 10) swipeState.leftBorder = dx / width;
                         else swipeState.right = dx / width;
                     } else if (-dx > threshold && Math.abs(dy) < threshold) {
-                        if (startX > width - 10) swipeState.rightborder = -dx / width;
+                        if (startX > width - 10) swipeState.rightBorder = -dx / width;
                         else swipeState.left = -dx / width;
                     } else if (dy > threshold && Math.abs(dx) < threshold) {
-                        if (startY < 10) swipeState.topborder = dy / height;
+                        if (startY < 10) swipeState.topBorder = dy / height;
                         else swipeState.down = dy / height;
                     } else if (-dy > threshold && Math.abs(dx) < threshold) {
-                        if (startY > height - 10) swipeState.bottomborder = -dy / height;
+                        if (startY > height - 10) swipeState.bottomBorder = -dy / height;
                         else swipeState.up = -dy / height;
                     }
                 }
 
-                if (updateSwipe) updateSwipe(swipeState, leftRoute, rightRoute);
+                if (updateSwipe) updateSwipe(swipeState, swipeNav, scope);
 
             };
 
@@ -113,17 +112,17 @@ Chondric.directive("cjsSwipe", function() {
                 $(document).off(useMouse ? "mousemove" : "touchmove", move)
                 $(document).off(useMouse ? "mouseup" : "touchend", end)
 
-                if (endSwipe) endSwipe(swipeState, leftRoute, rightRoute);
+                if (endSwipe) endSwipe(swipeState, swipeNav, scope);
 
                 swipeState = {
                     left: 0,
                     right: 0,
                     up: 0,
                     down: 0,
-                    leftborder: 0,
-                    rightborder: 0,
-                    topborder: 0,
-                    bottomborder: 0
+                    leftBorder: 0,
+                    rightBorder: 0,
+                    topBorder: 0,
+                    bottomBorder: 0
                 }
 
             }

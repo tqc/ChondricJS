@@ -871,29 +871,21 @@ left:5px;
 
  .sidepanel {
     position: absolute;
+    display: none;
     top:0;
     bottom: 0;
     width: 260px;
     z-index: 1100;
-    -webkit-transition: -webkit-transform 0.3s ease-in-out;
 }
 
- .sidepanel.right {
-    right: 0;
-    -webkit-transform: translate(261px, 0);
-}
 
-.sidepanel.left {
-    left: 0
-    -webkit-transform: translate(-261px, 0);
-}
-
+/*
 
 .sidepanel.active {
     display: block;
     -webkit-transform: translate(0, 0);
 }
-
+*/
 
 .sidepanel .navbar {
     background: #000;
@@ -950,7 +942,7 @@ border-top: 1px solid #aaa;
 .sidepanel .body button.menuitem.selected {
     color: white;
 }
-
+/*
 .chondric-page.haspushpanel .body,
 .chondric-page.haspushpanel .navbar,
 .chondric-page.haspushpanel .tabbar
@@ -978,6 +970,7 @@ border-top: 1px solid #aaa;
 {
     -webkit-transform: translate(0, 0);
 }
+*/
 
 .chondric-page.next.crossfade {
     pointer-events:none;

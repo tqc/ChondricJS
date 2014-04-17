@@ -1,5 +1,169 @@
 Chondric.directive("cjsSidepanel", function() {
 
+    var panelTransitions = {
+        revealRight: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        coverRight: {
+            init: function(panel, page, overlay) {
+                // set initial position
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "none",
+                    "opacity": "0"
+                })
+                panel.css({
+                    "right": 0,
+                    "left": "auto",
+                    "display": "block",
+                    "-webkit-transition": "none",
+                    "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
+                })
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "none",
+                    "opacity": (progress * 0.3)
+                })
+                panel.css({
+                    "right": 0,
+                    "left": "auto",
+                    "display": "block",
+                    "-webkit-transition": "none",
+                    "-webkit-transform": "translate(" + (spwidth - progress * spwidth) + "px, 0)"
+                })
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "opacity": "0"
+                })
+                panel.css({
+                    "display": "block",
+                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
+                })
+                return 300;
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "opacity": "0.3"
+                })
+                panel.css({
+                    "display": "block",
+                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transform": "translate(" + 0 + "px, 0)"
+                })
+                return 300;
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+                overlay.css({
+                    "visibility": "",
+                    "-webkit-transition": "",
+                    "opacity": ""
+                })
+                panel.css({
+                    "display": "",
+                    "-webkit-transition": "",
+                    "-webkit-transform": ""
+                })
+            }
+        },
+        slideRight: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        revealLeft: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        coverLeft: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        slideLeft: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        }
+    };
+
     return {
         //        restrict: "E",
         link: function(scope, element, attrs) {
@@ -41,20 +205,54 @@ Chondric.directive("cjsSidepanel", function() {
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             });
-            scope.$watch(attrs.cjsSidepanel, function(val) {
-                if (!val) {
-                    if (pushmode) {
-                        parentPageElement.removeClass("pushed" + pushmode);
-                    }
-                    overlay.removeClass("active");
-                    element.removeClass("active");
+            scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
+                if (!val && !oldval) return;
+                var transition = "coverRight";
+                var progress = 0;
+                var oldprogress = 0;
+                var spwidth = element.width() || 200;
+                var dwidth = $(document).width();
+
+                if (val && val.transition) transition = val.transition;
+                else if (oldval && oldval.transition) transition = oldval.transition;
+
+                if (val && val.progress) {
+                    // progress will be % of screen width
+                    // convert back to px and make 100% at side panel width
+                    progress = Math.min(1, val.progress * dwidth / spwidth);
                 } else {
-                    if (pushmode) {
-                        parentPageElement.addClass("pushed" + pushmode);
-                    }
-                    overlay.addClass("active");
-                    element.addClass("active");
+                    progress = 0;
                 }
+                console.log(progress);
+                if (oldval && oldval.progress) {
+                    // progress will be % of screen width
+                    // convert back to px and make 100% at side panel width
+                    oldprogress = Math.min(1, oldval.progress * dwidth / spwidth);
+                } else {
+                    oldprogress = 0;
+                }
+
+                if (progress == 1) {
+                    overlay.addClass("active");
+                    if (!oldprogress) {
+                        // ensure initial position was set
+                        panelTransitions[transition].init(element, parentPageElement, overlay);
+                    }
+                    window.setTimeout(function() {
+                        var time = panelTransitions[transition].complete(element, parentPageElement, overlay, oldprogress);
+                    }, 0)
+
+                } else if (progress == 0) {
+                    var time = panelTransitions[transition].cancel(element, parentPageElement, overlay, oldprogress);
+                    window.setTimeout(function() {
+                        panelTransitions[transition].reset(element, parentPageElement, overlay);
+                    }, time)
+                    overlay.removeClass("active");
+                } else {
+                    panelTransitions[transition].progress(element, parentPageElement, overlay, progress);
+                    overlay.addClass("active");
+                }
+
             })
         }
     }
