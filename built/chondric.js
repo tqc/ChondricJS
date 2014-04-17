@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-16 */
+/*! chondric-tools 2014-04-17 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -9,7 +9,7 @@ if (!window.console) {
 }
 
 var Chondric = angular.module('chondric', [])
-
+Chondric.allTransitions = {};
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
@@ -33,101 +33,8 @@ Chondric.App =
 
         var allRoutes = app.allRoutes = {}
 
-        var allTransitions = app.allTransitions = {
-            slideleft: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideleft " + prevProgress + " => " + progress)
-                    if (progress == 1) {
-                        // this element just became the active page - finish the transition
-                        if (prevProgress == 0) {
-                            // call is from change page. need to position as next page since
-                            // it was not previously set by a swipe
-                        }
-                        var transitionTime = 0.3;
-                        // position as next element, then reset to default on a timer
-                        window.setTimeout(function() {
-                            // element positioned. set transition timings and remove positioning
-                            // so it will transition to active page defaults.
-                            $(".body", element).css({
-                                "-webkit-transform": ""
-                            })
-                        }, 10);
-                        window.setTimeout(function() {
-                            // transition finished - clean up transition settings
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }, 10 + transitionTime * 1000);
+        var allTransitions = app.allTransitions = Chondric.allTransitions;
 
-                    } else if (progress == 0) {
-                        // a transition was cancelled
-                        if (prevProgress != 0 && prevProgress != 1) {
-                            // the page was already positioned - set up timers to return smoothly
-                        } else {
-                            // just clean up
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }
-                    }
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
-                        })
-                    }
-                }
-            },
-            slideright: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideright " + prevProgress + " => " + progress)
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
-                        })
-                    }
-                }
-            }
-        };
         // these options are defined in the
         var initialOptions = {
 
@@ -1885,13 +1792,60 @@ Chondric.directive("cjsTransitionStyle", function() {
         //        restrict: "E",
         link: function($scope, element, attrs) {
             $scope.$watch('transition', function(transition, old) {
-                console.log("transition: ", transition);
-                console.log("old: ", old);
+                //                console.log("transition: ", transition);
+                //                console.log("old: ", old);
                 if (!transition) return;
                 var td = app.allTransitions[transition.type];
                 if (!td) return;
-                if (td.setInProgress && attrs["route"] == transition.to) td.setInProgress(element, transition.progress, old && old.progress);
-                if (td.setOutProgress && attrs["route"] == transition.from) td.setOutProgress(element, transition.progress, old && old.progress);
+
+                var isNewTransition = !old || transition.from != old.from || transition.to != old.to || (old.progress == 0 || old.progress == 1);
+
+                if (attrs["route"] == transition.to) {
+                    // apply styles to next page
+                    if (transition.progress == 0 && isNewTransition) {
+                        // set initial style
+                        td.transitionIn.start(element);
+                    } else if (transition.progress == 0 && !isNewTransition) {
+                        // existing transition cancelled - reset to initial state and remove styles after timeout
+                        var time = td.transitionIn.cancel(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else if (transition.progress == 1) {
+                        // transition completed - set page as active and remove styles after timeout.
+                        // transition function returns time in milliseconds
+                        var time = td.transitionIn.complete(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else {
+                        // intermediate progress - set positions without transition.
+                        td.transitionIn.progress(element, transition.progress);
+                    }
+
+                } else if (attrs["route"] == transition.from) {
+                    // apply styles to prev page
+                    if (transition.progress == 0 && isNewTransition) {
+                        // set initial style
+                        td.transitionOut.start(element);
+                    } else if (transition.progress == 0 && !isNewTransition) {
+                        // existing transition cancelled - reset to initial state and remove styles after timeout
+                        var time = td.transitionOut.cancel(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else if (transition.progress == 1) {
+                        // transition completed - set page as active and remove styles after timeout.
+                        // transition function returns time in milliseconds
+                        var time = td.transitionOut.complete(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else {
+                        // intermediate progress - set positions without transition.
+                        td.transitionOut.progress(element, transition.progress);
+                    }
+                }
 
             }, true)
         }
@@ -1940,13 +1894,13 @@ Chondric.directive('chondricViewport', function($compile) {
                 // first level
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
-                template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{transition.type}} {{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute, notransition: noTransition}\" cjs-transition-style route=\"{{rk}}\">"
+                template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
                 template += "</div>"
                 //                template += "</div>"
 
             } else if (rv.isSection) {
                 template = "<div ng-controller=\"rv.controller\" >"
-                template += "<div ng-repeat=\"(rk, rv) in rv.subsections\" chondric-viewport=\"1\" class=\"{{transition.type}} {{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute, notransition: noTransition}\" cjs-transition-style route=\"{{rk}}\">"
+                template += "<div ng-repeat=\"(rk, rv) in rv.subsections\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
                 template += "</div>"
                 template += "</div>"
 
@@ -1965,6 +1919,194 @@ Chondric.directive('chondricViewport', function($compile) {
         }
     }
 });
+
+
+Chondric.allTransitions.slideleft = {
+    setInProgress: function(element, progress, prevProgress) {
+        console.log("slideleft " + prevProgress + " => " + progress)
+        if (progress == 1) {
+            // this element just became the active page - finish the transition
+            if (prevProgress == 0) {
+                // call is from change page. need to position as next page since
+                // it was not previously set by a swipe
+            }
+            var transitionTime = 0.3;
+            // position as next element, then reset to default on a timer
+            window.setTimeout(function() {
+                // element positioned. set transition timings and remove positioning
+                // so it will transition to active page defaults.
+                $(".body", element).css({
+                    "-webkit-transform": ""
+                })
+            }, 10);
+            window.setTimeout(function() {
+                // transition finished - clean up transition settings
+                $(".body", element).css({
+                    "-webkit-transition": "",
+                    "-webkit-transform": ""
+                })
+            }, 10 + transitionTime * 1000);
+
+        } else if (progress == 0) {
+            // a transition was cancelled
+            if (prevProgress != 0 && prevProgress != 1) {
+                // the page was already positioned - set up timers to return smoothly
+            } else {
+                // just clean up
+                $(".body", element).css({
+                    "-webkit-transition": "",
+                    "-webkit-transform": ""
+                })
+            }
+        }
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
+            })
+        }
+    },
+    setOutProgress: function(element, progress, prevProgress) {
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
+            })
+        }
+    }
+};
+Chondric.allTransitions.slideright = {
+    transitionIn: {
+        start: function(element) {
+            // show element and move to left
+            $(element).css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(-100%, 0)"
+            })
+        },
+        cancel: function(element, prevProgress) {
+            // move element to left with transition
+            var time = (prevProgress) * 300;
+
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(-100%, 0)"
+            })
+
+            return time;
+        },
+        complete: function(element, prevProgress) {
+            // set transform to 0 with transition
+            var time = (1 - prevProgress) * 300;
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(0, 0)"
+            })
+            return time;
+        },
+        progress: function(element, progress) {
+            // set element position without transition
+            $(element).css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
+            })
+        }
+    },
+    transitionOut: {
+        start: function(element) {
+            // set webkit-transform to 0
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(0, 0)"
+            })
+
+        },
+        cancel: function(element, prevProgress) {
+            // set transform to 0 with transition
+            var time = (prevProgress) * 300;
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(0, 0)"
+            })
+            return time;
+        },
+        complete: function(element, prevProgress) {
+            // move element to right with transition
+            var time = (1 - prevProgress) * 300;
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(100%, 0)"
+            })
+            return time;
+        },
+        progress: function(element, progress) {
+            // set element position without transition
+            $(element).css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
+            })
+        }
+    },
+    reset: function(element) {
+        // remove transition, transform and display settings from relevant subelements
+        element.css({
+            "display": ""
+        })
+        $(".body", element).css({
+            "-webkit-transition": "",
+            "-webkit-transform": ""
+        })
+    },
+    setInProgress: function(element, progress, prevProgress) {
+        console.log("slideright " + prevProgress + " => " + progress)
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            element.css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
+            })
+        }
+    },
+    setOutProgress: function(element, progress, prevProgress) {
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
+            })
+        }
+    }
+}
 Chondric.Syncable = function(options) {
     var syncable = this;
 

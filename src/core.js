@@ -8,7 +8,7 @@ if (!window.console) {
 }
 
 var Chondric = angular.module('chondric', [])
-
+Chondric.allTransitions = {};
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
@@ -32,101 +32,8 @@ Chondric.App =
 
         var allRoutes = app.allRoutes = {}
 
-        var allTransitions = app.allTransitions = {
-            slideleft: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideleft " + prevProgress + " => " + progress)
-                    if (progress == 1) {
-                        // this element just became the active page - finish the transition
-                        if (prevProgress == 0) {
-                            // call is from change page. need to position as next page since
-                            // it was not previously set by a swipe
-                        }
-                        var transitionTime = 0.3;
-                        // position as next element, then reset to default on a timer
-                        window.setTimeout(function() {
-                            // element positioned. set transition timings and remove positioning
-                            // so it will transition to active page defaults.
-                            $(".body", element).css({
-                                "-webkit-transform": ""
-                            })
-                        }, 10);
-                        window.setTimeout(function() {
-                            // transition finished - clean up transition settings
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }, 10 + transitionTime * 1000);
+        var allTransitions = app.allTransitions = Chondric.allTransitions;
 
-                    } else if (progress == 0) {
-                        // a transition was cancelled
-                        if (prevProgress != 0 && prevProgress != 1) {
-                            // the page was already positioned - set up timers to return smoothly
-                        } else {
-                            // just clean up
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }
-                    }
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
-                        })
-                    }
-                }
-            },
-            slideright: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideright " + prevProgress + " => " + progress)
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
-                        })
-                    }
-                }
-            }
-        };
         // these options are defined in the
         var initialOptions = {
 

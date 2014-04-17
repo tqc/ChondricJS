@@ -139,13 +139,60 @@ Chondric.directive("cjsTransitionStyle", function() {
         //        restrict: "E",
         link: function($scope, element, attrs) {
             $scope.$watch('transition', function(transition, old) {
-                console.log("transition: ", transition);
-                console.log("old: ", old);
+                //                console.log("transition: ", transition);
+                //                console.log("old: ", old);
                 if (!transition) return;
                 var td = app.allTransitions[transition.type];
                 if (!td) return;
-                if (td.setInProgress && attrs["route"] == transition.to) td.setInProgress(element, transition.progress, old && old.progress);
-                if (td.setOutProgress && attrs["route"] == transition.from) td.setOutProgress(element, transition.progress, old && old.progress);
+
+                var isNewTransition = !old || transition.from != old.from || transition.to != old.to || (old.progress == 0 || old.progress == 1);
+
+                if (attrs["route"] == transition.to) {
+                    // apply styles to next page
+                    if (transition.progress == 0 && isNewTransition) {
+                        // set initial style
+                        td.transitionIn.start(element);
+                    } else if (transition.progress == 0 && !isNewTransition) {
+                        // existing transition cancelled - reset to initial state and remove styles after timeout
+                        var time = td.transitionIn.cancel(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else if (transition.progress == 1) {
+                        // transition completed - set page as active and remove styles after timeout.
+                        // transition function returns time in milliseconds
+                        var time = td.transitionIn.complete(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else {
+                        // intermediate progress - set positions without transition.
+                        td.transitionIn.progress(element, transition.progress);
+                    }
+
+                } else if (attrs["route"] == transition.from) {
+                    // apply styles to prev page
+                    if (transition.progress == 0 && isNewTransition) {
+                        // set initial style
+                        td.transitionOut.start(element);
+                    } else if (transition.progress == 0 && !isNewTransition) {
+                        // existing transition cancelled - reset to initial state and remove styles after timeout
+                        var time = td.transitionOut.cancel(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else if (transition.progress == 1) {
+                        // transition completed - set page as active and remove styles after timeout.
+                        // transition function returns time in milliseconds
+                        var time = td.transitionOut.complete(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else {
+                        // intermediate progress - set positions without transition.
+                        td.transitionOut.progress(element, transition.progress);
+                    }
+                }
 
             }, true)
         }

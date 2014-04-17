@@ -275,7 +275,10 @@ exports.hostApp = function(options) {
             srcDir + "/directives/cjs-sidepanel.js",
             srcDir + "/directives/cjs-swipe.js",
             srcDir + "/directives/preview-controls.js",
-            srcDir + "/directives/chondric-viewport.js"
+            srcDir + "/directives/chondric-viewport.js",
+            srcDir + "/transitions/crossfade.js",
+            srcDir + "/transitions/sidepanel.js",
+            srcDir + "/transitions/slide.js"
         ]
 
         app.use(function(req, res, next) {
