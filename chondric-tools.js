@@ -257,6 +257,7 @@ exports.hostApp = function(options) {
             srcDir + "/css/core.css",
             srcDir + "/css/loading-overlay.css",
             srcDir + "/css/icons.css",
+            srcDir + "/css/loading-overlay.css",
             srcDir + "/css/modals.css",
             srcDir + "/css/transitions/crossfade.css",
             srcDir + "/css/transitions/slideleft.css",
@@ -364,6 +365,10 @@ exports.hostApp = function(options) {
             })
         };
 
+        app.get('/demo/',
+            function(req, res) {
+                updatescripts(req, res, "index.html");
+            });
         app.get('/demo/index.html',
             function(req, res) {
                 updatescripts(req, res, "index.html");
