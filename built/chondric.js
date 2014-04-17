@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-11 */
+/*! chondric-tools 2014-04-17 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -9,7 +9,7 @@ if (!window.console) {
 }
 
 var Chondric = angular.module('chondric', [])
-
+Chondric.allTransitions = {};
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
@@ -33,101 +33,8 @@ Chondric.App =
 
         var allRoutes = app.allRoutes = {}
 
-        var allTransitions = app.allTransitions = {
-            slideleft: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideleft " + prevProgress + " => " + progress)
-                    if (progress == 1) {
-                        // this element just became the active page - finish the transition
-                        if (prevProgress == 0) {
-                            // call is from change page. need to position as next page since
-                            // it was not previously set by a swipe
-                        }
-                        var transitionTime = 0.3;
-                        // position as next element, then reset to default on a timer
-                        window.setTimeout(function() {
-                            // element positioned. set transition timings and remove positioning
-                            // so it will transition to active page defaults.
-                            $(".body", element).css({
-                                "-webkit-transform": ""
-                            })
-                        }, 10);
-                        window.setTimeout(function() {
-                            // transition finished - clean up transition settings
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }, 10 + transitionTime * 1000);
+        var allTransitions = app.allTransitions = Chondric.allTransitions;
 
-                    } else if (progress == 0) {
-                        // a transition was cancelled
-                        if (prevProgress != 0 && prevProgress != 1) {
-                            // the page was already positioned - set up timers to return smoothly
-                        } else {
-                            // just clean up
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }
-                    }
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
-                        })
-                    }
-                }
-            },
-            slideright: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideright " + prevProgress + " => " + progress)
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
-                        })
-                    }
-                }
-            }
-        };
         // these options are defined in the
         var initialOptions = {
 
@@ -328,69 +235,68 @@ Chondric.App =
 
             }
 
-            $scope.updateSwipe = function(swipeState, leftRoute, rightRoute) {
+            $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
                 // default handler covers left and right border swipe
-                if (swipeState.leftborder && leftRoute) {
-                    console.log("updating swipe - left border");
-                    $scope.noTransition = true;
-                    loadView(leftRoute);
-                    $scope.nextRoute = leftRoute;
-                    $scope.transition.from = $scope.route;
-                    $scope.transition.to = $scope.nextRoute;
-                    $scope.transition.type = "slideright";
-                    $scope.transition.progress = swipeState.leftborder;
-                    $scope.$apply();
-                } else if (swipeState.rightborder && rightRoute) {
-                    console.log("updating swipe - right border");
-                    $scope.noTransition = true;
-                    loadView(rightRoute);
-                    $scope.nextRoute = rightRoute;
-                    $scope.transition.from = $scope.route;
-                    $scope.transition.to = $scope.nextRoute;
-                    $scope.transition.type = "slideleft";
-                    $scope.transition.progress = swipeState.rightborder;
-                    $scope.$apply();
-                } else {
+                for (var p in swipeState) {
+                    if (swipeState[p] && swipeNav[p]) {
+                        console.log("updating swipe - left border");
+                        if (swipeNav[p].route) {
+                            loadView(swipeNav[p].route);
+                            $scope.nextRoute = swipeNav[p].route;
+                            $scope.transition.from = $scope.route;
+                            $scope.transition.to = $scope.nextRoute;
+                            $scope.transition.type = swipeNav[p].transition;
+
+                            $scope.transition.progress = swipeState[p];
+                        } else if (swipeNav[p].panel) {
+                            var showModal = pageScope.$eval("showModal");
+                            showModal(swipeNav[p].panel, {
+                                progress: swipeState[p],
+                                transition: swipeNav[p].transition
+                            });
+                        }
+                        $scope.$apply();
+                    }
 
                 }
-
             }
 
-            $scope.endSwipe = function(swipeState, leftRoute, rightRoute) {
+            $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
                 console.log("ending swipe");
-                if (swipeState.leftborder && leftRoute) {
-                    console.log("ending swipe - left border");
-                    $scope.noTransition = false;
+                for (var p in swipeState) {
+                    if (swipeState[p] && swipeNav[p]) {
+                        console.log("ending swipe - " + p);
+                        if (swipeNav[p].route) {
+                            if (swipeState[p] > 0.6) {
+                                // continue change to next page
+                                loadView(swipeNav[p].route);
+                                $scope.transition.progress = 1;
+                                $scope.lastRoute = $scope.route;
+                                $scope.route = swipeNav[p].route;
+                            } else {
+                                // cancel page change
+                                $scope.transition.progress = 0;
 
-                    if (swipeState.leftborder > 0.6) {
-                        // continue change to next page
-                        loadView(leftRoute);
-                        $scope.transition.progress = 1;
-                        $scope.lastRoute = $scope.route;
-                        $scope.route = leftRoute;
-                    } else {
-                        // cancel page change
-                        $scope.transition.progress = 0;
+                            }
+
+                        } else if (swipeNav[p].panel) {
+                            if (swipeState[p] > 0.1) {
+                                var showModal = pageScope.$eval("showModal");
+                                showModal(swipeNav[p].panel, {
+                                    progress: 1,
+                                    transition: swipeNav[p].transition
+                                });
+                            } else {
+                                var hideModal = pageScope.$eval("hideModal");
+                                hideModal(swipeNav[p].panel);
+
+                            }
+                        }
+
+                        $scope.$apply();
                     }
-                    $scope.$apply();
-                } else if (swipeState.rightborder && rightRoute) {
-                    console.log("ending swipe - right border");
-                    $scope.noTransition = false;
-
-                    if (swipeState.rightborder > 0.6) {
-                        // continue change to next page
-                        loadView(rightRoute);
-                        $scope.transition.progress = 1;
-                        $scope.lastRoute = $scope.route;
-                        $scope.route = rightRoute;
-                    } else {
-                        // cancel page change
-                        $scope.transition.progress = 0;
-                    }
-                    $scope.$apply();
-                } else {
-
                 }
+
             }
 
 
@@ -1486,10 +1392,13 @@ Chondric.directive('loadingOverlay', function($compile) {
     }
 });
 Chondric.directive("cjsPopover", function() {
-
     return {
         //        restrict: "E",
         link: function(scope, element, attrs) {
+            var useOverlay = attrs.noOverlay === undefined;
+            var horizontal = attrs.horizontal !== undefined;
+            var menuwidth = parseFloat(attrs.menuwidth) || 280;
+            var menuheight = parseFloat(attrs.menuheight) || 150;
 
             var useMouse = true;
 
@@ -1504,58 +1413,136 @@ Chondric.directive("cjsPopover", function() {
             element.addClass("popover");
 
             var parentPageElement = element.closest(".chondric-page");
-            var overlay = $(".modal-overlay", parentPageElement);
-            if (overlay.length == 0) {
-                overlay = angular.element('<div class="modal-overlay"></div>');
-                parentPageElement.append(overlay);
+            if (useOverlay) {
+                var overlay = $(".modal-overlay", parentPageElement);
+                if (overlay.length == 0) {
+                    overlay = angular.element('<div class="modal-overlay"></div>');
+                    parentPageElement.append(overlay);
+                }
+                overlay.on(useMouse ? "mousedown" : "touchstart", function() {
+                    console.log("overlay touch");
+                    scope.$apply("hideModal('" + attrs.cjsPopover + "')");
+                });
             }
-            overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                console.log("overlay touch");
-                scope.$apply("hideModal('" + attrs.cjsPopover + "')");
-            });
             scope.$watch(attrs.cjsPopover, function(val) {
                 if (!val) {
-                    overlay.removeClass("active");
+                    if (useOverlay) {
+                        overlay.removeClass("active");
+                    }
                     element.removeClass("active");
                 } else {
-                    var button = val.element[0];
+
+                    menuheight = element.height() || menuheight;
+                    menuwidth = element.width() || menuwidth;
+
                     var menupos = {};
                     // TODO: should get actual size of the element, but it is display:none at this point.
-                    var menuwidth = 280;
 
                     var sw = element[0].offsetParent.offsetWidth;
                     var sh = element[0].offsetParent.offsetHeight;
-                    var cr = button.getBoundingClientRect();
 
-                    if (cr.bottom > sh / 2) {
-                        menupos.bottom = (sh - cr.top + 12) + "px";
-                        menupos.top = "auto";
-                        element.addClass("up").removeClass("down");
+                    var horizontalCutoff = sw / 2;
+                    var verticalCutoff = sh / 2;
+                    var idealX = 0;
+                    var idealY = 0;
+
+
+                    if (val.element && val.element[0]) {
+                        var button = val.element[0];
+                        var cr = button.getBoundingClientRect();
+
+                        if (horizontal) {
+                            // x at left or right of button, y center of button
+                            if (cr.right > horizontalCutoff) {
+                                idealX = cr.right;
+                            } else {
+                                idealX = cr.left;
+                            }
+                            idealY = cr.top + cr.height / 2;
+                        } else {
+                            // x at center of button, y at left or right of button
+                            idealX = cr.left + cr.width / 2;
+                            if (cr.bottom > verticalCutoff) {
+                                idealY = cr.top;
+                            } else {
+                                idealY = cr.bottom;
+                            }
+                        }
+
                     } else {
-                        menupos.top = (cr.bottom + 12) + "px";
-                        menupos.bottom = "auto";
-                        element.addClass("down").removeClass("up");
+                        idealX = val.x || 0;
+                        idealY = val.y || 0;
                     }
-                    var left = ((button.offsetLeft + button.offsetWidth / 2) - menuwidth / 2);
 
+                    var actualX = idealX;
+                    var actualY = idealY;
+                    // adjust position to ensure menu remains onscreen
+                    if (horizontal) {
+                        if (idealY - 10 - menuheight / 2 < 0) actualY = menuheight / 2 + 10;
+                        if ((idealY + 10 + menuheight / 2) > sh) actualY = sh - menuheight / 2 - 10;
+                    } else {
+                        if (idealX - 10 - menuwidth / 2 < 0) actualX = menuwidth / 2 + 10;
+                        if ((idealX + 10 + menuwidth / 2) > sw) actualX = sw - menuwidth / 2 - 10;
+                    }
 
-                    if (left < 10) {
-                        left = 10;
+                    if (horizontal) {
+                        if (actualX < horizontalCutoff) {
+                            menupos.left = (actualX + 13) + "px";
+                            menupos.right = "auto"
+                            element.addClass("right").removeClass("left");
+                        } else {
+                            menupos.right = (sw - actualX + 13) + "px";
+                            menupos.left = "auto"
+                            element.addClass("left").removeClass("right");
+                        }
+                        menupos.top = (actualY - menuheight / 2) + "px";
+                    } else {
+                        if (actualY < verticalCutoff) {
+                            menupos.top = (actualY + 13) + "px";
+                            menupos.bottom = "auto"
+                            element.addClass("down").removeClass("up");
+                        } else {
+                            menupos.bottom = (sh - actualY + 13) + "px";
+                            menupos.top = "auto"
+                            element.addClass("up").removeClass("down");
+                        }
+                        menupos.left = (actualX - menuwidth / 2) + "px";
                     }
-                    if (left + menuwidth > sw - 10) {
-                        left = (sw - menuwidth - 10);
-                    }
-                    menupos.left = left + "px"
+
+                    /* 
+
+                        if (cr.bottom > sh / 2) {
+                            menupos.bottom = (sh - cr.top + 12) + "px";
+                            menupos.top = "auto";
+                            
+                        } else {
+                            menupos.top = (cr.bottom + 12) + "px";
+                            menupos.bottom = "auto";
+                            element.addClass("down").removeClass("up");
+                        }
+                        var left = ((button.offsetLeft + button.offsetWidth / 2) - menuwidth / 2);
+                        var arrowleft = (cr.left + cr.width / 2) - 13 - left;
+
+*/
 
                     var indel = $(".poparrow", element);
                     if (indel.length > 0) {
-                        var arrowleft = (cr.left + cr.width / 2) - 13 - left;
-                        if (arrowleft < 10) arrowleft = 10;
-                        if (arrowleft + 26 > menuwidth - 10) arrowleft = menuwidth - 10 - 26;
-                        indel.css("left", arrowleft + "px");
-                    }
+                        if (horizontal) {
+                            var arrowtop = idealY - (actualY - menuheight / 2) - 13;
+                            if (arrowtop < 10) arrowtop = 10;
+                            if (arrowtop + 26 > menuheight - 10) arrowtop = menuheight - 10 - 26;
+                            indel.css("top", arrowtop + "px");
+                        } else {
+                            var arrowleft = idealX - (actualX - menuwidth / 2) - 13;
+                            if (arrowleft < 10) arrowleft = 10;
+                            if (arrowleft + 26 > menuwidth - 10) arrowleft = menuwidth - 10 - 26;
+                            indel.css("left", arrowleft + "px");
 
-                    overlay.addClass("active");
+                        }
+                    }
+                    if (useOverlay) {
+                        overlay.addClass("active");
+                    }
                     element.addClass("active");
                     element.css(menupos);
                 }
@@ -1604,6 +1591,170 @@ Chondric.directive("cjsPopup", function() {
 });
 Chondric.directive("cjsSidepanel", function() {
 
+    var panelTransitions = {
+        revealRight: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        coverRight: {
+            init: function(panel, page, overlay) {
+                // set initial position
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "none",
+                    "opacity": "0"
+                })
+                panel.css({
+                    "right": 0,
+                    "left": "auto",
+                    "display": "block",
+                    "-webkit-transition": "none",
+                    "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
+                })
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "none",
+                    "opacity": (progress * 0.3)
+                })
+                panel.css({
+                    "right": 0,
+                    "left": "auto",
+                    "display": "block",
+                    "-webkit-transition": "none",
+                    "-webkit-transform": "translate(" + (spwidth - progress * spwidth) + "px, 0)"
+                })
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "opacity": "0"
+                })
+                panel.css({
+                    "display": "block",
+                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
+                })
+                return 300;
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "opacity": "0.3"
+                })
+                panel.css({
+                    "display": "block",
+                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transform": "translate(" + 0 + "px, 0)"
+                })
+                return 300;
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+                overlay.css({
+                    "visibility": "",
+                    "-webkit-transition": "",
+                    "opacity": ""
+                })
+                panel.css({
+                    "display": "",
+                    "-webkit-transition": "",
+                    "-webkit-transform": ""
+                })
+            }
+        },
+        slideRight: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        revealLeft: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        coverLeft: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        },
+        slideLeft: {
+            init: function(panel, page, overlay) {
+                // set initial position
+            },
+            progress: function(panel, page, overlay, progress) {
+                // set intermediate position
+            },
+            cancel: function(panel, page, overlay, prevProgress) {
+                // move off screen with transition, return timing
+            },
+            complete: function(panel, page, overlay, prevProgress) {
+                // move on screen with transition, return timing
+            },
+            reset: function(panel, page, overlay) {
+                // remove custom css
+            }
+        }
+    };
+
     return {
         //        restrict: "E",
         link: function(scope, element, attrs) {
@@ -1645,20 +1796,54 @@ Chondric.directive("cjsSidepanel", function() {
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             });
-            scope.$watch(attrs.cjsSidepanel, function(val) {
-                if (!val) {
-                    if (pushmode) {
-                        parentPageElement.removeClass("pushed" + pushmode);
-                    }
-                    overlay.removeClass("active");
-                    element.removeClass("active");
+            scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
+                if (!val && !oldval) return;
+                var transition = "coverRight";
+                var progress = 0;
+                var oldprogress = 0;
+                var spwidth = element.width() || 200;
+                var dwidth = $(document).width();
+
+                if (val && val.transition) transition = val.transition;
+                else if (oldval && oldval.transition) transition = oldval.transition;
+
+                if (val && val.progress) {
+                    // progress will be % of screen width
+                    // convert back to px and make 100% at side panel width
+                    progress = Math.min(1, val.progress * dwidth / spwidth);
                 } else {
-                    if (pushmode) {
-                        parentPageElement.addClass("pushed" + pushmode);
-                    }
-                    overlay.addClass("active");
-                    element.addClass("active");
+                    progress = 0;
                 }
+                console.log(progress);
+                if (oldval && oldval.progress) {
+                    // progress will be % of screen width
+                    // convert back to px and make 100% at side panel width
+                    oldprogress = Math.min(1, oldval.progress * dwidth / spwidth);
+                } else {
+                    oldprogress = 0;
+                }
+
+                if (progress == 1) {
+                    overlay.addClass("active");
+                    if (!oldprogress) {
+                        // ensure initial position was set
+                        panelTransitions[transition].init(element, parentPageElement, overlay);
+                    }
+                    window.setTimeout(function() {
+                        var time = panelTransitions[transition].complete(element, parentPageElement, overlay, oldprogress);
+                    }, 0)
+
+                } else if (progress == 0) {
+                    var time = panelTransitions[transition].cancel(element, parentPageElement, overlay, oldprogress);
+                    window.setTimeout(function() {
+                        panelTransitions[transition].reset(element, parentPageElement, overlay);
+                    }, time)
+                    overlay.removeClass("active");
+                } else {
+                    panelTransitions[transition].progress(element, parentPageElement, overlay, progress);
+                    overlay.addClass("active");
+                }
+
             })
         }
     }
@@ -1696,8 +1881,7 @@ Chondric.directive("cjsSwipe", function() {
             var updateSwipe = scope.$eval("updateSwipe");
             var endSwipe = scope.$eval("endSwipe");
 
-            var leftRoute;
-            var rightRoute;
+            var swipeNav;
 
             element.on(useMouse ? "mousedown" : "touchstart", function(e) {
                 if (tracking) return;
@@ -1721,16 +1905,16 @@ Chondric.directive("cjsSwipe", function() {
                     right: 0,
                     up: 0,
                     down: 0,
-                    leftborder: 0,
-                    rightborder: 0,
-                    topborder: 0,
-                    bottomborder: 0
+                    leftBorder: 0,
+                    rightBorder: 0,
+                    topBorder: 0,
+                    bottomBorder: 0
                 }
 
                 $(document).on(useMouse ? "mousemove" : "touchmove", move);
                 $(document).on(useMouse ? "mouseup" : "touchend", end);
-                leftRoute = scope.$eval("leftRoute");
-                rightRoute = scope.$eval("rightRoute");
+
+                swipeNav = scope.$eval("swipeNav");
 
             });
 
@@ -1745,30 +1929,30 @@ Chondric.directive("cjsSwipe", function() {
 
                 if (swipeState.left) swipeState.left = Math.max(0, -dx / width);
                 else if (swipeState.right) swipeState.right = Math.max(0, dx / width);
-                else if (swipeState.leftborder) swipeState.leftborder = Math.max(0, dx / width);
-                else if (swipeState.rightborder) swipeState.rightborder = Math.max(0, -dx / width);
+                else if (swipeState.leftBorder) swipeState.leftBorder = Math.max(0, dx / width);
+                else if (swipeState.rightBorder) swipeState.rightBorder = Math.max(0, -dx / width);
                 else if (swipeState.up) swipeState.up = Math.max(0, -dy / height);
                 else if (swipeState.down) swipeState.down = Math.max(0, dy / height);
-                else if (swipeState.topborder) swipeState.topborder = Math.max(0, dy / height);
-                else if (swipeState.bottomborder) swipeState.bottomborder = Math.max(0, -dy / height);
+                else if (swipeState.topBorder) swipeState.topBorder = Math.max(0, dy / height);
+                else if (swipeState.bottomBorder) swipeState.bottomBorder = Math.max(0, -dy / height);
                 else {
                     // starting a new swipe
                     if (dx > threshold && Math.abs(dy) < threshold) {
-                        if (startX < 10) swipeState.leftborder = dx / width;
+                        if (startX < 10) swipeState.leftBorder = dx / width;
                         else swipeState.right = dx / width;
                     } else if (-dx > threshold && Math.abs(dy) < threshold) {
-                        if (startX > width - 10) swipeState.rightborder = -dx / width;
+                        if (startX > width - 10) swipeState.rightBorder = -dx / width;
                         else swipeState.left = -dx / width;
                     } else if (dy > threshold && Math.abs(dx) < threshold) {
-                        if (startY < 10) swipeState.topborder = dy / height;
+                        if (startY < 10) swipeState.topBorder = dy / height;
                         else swipeState.down = dy / height;
                     } else if (-dy > threshold && Math.abs(dx) < threshold) {
-                        if (startY > height - 10) swipeState.bottomborder = -dy / height;
+                        if (startY > height - 10) swipeState.bottomBorder = -dy / height;
                         else swipeState.up = -dy / height;
                     }
                 }
 
-                if (updateSwipe) updateSwipe(swipeState, leftRoute, rightRoute);
+                if (updateSwipe) updateSwipe(swipeState, swipeNav, scope);
 
             };
 
@@ -1778,17 +1962,17 @@ Chondric.directive("cjsSwipe", function() {
                 $(document).off(useMouse ? "mousemove" : "touchmove", move)
                 $(document).off(useMouse ? "mouseup" : "touchend", end)
 
-                if (endSwipe) endSwipe(swipeState, leftRoute, rightRoute);
+                if (endSwipe) endSwipe(swipeState, swipeNav, scope);
 
                 swipeState = {
                     left: 0,
                     right: 0,
                     up: 0,
                     down: 0,
-                    leftborder: 0,
-                    rightborder: 0,
-                    topborder: 0,
-                    bottomborder: 0
+                    leftBorder: 0,
+                    rightBorder: 0,
+                    topBorder: 0,
+                    bottomBorder: 0
                 }
 
             }
@@ -1804,13 +1988,60 @@ Chondric.directive("cjsTransitionStyle", function() {
         //        restrict: "E",
         link: function($scope, element, attrs) {
             $scope.$watch('transition', function(transition, old) {
-                console.log("transition: ", transition);
-                console.log("old: ", old);
+                //                console.log("transition: ", transition);
+                //                console.log("old: ", old);
                 if (!transition) return;
                 var td = app.allTransitions[transition.type];
                 if (!td) return;
-                if (td.setInProgress && attrs["route"] == transition.to) td.setInProgress(element, transition.progress, old && old.progress);
-                if (td.setOutProgress && attrs["route"] == transition.from) td.setOutProgress(element, transition.progress, old && old.progress);
+
+                var isNewTransition = !old || transition.from != old.from || transition.to != old.to || (old.progress == 0 || old.progress == 1);
+
+                if (attrs["route"] == transition.to) {
+                    // apply styles to next page
+                    if (transition.progress == 0 && isNewTransition) {
+                        // set initial style
+                        td.transitionIn.start(element);
+                    } else if (transition.progress == 0 && !isNewTransition) {
+                        // existing transition cancelled - reset to initial state and remove styles after timeout
+                        var time = td.transitionIn.cancel(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else if (transition.progress == 1) {
+                        // transition completed - set page as active and remove styles after timeout.
+                        // transition function returns time in milliseconds
+                        var time = td.transitionIn.complete(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else {
+                        // intermediate progress - set positions without transition.
+                        td.transitionIn.progress(element, transition.progress);
+                    }
+
+                } else if (attrs["route"] == transition.from) {
+                    // apply styles to prev page
+                    if (transition.progress == 0 && isNewTransition) {
+                        // set initial style
+                        td.transitionOut.start(element);
+                    } else if (transition.progress == 0 && !isNewTransition) {
+                        // existing transition cancelled - reset to initial state and remove styles after timeout
+                        var time = td.transitionOut.cancel(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else if (transition.progress == 1) {
+                        // transition completed - set page as active and remove styles after timeout.
+                        // transition function returns time in milliseconds
+                        var time = td.transitionOut.complete(element, old.progress);
+                        window.setTimeout(function() {
+                            td.reset(element);
+                        }, time);
+                    } else {
+                        // intermediate progress - set positions without transition.
+                        td.transitionOut.progress(element, transition.progress);
+                    }
+                }
 
             }, true)
         }
@@ -1859,13 +2090,13 @@ Chondric.directive('chondricViewport', function($compile) {
                 // first level
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
-                template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{transition.type}} {{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute, notransition: noTransition}\" cjs-transition-style route=\"{{rk}}\">"
+                template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
                 template += "</div>"
                 //                template += "</div>"
 
             } else if (rv.isSection) {
                 template = "<div ng-controller=\"rv.controller\" >"
-                template += "<div ng-repeat=\"(rk, rv) in rv.subsections\" chondric-viewport=\"1\" class=\"{{transition.type}} {{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute, notransition: noTransition}\" cjs-transition-style route=\"{{rk}}\">"
+                template += "<div ng-repeat=\"(rk, rv) in rv.subsections\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
                 template += "</div>"
                 template += "</div>"
 
@@ -1884,6 +2115,194 @@ Chondric.directive('chondricViewport', function($compile) {
         }
     }
 });
+
+
+Chondric.allTransitions.slideleft = {
+    setInProgress: function(element, progress, prevProgress) {
+        console.log("slideleft " + prevProgress + " => " + progress)
+        if (progress == 1) {
+            // this element just became the active page - finish the transition
+            if (prevProgress == 0) {
+                // call is from change page. need to position as next page since
+                // it was not previously set by a swipe
+            }
+            var transitionTime = 0.3;
+            // position as next element, then reset to default on a timer
+            window.setTimeout(function() {
+                // element positioned. set transition timings and remove positioning
+                // so it will transition to active page defaults.
+                $(".body", element).css({
+                    "-webkit-transform": ""
+                })
+            }, 10);
+            window.setTimeout(function() {
+                // transition finished - clean up transition settings
+                $(".body", element).css({
+                    "-webkit-transition": "",
+                    "-webkit-transform": ""
+                })
+            }, 10 + transitionTime * 1000);
+
+        } else if (progress == 0) {
+            // a transition was cancelled
+            if (prevProgress != 0 && prevProgress != 1) {
+                // the page was already positioned - set up timers to return smoothly
+            } else {
+                // just clean up
+                $(".body", element).css({
+                    "-webkit-transition": "",
+                    "-webkit-transform": ""
+                })
+            }
+        }
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
+            })
+        }
+    },
+    setOutProgress: function(element, progress, prevProgress) {
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
+            })
+        }
+    }
+};
+Chondric.allTransitions.slideright = {
+    transitionIn: {
+        start: function(element) {
+            // show element and move to left
+            $(element).css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(-100%, 0)"
+            })
+        },
+        cancel: function(element, prevProgress) {
+            // move element to left with transition
+            var time = (prevProgress) * 300;
+
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(-100%, 0)"
+            })
+
+            return time;
+        },
+        complete: function(element, prevProgress) {
+            // set transform to 0 with transition
+            var time = (1 - prevProgress) * 300;
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(0, 0)"
+            })
+            return time;
+        },
+        progress: function(element, progress) {
+            // set element position without transition
+            $(element).css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
+            })
+        }
+    },
+    transitionOut: {
+        start: function(element) {
+            // set webkit-transform to 0
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(0, 0)"
+            })
+
+        },
+        cancel: function(element, prevProgress) {
+            // set transform to 0 with transition
+            var time = (prevProgress) * 300;
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(0, 0)"
+            })
+            return time;
+        },
+        complete: function(element, prevProgress) {
+            // move element to right with transition
+            var time = (1 - prevProgress) * 300;
+            $(".body", element).css({
+                "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
+                "-webkit-transform": "translate(100%, 0)"
+            })
+            return time;
+        },
+        progress: function(element, progress) {
+            // set element position without transition
+            $(element).css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
+            })
+        }
+    },
+    reset: function(element) {
+        // remove transition, transform and display settings from relevant subelements
+        element.css({
+            "display": ""
+        })
+        $(".body", element).css({
+            "-webkit-transition": "",
+            "-webkit-transform": ""
+        })
+    },
+    setInProgress: function(element, progress, prevProgress) {
+        console.log("slideright " + prevProgress + " => " + progress)
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            element.css({
+                "display": "block"
+            })
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
+            })
+        }
+    },
+    setOutProgress: function(element, progress, prevProgress) {
+        if (!progress || progress == 1) {
+            $(".body", element).css({
+                "-webkit-transition": "",
+                "-webkit-transform": ""
+            })
+        } else {
+            $(".body", element).css({
+                "-webkit-transition": "none",
+                "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
+            })
+        }
+    }
+}
 Chondric.Syncable = function(options) {
     var syncable = this;
 

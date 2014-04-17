@@ -8,7 +8,7 @@ if (!window.console) {
 }
 
 var Chondric = angular.module('chondric', [])
-
+Chondric.allTransitions = {};
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
@@ -32,101 +32,8 @@ Chondric.App =
 
         var allRoutes = app.allRoutes = {}
 
-        var allTransitions = app.allTransitions = {
-            slideleft: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideleft " + prevProgress + " => " + progress)
-                    if (progress == 1) {
-                        // this element just became the active page - finish the transition
-                        if (prevProgress == 0) {
-                            // call is from change page. need to position as next page since
-                            // it was not previously set by a swipe
-                        }
-                        var transitionTime = 0.3;
-                        // position as next element, then reset to default on a timer
-                        window.setTimeout(function() {
-                            // element positioned. set transition timings and remove positioning
-                            // so it will transition to active page defaults.
-                            $(".body", element).css({
-                                "-webkit-transform": ""
-                            })
-                        }, 10);
-                        window.setTimeout(function() {
-                            // transition finished - clean up transition settings
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }, 10 + transitionTime * 1000);
+        var allTransitions = app.allTransitions = Chondric.allTransitions;
 
-                    } else if (progress == 0) {
-                        // a transition was cancelled
-                        if (prevProgress != 0 && prevProgress != 1) {
-                            // the page was already positioned - set up timers to return smoothly
-                        } else {
-                            // just clean up
-                            $(".body", element).css({
-                                "-webkit-transition": "",
-                                "-webkit-transform": ""
-                            })
-                        }
-                    }
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
-                        })
-                    }
-                }
-            },
-            slideright: {
-                setInProgress: function(element, progress, prevProgress) {
-                    console.log("slideright " + prevProgress + " => " + progress)
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
-                        })
-                    }
-                },
-                setOutProgress: function(element, progress, prevProgress) {
-                    if (!progress || progress == 1) {
-                        $(".body", element).css({
-                            "-webkit-transition": "",
-                            "-webkit-transform": ""
-                        })
-                    } else {
-                        $(".body", element).css({
-                            "-webkit-transition": "none",
-                            "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
-                        })
-                    }
-                }
-            }
-        };
         // these options are defined in the
         var initialOptions = {
 
@@ -327,69 +234,68 @@ Chondric.App =
 
             }
 
-            $scope.updateSwipe = function(swipeState, leftRoute, rightRoute) {
+            $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
                 // default handler covers left and right border swipe
-                if (swipeState.leftborder && leftRoute) {
-                    console.log("updating swipe - left border");
-                    $scope.noTransition = true;
-                    loadView(leftRoute);
-                    $scope.nextRoute = leftRoute;
-                    $scope.transition.from = $scope.route;
-                    $scope.transition.to = $scope.nextRoute;
-                    $scope.transition.type = "slideright";
-                    $scope.transition.progress = swipeState.leftborder;
-                    $scope.$apply();
-                } else if (swipeState.rightborder && rightRoute) {
-                    console.log("updating swipe - right border");
-                    $scope.noTransition = true;
-                    loadView(rightRoute);
-                    $scope.nextRoute = rightRoute;
-                    $scope.transition.from = $scope.route;
-                    $scope.transition.to = $scope.nextRoute;
-                    $scope.transition.type = "slideleft";
-                    $scope.transition.progress = swipeState.rightborder;
-                    $scope.$apply();
-                } else {
+                for (var p in swipeState) {
+                    if (swipeState[p] && swipeNav[p]) {
+                        console.log("updating swipe - left border");
+                        if (swipeNav[p].route) {
+                            loadView(swipeNav[p].route);
+                            $scope.nextRoute = swipeNav[p].route;
+                            $scope.transition.from = $scope.route;
+                            $scope.transition.to = $scope.nextRoute;
+                            $scope.transition.type = swipeNav[p].transition;
+
+                            $scope.transition.progress = swipeState[p];
+                        } else if (swipeNav[p].panel) {
+                            var showModal = pageScope.$eval("showModal");
+                            showModal(swipeNav[p].panel, {
+                                progress: swipeState[p],
+                                transition: swipeNav[p].transition
+                            });
+                        }
+                        $scope.$apply();
+                    }
 
                 }
-
             }
 
-            $scope.endSwipe = function(swipeState, leftRoute, rightRoute) {
+            $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
                 console.log("ending swipe");
-                if (swipeState.leftborder && leftRoute) {
-                    console.log("ending swipe - left border");
-                    $scope.noTransition = false;
+                for (var p in swipeState) {
+                    if (swipeState[p] && swipeNav[p]) {
+                        console.log("ending swipe - " + p);
+                        if (swipeNav[p].route) {
+                            if (swipeState[p] > 0.6) {
+                                // continue change to next page
+                                loadView(swipeNav[p].route);
+                                $scope.transition.progress = 1;
+                                $scope.lastRoute = $scope.route;
+                                $scope.route = swipeNav[p].route;
+                            } else {
+                                // cancel page change
+                                $scope.transition.progress = 0;
 
-                    if (swipeState.leftborder > 0.6) {
-                        // continue change to next page
-                        loadView(leftRoute);
-                        $scope.transition.progress = 1;
-                        $scope.lastRoute = $scope.route;
-                        $scope.route = leftRoute;
-                    } else {
-                        // cancel page change
-                        $scope.transition.progress = 0;
+                            }
+
+                        } else if (swipeNav[p].panel) {
+                            if (swipeState[p] > 0.1) {
+                                var showModal = pageScope.$eval("showModal");
+                                showModal(swipeNav[p].panel, {
+                                    progress: 1,
+                                    transition: swipeNav[p].transition
+                                });
+                            } else {
+                                var hideModal = pageScope.$eval("hideModal");
+                                hideModal(swipeNav[p].panel);
+
+                            }
+                        }
+
+                        $scope.$apply();
                     }
-                    $scope.$apply();
-                } else if (swipeState.rightborder && rightRoute) {
-                    console.log("ending swipe - right border");
-                    $scope.noTransition = false;
-
-                    if (swipeState.rightborder > 0.6) {
-                        // continue change to next page
-                        loadView(rightRoute);
-                        $scope.transition.progress = 1;
-                        $scope.lastRoute = $scope.route;
-                        $scope.route = rightRoute;
-                    } else {
-                        // cancel page change
-                        $scope.transition.progress = 0;
-                    }
-                    $scope.$apply();
-                } else {
-
                 }
+
             }
 
 

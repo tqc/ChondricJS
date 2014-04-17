@@ -12,6 +12,9 @@ module.exports = function(grunt) {
         "src/directives/cjs-swipe.js",
         "src/directives/preview-controls.js",
         "src/directives/chondric-viewport.js",
+        "src/transitions/crossfade.js",
+        "src/transitions/sidepanel.js",
+        "src/transitions/slide.js",
         "src/genericsync.js"
     ];
 
