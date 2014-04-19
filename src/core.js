@@ -235,6 +235,7 @@ Chondric.App =
             }
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
+                if (!swipeState || !swipeNav) return;
                 // default handler covers left and right border swipe
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
@@ -261,6 +262,7 @@ Chondric.App =
             }
 
             $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
+                if (!swipeState || !swipeNav) return;
                 console.log("ending swipe");
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
@@ -326,7 +328,7 @@ Chondric.App =
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 console.log("Route changed to " + url + " from " + oldVal);
-                if (url) document.location.hash = url;
+                if (url) window.history.replaceState(null, null, "#" + url);
                 loadView(url);
                 console.log($scope.openViews);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
