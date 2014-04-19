@@ -26,7 +26,7 @@ Chondric.directive('chondricViewport', function($compile) {
                 template += "</div>"
 
             } else if (rv.templateUrl) {
-                template = "<div  ng-controller=\"rv.controller\"> <div ng-include src=\"rv.templateUrl\"></div>";
+                template = "<div  ng-controller=\"rv.controller\" cjs-swipe> <div ng-include src=\"rv.templateUrl\"></div>";
                 template += '<div loading-overlay></div></div>'
 
             } else {

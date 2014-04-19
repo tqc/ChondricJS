@@ -69,6 +69,7 @@ Chondric.directive("cjsSwipe", function() {
             });
 
             function move(e) {
+
                 if (e.originalEvent.changedTouches) {
                     dx = e.originalEvent.changedTouches[0].clientX - startX;
                     dy = e.originalEvent.changedTouches[0].clientY - startY;
