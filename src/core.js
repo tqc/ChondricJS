@@ -118,7 +118,7 @@ Chondric.App =
 
 
 
-        var appCtrl = app.controller = function($scope) {
+        var appCtrl = app.controller = function($scope, $location) {
             app.scope = $scope;
             $scope.allRoutes = allRoutes;
             $scope.route = null;
@@ -328,7 +328,11 @@ Chondric.App =
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 console.log("Route changed to " + url + " from " + oldVal);
-                if (url) window.history.replaceState(null, null, "#" + url);
+                if (url) {
+                    // window.history.replaceState(null, null, "#" + url);
+                    // workaround for https://github.com/angular/angular.js/issues/1417
+                    $location.path(url).replace();
+                }
                 loadView(url);
                 console.log($scope.openViews);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);

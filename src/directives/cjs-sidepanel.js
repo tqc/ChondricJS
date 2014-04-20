@@ -131,18 +131,77 @@ Chondric.directive("cjsSidepanel", function() {
         coverLeft: {
             init: function(panel, page, overlay) {
                 // set initial position
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "none",
+                    "opacity": "0"
+                })
+                panel.css({
+                    "left": 0,
+                    "right": "auto",
+                    "display": "block",
+                    "-webkit-transition": "none",
+                    "-webkit-transform": "translate(" + (-spwidth) + "px, 0)"
+                })
             },
             progress: function(panel, page, overlay, progress) {
                 // set intermediate position
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "none",
+                    "opacity": (progress * 0.3)
+                })
+                panel.css({
+                    "left": 0,
+                    "right": "auto",
+                    "display": "block",
+                    "-webkit-transition": "none",
+                    "-webkit-transform": "translate(" + (-spwidth + progress * spwidth) + "px, 0)"
+                })
             },
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
+                var spwidth = panel.width();
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "opacity": "0"
+                })
+                panel.css({
+                    "display": "block",
+                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transform": "translate(" + (-spwidth) + "px, 0)"
+                })
+                return 300;
             },
             complete: function(panel, page, overlay, prevProgress) {
                 // move on screen with transition, return timing
+                overlay.css({
+                    "visibility": "visible",
+                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "opacity": "0.3"
+                })
+                panel.css({
+                    "display": "block",
+                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transform": "translate(" + 0 + "px, 0)"
+                })
+                return 300;
             },
             reset: function(panel, page, overlay) {
                 // remove custom css
+                overlay.css({
+                    "visibility": "",
+                    "-webkit-transition": "",
+                    "opacity": ""
+                })
+                panel.css({
+                    "display": "",
+                    "-webkit-transition": "",
+                    "-webkit-transform": ""
+                })
             }
         },
         slideLeft: {
