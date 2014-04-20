@@ -208,7 +208,7 @@ color: white;
 }
 
 .sidepanel .body button.menuitem {
-color: rgb(202, 202, 202);
+color: rgb(111, 111, 116);
 display: block;
 width: 260px;
 border: none;
@@ -226,7 +226,8 @@ border-top: 1px solid #aaa;
 }
 
 .sidepanel .body button.menuitem.selected {
-    color: white;
+    color: #007aff;
+    background-color: transparent;
 }
 
 .sidepanel .body button.menutile {
