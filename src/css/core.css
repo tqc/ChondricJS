@@ -306,8 +306,8 @@ button.icon-only {
 .navbar h1 {
     position: absolute;
     top:0;
-    left: 0;
-    right:0;
+    left: 33%;
+    right:33%;
     margin: 0;
     text-align: center;
     font-size: 17px;
@@ -316,6 +316,29 @@ button.icon-only {
     z-index: -1;
     text-overflow: ellipsis;
 }
+
+.navbar input.h1 {
+position: absolute;
+top: 0;
+left: 33%;
+right: 33%;
+margin: 0;
+text-align: center;
+font-size: 17px;
+line-height: 44px;
+font-weight: 500;
+z-index: -1;
+text-overflow: ellipsis;
+width: 34%;
+padding: 0;
+border: none;
+outline: none;
+-webkit-appearance: none;
+background-color: transparent;
+}
+}
+
+
 /* Menu bar */
 
 /* A bar with text buttons like the nav bar but that can appear anywhere */
