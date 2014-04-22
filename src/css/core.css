@@ -315,6 +315,8 @@ button.icon-only {
     font-weight: 500;
     z-index: -1;
     text-overflow: ellipsis;
+    white-space: nowrap;
+overflow: hidden;
 }
 
 .navbar input.h1 {
@@ -546,6 +548,16 @@ background-color: transparent;
     margin: 10px 15px 9px;
     font-weight: normal;
 }
+
+input.inline {
+    background-color: inherit;
+outline: none;
+border: none;
+font: inherit;
+color: inherit;
+text-transform: inherit;
+}
+
 .contentblock {
     background: #fff;
     padding: 10px 15px;

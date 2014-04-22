@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-17 */
+/*! chondric-tools 2014-04-22 */
 body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
@@ -288,10 +288,10 @@ button.icon-only {
     color: #007aff;
     background: transparent;
     border: none;
-    padding: 0 10px;
+    padding: 0 5px;
     line-height: 44px;
     height: 44px;
-    margin: 0;
+    margin: 0 5px;
     font-size: inherit;
 }
 .navbar button.active {
@@ -307,8 +307,8 @@ button.icon-only {
 .navbar h1 {
     position: absolute;
     top:0;
-    left: 0;
-    right:0;
+    left: 33%;
+    right:33%;
     margin: 0;
     text-align: center;
     font-size: 17px;
@@ -316,7 +316,32 @@ button.icon-only {
     font-weight: 500;
     z-index: -1;
     text-overflow: ellipsis;
+    white-space: nowrap;
+overflow: hidden;
 }
+
+.navbar input.h1 {
+position: absolute;
+top: 0;
+left: 33%;
+right: 33%;
+margin: 0;
+text-align: center;
+font-size: 17px;
+line-height: 44px;
+font-weight: 500;
+z-index: -1;
+text-overflow: ellipsis;
+width: 34%;
+padding: 0;
+border: none;
+outline: none;
+-webkit-appearance: none;
+background-color: transparent;
+}
+}
+
+
 /* Menu bar */
 
 /* A bar with text buttons like the nav bar but that can appear anywhere */
@@ -524,6 +549,16 @@ button.icon-only {
     margin: 10px 15px 9px;
     font-weight: normal;
 }
+
+input.inline {
+    background-color: inherit;
+outline: none;
+border: none;
+font: inherit;
+color: inherit;
+text-transform: inherit;
+}
+
 .contentblock {
     background: #fff;
     padding: 10px 15px;
@@ -922,7 +957,7 @@ color: white;
 }
 
 .sidepanel .body button.menuitem {
-color: rgb(202, 202, 202);
+color: rgb(111, 111, 116);
 display: block;
 width: 260px;
 border: none;
@@ -940,8 +975,38 @@ border-top: 1px solid #aaa;
 }
 
 .sidepanel .body button.menuitem.selected {
-    color: white;
+    color: #007aff;
+    background-color: transparent;
 }
+
+.sidepanel .body button.menutile {
+width: 100%;
+margin: 5px 0;
+box-sizing: border-box;
+border: none;
+float: left;
+height: 50px;
+font-size: 8pt;
+color: rgb(111, 111, 116);
+}
+
+.sidepanel .body button.half {
+    width: 50%;
+}
+.sidepanel .body button.third {
+    width: 33.3%;
+}
+.sidepanel .body button.quarter {
+    width: 25%;
+}
+
+
+
+.sidepanel .body button.menutile.selected {
+    background-color: transparent;
+    color: #007aff;
+}
+
 /*
 .chondric-page.haspushpanel .body,
 .chondric-page.haspushpanel .navbar,

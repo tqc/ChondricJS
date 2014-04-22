@@ -53,32 +53,34 @@ Chondric.directive("cjsSidepanel", function() {
             },
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
+                var time = (prevProgress) * 300;
                 var spwidth = panel.width();
                 overlay.css({
                     "visibility": "visible",
-                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0"
                 })
                 panel.css({
                     "display": "block",
-                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
                 })
-                return 300;
+                return time;
             },
             complete: function(panel, page, overlay, prevProgress) {
                 // move on screen with transition, return timing
+                var time = (1 - prevProgress) * 300;
                 overlay.css({
                     "visibility": "visible",
-                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0.3"
                 })
                 panel.css({
                     "display": "block",
-                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + 0 + "px, 0)"
                 })
-                return 300;
+                return time;
             },
             reset: function(panel, page, overlay) {
                 // remove custom css
@@ -163,32 +165,34 @@ Chondric.directive("cjsSidepanel", function() {
             },
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
+                var time = (prevProgress) * 300;
                 var spwidth = panel.width();
                 overlay.css({
                     "visibility": "visible",
-                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0"
                 })
                 panel.css({
                     "display": "block",
-                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + (-spwidth) + "px, 0)"
                 })
-                return 300;
+                return time;
             },
             complete: function(panel, page, overlay, prevProgress) {
                 // move on screen with transition, return timing
+                var time = (1 - prevProgress) * 300;
                 overlay.css({
                     "visibility": "visible",
-                    "-webkit-transition": "opacity 300ms ease-in-out",
+                    "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0.3"
                 })
                 panel.css({
                     "display": "block",
-                    "-webkit-transition": "-webkit-transform 300ms ease-in-out",
+                    "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + 0 + "px, 0)"
                 })
-                return 300;
+                return time;
             },
             reset: function(panel, page, overlay) {
                 // remove custom css
