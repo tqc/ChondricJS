@@ -325,6 +325,7 @@ Chondric.App =
             }
 
             $scope.$watch("route", function(url, oldVal) {
+                if (document.activeElement) document.activeElement.blur();
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 console.log("Route changed to " + url + " from " + oldVal);

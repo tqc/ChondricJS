@@ -32,6 +32,7 @@ Chondric.directive("cjsPopover", function() {
                 });
             }
             scope.$watch(attrs.cjsPopover, function(val) {
+                if (document.activeElement) document.activeElement.blur();
                 if (!val) {
                     if (useOverlay) {
                         overlay.removeClass("active");

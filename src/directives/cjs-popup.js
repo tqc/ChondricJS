@@ -26,6 +26,7 @@ Chondric.directive("cjsPopup", function() {
                 scope.$apply("hideModal('" + attrs.cjsPopup + "')");
             });
             scope.$watch(attrs.cjsPopup, function(val) {
+                if (document.activeElement) document.activeElement.blur();
                 if (!val) {
                     overlay.removeClass("active");
                     element.removeClass("active");

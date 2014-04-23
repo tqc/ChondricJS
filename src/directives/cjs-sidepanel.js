@@ -270,6 +270,7 @@ Chondric.directive("cjsSidepanel", function() {
             });
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
+                if (document.activeElement) document.activeElement.blur();
                 var transition = "coverRight";
                 var progress = 0;
                 var oldprogress = 0;
