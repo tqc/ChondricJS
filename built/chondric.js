@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-22 */
+/*! chondric-tools 2014-04-23 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -326,6 +326,7 @@ Chondric.App =
             }
 
             $scope.$watch("route", function(url, oldVal) {
+                if (document.activeElement) document.activeElement.blur();
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 console.log("Route changed to " + url + " from " + oldVal);
@@ -865,8 +866,10 @@ Chondric.App =
                 app.platform = "cordova";
                 document.addEventListener("deviceready", function() {
                         console.log("appframework deviceready");
-                        console.log(device.platform);
-                        app.isSimulator = device.platform.indexOf("Simulator") > 0;
+                        if (window.device) {
+                            console.log(device.platform);
+                            app.isSimulator = device.platform.indexOf("Simulator") > 0;
+                        }
                         $(initInternal);
                     }
 
@@ -1431,6 +1434,7 @@ Chondric.directive("cjsPopover", function() {
                 });
             }
             scope.$watch(attrs.cjsPopover, function(val) {
+                if (document.activeElement) document.activeElement.blur();
                 if (!val) {
                     if (useOverlay) {
                         overlay.removeClass("active");
@@ -1584,6 +1588,7 @@ Chondric.directive("cjsPopup", function() {
                 scope.$apply("hideModal('" + attrs.cjsPopup + "')");
             });
             scope.$watch(attrs.cjsPopup, function(val) {
+                if (document.activeElement) document.activeElement.blur();
                 if (!val) {
                     overlay.removeClass("active");
                     element.removeClass("active");
@@ -1867,6 +1872,7 @@ Chondric.directive("cjsSidepanel", function() {
             });
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
+                if (document.activeElement) document.activeElement.blur();
                 var transition = "coverRight";
                 var progress = 0;
                 var oldprogress = 0;

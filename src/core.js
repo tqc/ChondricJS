@@ -865,8 +865,10 @@ Chondric.App =
                 app.platform = "cordova";
                 document.addEventListener("deviceready", function() {
                         console.log("appframework deviceready");
-                        console.log(device.platform);
-                        app.isSimulator = device.platform.indexOf("Simulator") > 0;
+                        if (window.device) {
+                            console.log(device.platform);
+                            app.isSimulator = device.platform.indexOf("Simulator") > 0;
+                        }
                         $(initInternal);
                     }
 
