@@ -71,11 +71,11 @@ body {
     -webkit-transition: -webkit-transform 0.2s linear, opacity 0.9s ease-in-out, z-index 0.9s linear, visibility 0.9s linear;
 }
 
-body {
+.chondric-viewport {
 -webkit-user-select:none;
 }
 
-input, textarea, div[contenteditable] {
+input, textarea, [contenteditable=true] {
 -webkit-user-select:auto;
     -webkit-touch-callout: auto;
 }
