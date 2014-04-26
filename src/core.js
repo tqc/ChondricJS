@@ -174,7 +174,6 @@ Chondric.App =
                         if (mrp[j][0] == "$") params[mrp[j].substr(1)] = decodeURIComponent(parts[j]);
                         if (parts[j]) ar += "/" + parts[j];
                     }
-                    console.log(params);
                     if (template.isSection) {
                         console.log("Get section with route " + ar);
                         var section = openViews[ar];
@@ -335,7 +334,6 @@ Chondric.App =
                     $location.path(url).replace();
                 }
                 loadView(url);
-                console.log($scope.openViews);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
             })
             if (options.appCtrl) options.appCtrl($scope);
@@ -580,7 +578,7 @@ Chondric.App =
             // todo: load any pages in preload list that are not already loaded
 
             for (var i = 0; i < preloads.length; i++) {
-                console.log("preload: " + preloads[i]);
+                //                console.log("preload: " + preloads[i]);
                 app.getView(preloads[i]).ensureLoaded(null, function() {});
             }
 
