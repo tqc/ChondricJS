@@ -175,6 +175,7 @@ Chondric.App =
                         if (mrp[j][0] == "$") params[mrp[j].substr(1)] = decodeURIComponent(parts[j]);
                         if (parts[j]) ar += "/" + parts[j];
                     }
+                    console.log(params);
                     if (template.isSection) {
                         console.log("Get section with route " + ar);
                         var section = openViews[ar];
