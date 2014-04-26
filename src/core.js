@@ -174,7 +174,6 @@ Chondric.App =
                         if (mrp[j][0] == "$") params[mrp[j].substr(1)] = decodeURIComponent(parts[j]);
                         if (parts[j]) ar += "/" + parts[j];
                     }
-                    console.log(params);
                     if (template.isSection) {
                         console.log("Get section with route " + ar);
                         var section = openViews[ar];
@@ -727,7 +726,11 @@ Chondric.App =
             if (app.scope.route) return callback(); // already loaded by custominit
 
             if (settings.loadPageFromHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
-                app.changePage(location.hash.substr(1));
+                var parts = location.hash.substr(2).split("/");
+                for (var i = 0; i < parts.length; i++) {
+                    parts[i] = decodeURIComponent(parts[i]);
+                }
+                app.changePage(parts);
             } else if (settings.firstPageTemplate) {
                 app.changePage(settings.firstPageTemplate, "crossfade");
             }
