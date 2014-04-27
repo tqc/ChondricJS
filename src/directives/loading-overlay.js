@@ -5,6 +5,6 @@
 Chondric.directive('loadingOverlay', function($compile) {
     return {
         replace: true,
-        template: '<div class="loadingoverlay" ng-show="dataLoadStatus.waitingForData"><div ng-show="!dataLoadStatus.error" class="progress large"><div></div></div><div ng-show="!dataLoadStatus.error">Loading</div><div class="error" ng-show="dataLoadStatus.error">{{dataLoadStatus.error}}</div><div><button ng-show="dataLoadStatus.retry && dataLoadStatus.error" ng-tap="dataLoadStatus.retry()">Retry</button><button ng-show="dataLoadStatus.cancel" ng-tap="dataLoadStatus.cancel()">Cancel</button></div></div>'
+        template: '<div class="loadingoverlay" ng-show="dataLoadStatus.waitingForData"><div ng-show="!dataLoadStatus.error" class="progress large"><div></div></div><div ng-show="!dataLoadStatus.error">{{dataLoadStatus.message || "Loading"}}</div><div class="error" ng-show="dataLoadStatus.error">{{dataLoadStatus.error}}</div><div><button ng-show="dataLoadStatus.retry && dataLoadStatus.error" ng-tap="dataLoadStatus.retry()">Retry</button><button ng-show="dataLoadStatus.cancel" ng-tap="dataLoadStatus.cancel()">Cancel</button></div></div>'
     }
 });

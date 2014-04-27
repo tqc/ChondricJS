@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-27 */
+/*! chondric-tools 2014-04-28 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -1399,7 +1399,7 @@ Chondric.directive('ngTap', function() {
 Chondric.directive('loadingOverlay', function($compile) {
     return {
         replace: true,
-        template: '<div class="loadingoverlay" ng-show="dataLoadStatus.waitingForData"><div ng-show="!dataLoadStatus.error" class="progress large"><div></div></div><div ng-show="!dataLoadStatus.error">Loading</div><div class="error" ng-show="dataLoadStatus.error">{{dataLoadStatus.error}}</div><div><button ng-show="dataLoadStatus.retry && dataLoadStatus.error" ng-tap="dataLoadStatus.retry()">Retry</button><button ng-show="dataLoadStatus.cancel" ng-tap="dataLoadStatus.cancel()">Cancel</button></div></div>'
+        template: '<div class="loadingoverlay" ng-show="dataLoadStatus.waitingForData"><div ng-show="!dataLoadStatus.error" class="progress large"><div></div></div><div ng-show="!dataLoadStatus.error">{{dataLoadStatus.message || "Loading"}}</div><div class="error" ng-show="dataLoadStatus.error">{{dataLoadStatus.error}}</div><div><button ng-show="dataLoadStatus.retry && dataLoadStatus.error" ng-tap="dataLoadStatus.retry()">Retry</button><button ng-show="dataLoadStatus.cancel" ng-tap="dataLoadStatus.cancel()">Cancel</button></div></div>'
     }
 });
 Chondric.directive("cjsPopover", function() {
