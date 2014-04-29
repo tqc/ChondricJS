@@ -140,13 +140,26 @@ Chondric.App =
                 $scope[name] = null;
             }
 
+
             $scope.showPopupMenu = function(popupoptions) {
-                $scope.globalPopupMenu = popupoptions;
+                app.scopesForRoutes[popupoptions.scope.rk] = popupoptions.scope;
+                if (window.NativeNav) {
+                    var rect = popupoptions.element[0].getBoundingClientRect();
+                    NativeNav.showPopupMenu(popupoptions.scope.rk, rect.left, rect.top, rect.width, rect.height, popupoptions.items);
+                } else {
+                    $scope.globalPopupMenu = popupoptions;
+                }
             }
+
+            app.scopesForRoutes = {};
+
+
+
 
             $scope.headersForRoutes = {};
             $scope.setSharedHeader = function(rk, headerOptions) {
                 $scope.headersForRoutes[rk] = headerOptions;
+                app.scopesForRoutes[rk] = headerOptions.scope;
             }
 
             function loadView(url) {
@@ -323,6 +336,9 @@ Chondric.App =
                     if (!keep) {
                         for (var shik in $scope.headersForRoutes) {
                             if (shik.indexOf(k) == 0) delete $scope.headersForRoutes[shik];
+                        }
+                        for (var shik in app.scopesForRoutes) {
+                            if (shik.indexOf(k) == 0) delete app.scopesForRoutes[shik];
                         }
                         delete viewCollection[k]
                         continue;
@@ -854,6 +870,17 @@ Chondric.App =
                                 settings.loadData.call(app, loadedctx, function() {
                                     // attach common events
                                     attachEvents(function() {
+
+                                        if (window.NativeNav) {
+                                            NativeNav.handleAction = function(route, action) {
+                                                var routeScope = app.scopesForRoutes[route];
+                                                if (routeScope) {
+                                                    routeScope.$apply(action);
+                                                }
+                                            }
+
+                                        }
+
                                         // custom init function
                                         settings.customInit.call(app, function() {
                                             // hide splash screen and show page

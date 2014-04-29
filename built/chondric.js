@@ -141,13 +141,26 @@ Chondric.App =
                 $scope[name] = null;
             }
 
-            app.showPopupMenu = function(popupoptions) {
-                $scope.globalPopupMenu = popupoptions;
+
+            $scope.showPopupMenu = function(popupoptions) {
+                app.scopesForRoutes[popupoptions.scope.rk] = popupoptions.scope;
+                if (window.NativeNav) {
+                    var rect = popupoptions.element[0].getBoundingClientRect();
+                    NativeNav.showPopupMenu(popupoptions.scope.rk, rect.left, rect.top, rect.width, rect.height, popupoptions.items);
+                } else {
+                    $scope.globalPopupMenu = popupoptions;
+                }
             }
+
+            app.scopesForRoutes = {};
+
+
+
 
             $scope.headersForRoutes = {};
             $scope.setSharedHeader = function(rk, headerOptions) {
                 $scope.headersForRoutes[rk] = headerOptions;
+                app.scopesForRoutes[rk] = headerOptions.scope;
             }
 
             function loadView(url) {
@@ -322,6 +335,12 @@ Chondric.App =
                         }
                     }
                     if (!keep) {
+                        for (var shik in $scope.headersForRoutes) {
+                            if (shik.indexOf(k) == 0) delete $scope.headersForRoutes[shik];
+                        }
+                        for (var shik in app.scopesForRoutes) {
+                            if (shik.indexOf(k) == 0) delete app.scopesForRoutes[shik];
+                        }
                         delete viewCollection[k]
                         continue;
                     }
@@ -852,6 +871,17 @@ Chondric.App =
                                 settings.loadData.call(app, loadedctx, function() {
                                     // attach common events
                                     attachEvents(function() {
+
+                                        if (window.NativeNav) {
+                                            NativeNav.handleAction = function(route, action) {
+                                                var routeScope = app.scopesForRoutes[route];
+                                                if (routeScope) {
+                                                    routeScope.$apply(action);
+                                                }
+                                            }
+
+                                        }
+
                                         // custom init function
                                         settings.customInit.call(app, function() {
                                             // hide splash screen and show page
@@ -2187,11 +2217,18 @@ Chondric.directive('chondricViewport', function($compile) {
             var template = "";
             if (!rv) {
                 // first level
+                scope.handleSharedPopupButtonClick = function(b) {
+                    var options = scope.globalPopupMenu;
+                    scope.hideModal("globalPopupMenu")
+                    if (b.action) {
+                        options.scope.$eval(b.action)
+                    }
+                }
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
                 template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
                 template += "</div>"
-                template += '<div cjs-popover="globalPopupMenu"><div class="poparrow"></div><button ng-repeat="b in globalPopupMenu.items" ng-tap="globalPopupMenu.scope.$eval(b.action)">Button</button></div>'
+                template += '<div cjs-popover="globalPopupMenu"><div class="poparrow"></div><button ng-repeat="b in globalPopupMenu.items" ng-tap="handleSharedPopupButtonClick(b)">Button</button></div>'
                 template += '<div cjs-shared-header="globalHeaderOptions"></div>'
 
 
@@ -2223,7 +2260,7 @@ Chondric.directive('chondricViewport', function($compile) {
 
 Chondric.directive("cjsSharedHeader", function() {
     return {
-
+        template: '<div class="v1"><button class="left" ng-repeat="b in globalHeaderOptions.v1.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v1.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v1.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button></div>' + '<div class="v2"><button class="left" ng-repeat="b in globalHeaderOptions.v2.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v2.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v2.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button></div>',
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var useOverlay = attrs.noOverlay === undefined;
@@ -2241,7 +2278,6 @@ Chondric.directive("cjsSharedHeader", function() {
 
 
             element.addClass("navbar sharedheader");
-            element.html("<h1>Shared Header Stuff here</h1>");
 
             scope.$watch(attrs.cjsSharedHeader, function(val) {
                 if (document.activeElement) document.activeElement.blur();
@@ -2253,25 +2289,68 @@ Chondric.directive("cjsSharedHeader", function() {
                 }
             })
 
+            var current = "v1";
+            var other = "v2";
+
+            scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
+                //
+                if (b.action) {
+                    headerOptions.scope.$eval(b.action)
+                } else if (b.items) {
+                    scope.showPopupMenu({
+                        scope: headerOptions.scope,
+                        element: lastTap.element,
+                        items: b.items
+                    })
+                }
+            }
+
             scope.$watch('transition', function(transition, old) {
+
+
                 var fromHeader = scope.headersForRoutes[transition.from];
                 var toHeader = scope.headersForRoutes[transition.to];
+
+                scope.globalHeaderOptions = scope.globalHeaderOptions || {};
+                scope.globalHeaderOptions[current] = fromHeader;
+                scope.globalHeaderOptions[other] = toHeader;
+
+                $("." + other, element).css("opacity", transition.progress);
+                $("." + current, element).css("opacity", 1 - transition.progress);
+
+
+
                 if (transition.progress > 0.5) {
                     if (!toHeader) {
                         element.removeClass("active");
                     } else if (toHeader) {
                         element.addClass("active");
-                        $("h1", element).html(toHeader.title);
+                        //                        $("." + other, element).show();
+                        //                        $("." + current, element).hide();
                     }
                 } else {
                     if (!fromHeader) {
                         element.removeClass("active");
                     } else if (fromHeader) {
                         element.addClass("active");
-                        $("h1", element).html(fromHeader.title);
+                        //            $("." + current, element).show();
+                        //            $("." + other, element).hide();
                     }
 
                 }
+
+                if (transition.progress == 1) {
+                    if (current == "v1") {
+                        current = "v2";
+                        other = "v1";
+                    } else {
+                        current = "v1";
+                        other = "v2";
+                    }
+                }
+                $("." + other, element).css("z-index", 1);
+                $("." + current, element).css("z-index", 2);
+
 
             }, true);
 

@@ -611,16 +611,21 @@ text-transform: inherit;
 
 .sharedheader {
 position: fixed;
-z-index: 12000;
-pointer-events:none;
+z-index: 999;
 top: -50px;
-opacity: 0.5;
+opacity: 1;
 }
 
 .sharedheader.active {
 top: 0px;
 }
-
+.sharedheader > div {
+position: absolute;
+left: 0;
+right: 0;
+top: 0;
+bottom: 0;
+}
 /* Loading overlay */
  .loadingoverlay {
     position: absolute;
