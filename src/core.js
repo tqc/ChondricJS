@@ -140,7 +140,7 @@ Chondric.App =
                 $scope[name] = null;
             }
 
-            app.showPopupMenu = function(popupoptions) {
+            $scope.showPopupMenu = function(popupoptions) {
                 $scope.globalPopupMenu = popupoptions;
             }
 
