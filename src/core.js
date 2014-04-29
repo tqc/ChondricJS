@@ -321,6 +321,9 @@ Chondric.App =
                         }
                     }
                     if (!keep) {
+                        for (var shik in $scope.headersForRoutes) {
+                            if (shik.indexOf(k) == 0) delete $scope.headersForRoutes[shik];
+                        }
                         delete viewCollection[k]
                         continue;
                     }
