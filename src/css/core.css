@@ -605,3 +605,17 @@ text-transform: inherit;
 .ui-hide {
   opacity: 0;
 }
+
+/* Shared Header */ 
+
+.sharedheader {
+position: fixed;
+z-index: 12000;
+pointer-events:none;
+top: -50px;
+opacity: 0.5;
+}
+
+.sharedheader.active {
+top: 0px;
+}

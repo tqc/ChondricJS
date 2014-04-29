@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-28 */
+/*! chondric-tools 2014-04-29 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -141,6 +141,14 @@ Chondric.App =
                 $scope[name] = null;
             }
 
+            app.showPopupMenu = function(popupoptions) {
+                $scope.globalPopupMenu = popupoptions;
+            }
+
+            $scope.headersForRoutes = {};
+            $scope.setSharedHeader = function(rk, headerOptions) {
+                $scope.headersForRoutes[rk] = headerOptions;
+            }
 
             function loadView(url) {
                 if (!url) {
@@ -1404,6 +1412,7 @@ Chondric.directive('loadingOverlay', function($compile) {
 });
 Chondric.directive("cjsPopover", function() {
     return {
+
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var useOverlay = attrs.noOverlay === undefined;
@@ -1423,27 +1432,37 @@ Chondric.directive("cjsPopover", function() {
             element.addClass("modal");
             element.addClass("popover");
 
-            var parentPageElement = element.closest(".chondric-page");
-            if (useOverlay) {
-                var overlay = $(".modal-overlay", parentPageElement);
-                if (overlay.length == 0) {
-                    overlay = angular.element('<div class="modal-overlay"></div>');
-                    parentPageElement.append(overlay);
+            function ensureOverlay(element, useOverlay) {
+                var parentPageElement = element.closest(".chondric-page");
+                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
+                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+                if (useOverlay) {
+                    var overlay = $(".modal-overlay", parentPageElement);
+                    if (overlay.length == 0) {
+                        overlay = angular.element('<div class="modal-overlay"></div>');
+                        parentPageElement.append(overlay);
+                    }
+                    var hide = function() {
+                        console.log("overlay touch");
+
+                        scope.$apply("hideModal('" + attrs.cjsPopover + "')");
+                        overlay.off(useMouse ? "mousedown" : "touchstart", hide);
+                    };
+                    overlay.on(useMouse ? "mousedown" : "touchstart", hide);
+                    return overlay;
                 }
-                overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                    console.log("overlay touch");
-                    scope.$apply("hideModal('" + attrs.cjsPopover + "')");
-                });
             }
+
             scope.$watch(attrs.cjsPopover, function(val) {
                 if (document.activeElement) document.activeElement.blur();
+                var overlay = ensureOverlay(element, useOverlay);
+
                 if (!val) {
                     if (useOverlay) {
                         overlay.removeClass("active");
                     }
                     element.removeClass("active");
                 } else {
-
                     menuheight = element.height() || menuheight;
                     menuwidth = element.width() || menuwidth;
 
@@ -1579,6 +1598,8 @@ Chondric.directive("cjsPopup", function() {
             element.addClass("modal");
             element.addClass("popup");
             var parentPageElement = element.closest(".chondric-page");
+            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
+            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
             var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
@@ -2170,6 +2191,11 @@ Chondric.directive('chondricViewport', function($compile) {
                 //                template = "<div class=\"chondric-viewport\">"
                 template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
                 template += "</div>"
+                template += '<div cjs-popover="globalPopupMenu"><div class="poparrow"></div><button ng-repeat="b in globalPopupMenu.items" ng-tap="globalPopupMenu.scope.$eval(b.action)">Button</button></div>'
+                template += '<div cjs-shared-header="globalHeaderOptions"></div>'
+
+
+
                 //                template += "</div>"
 
             } else if (rv.isSection) {
@@ -2190,6 +2216,65 @@ Chondric.directive('chondricViewport', function($compile) {
             $compile(newElement)(scope);
             element.html("");
             element.append(newElement);
+        }
+    }
+});
+
+
+Chondric.directive("cjsSharedHeader", function() {
+    return {
+
+        //        restrict: "E",
+        link: function(scope, element, attrs) {
+            var useOverlay = attrs.noOverlay === undefined;
+            var horizontal = attrs.horizontal !== undefined;
+            var menuwidth = parseFloat(attrs.menuwidth) || 280;
+            var menuheight = parseFloat(attrs.menuheight) || 150;
+
+            var useMouse = true;
+
+            var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+
+            if (iOS) {
+                useMouse = false;
+            }
+
+
+            element.addClass("navbar sharedheader");
+            element.html("<h1>Shared Header Stuff here</h1>");
+
+            scope.$watch(attrs.cjsSharedHeader, function(val) {
+                if (document.activeElement) document.activeElement.blur();
+
+                if (!val) {
+                    element.removeClass("active");
+                } else {
+                    element.addClass("active");
+                }
+            })
+
+            scope.$watch('transition', function(transition, old) {
+                var fromHeader = scope.headersForRoutes[transition.from];
+                var toHeader = scope.headersForRoutes[transition.to];
+                if (transition.progress > 0.5) {
+                    if (!toHeader) {
+                        element.removeClass("active");
+                    } else if (toHeader) {
+                        element.addClass("active");
+                        $("h1", element).html(toHeader.title);
+                    }
+                } else {
+                    if (!fromHeader) {
+                        element.removeClass("active");
+                    } else if (fromHeader) {
+                        element.addClass("active");
+                        $("h1", element).html(fromHeader.title);
+                    }
+
+                }
+
+            }, true);
+
         }
     }
 });

@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-28 */
+/*! chondric-tools 2014-04-29 */
 body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
@@ -606,6 +606,21 @@ text-transform: inherit;
 .ui-hide {
   opacity: 0;
 }
+
+/* Shared Header */ 
+
+.sharedheader {
+position: fixed;
+z-index: 12000;
+pointer-events:none;
+top: -50px;
+opacity: 0.5;
+}
+
+.sharedheader.active {
+top: 0px;
+}
+
 /* Loading overlay */
  .loadingoverlay {
     position: absolute;

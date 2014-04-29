@@ -1,5 +1,6 @@
 Chondric.directive("cjsPopover", function() {
     return {
+
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var useOverlay = attrs.noOverlay === undefined;
@@ -19,27 +20,37 @@ Chondric.directive("cjsPopover", function() {
             element.addClass("modal");
             element.addClass("popover");
 
-            var parentPageElement = element.closest(".chondric-page");
-            if (useOverlay) {
-                var overlay = $(".modal-overlay", parentPageElement);
-                if (overlay.length == 0) {
-                    overlay = angular.element('<div class="modal-overlay"></div>');
-                    parentPageElement.append(overlay);
+            function ensureOverlay(element, useOverlay) {
+                var parentPageElement = element.closest(".chondric-page");
+                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
+                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+                if (useOverlay) {
+                    var overlay = $(".modal-overlay", parentPageElement);
+                    if (overlay.length == 0) {
+                        overlay = angular.element('<div class="modal-overlay"></div>');
+                        parentPageElement.append(overlay);
+                    }
+                    var hide = function() {
+                        console.log("overlay touch");
+
+                        scope.$apply("hideModal('" + attrs.cjsPopover + "')");
+                        overlay.off(useMouse ? "mousedown" : "touchstart", hide);
+                    };
+                    overlay.on(useMouse ? "mousedown" : "touchstart", hide);
+                    return overlay;
                 }
-                overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                    console.log("overlay touch");
-                    scope.$apply("hideModal('" + attrs.cjsPopover + "')");
-                });
             }
+
             scope.$watch(attrs.cjsPopover, function(val) {
                 if (document.activeElement) document.activeElement.blur();
+                var overlay = ensureOverlay(element, useOverlay);
+
                 if (!val) {
                     if (useOverlay) {
                         overlay.removeClass("active");
                     }
                     element.removeClass("active");
                 } else {
-
                     menuheight = element.height() || menuheight;
                     menuwidth = element.width() || menuwidth;
 

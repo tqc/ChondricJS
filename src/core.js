@@ -140,6 +140,14 @@ Chondric.App =
                 $scope[name] = null;
             }
 
+            app.showPopupMenu = function(popupoptions) {
+                $scope.globalPopupMenu = popupoptions;
+            }
+
+            $scope.headersForRoutes = {};
+            $scope.setSharedHeader = function(rk, headerOptions) {
+                $scope.headersForRoutes[rk] = headerOptions;
+            }
 
             function loadView(url) {
                 if (!url) {
