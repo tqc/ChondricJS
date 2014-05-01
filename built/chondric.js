@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-04-29 */
+/*! chondric-tools 2014-05-01 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -116,7 +116,121 @@ Chondric.App =
             }
         }
 
+        app.sharedUiComponents = {};
+        app.registerSharedUiComponent = function(component) {
+            app.sharedUiComponents[component.id] = component;
+        }
 
+
+        app.registerSharedUiComponent({
+            id: "popupmenu",
+            template: '<div cjs-popover="componentDefinition.popuptrigger"><div class="poparrow"></div><button ng-repeat="b in componentDefinition.data.items" ng-tap="handleSharedPopupButtonClick(b)">Button</button></div>',
+            controller: function($scope) {
+                var self = $scope.componentDefinition;
+                $scope.hideModal = function() {
+                    self.popuptrigger = null;
+                    var routeScope = app.scopesForRoutes[self.route];
+                    // need to reset this so the popup doesnt reopen if the page is reactivated.
+                    app.setSharedUiComponentState(routeScope, "popupmenu", false, true, null);
+                }
+                $scope.handleSharedPopupButtonClick = function(b) {
+                    self.popuptrigger = null;
+                    var routeScope = app.scopesForRoutes[self.route];
+                    if (routeScope && b.action) {
+                        routeScope.$eval(b.action)
+                    }
+                }
+            },
+            setState: function(self, route, active, available, data) {
+                self.data = data;
+                self.route = route;
+
+                if (window.NativeNav) {
+                    var rect = popupoptions.element[0].getBoundingClientRect();
+                    NativeNav.showPopupMenu(popupoptions.scope.rk, rect.left, rect.top, rect.width, rect.height, popupoptions.items);
+                } else {
+                    if (!active) {
+                        self.popuptrigger = null;
+                    } else {
+                        self.popuptrigger = {
+                            element: data.element
+                        }
+                    }
+                }
+            }
+        })
+
+
+        app.registerSharedUiComponent({
+            id: "standardnavigationbar",
+            template: '<div cjs-shared-header="componentDefinition.globalHeaderOptions"></div>',
+            controller: function($scope) {
+                var self = $scope.componentDefinition;
+                $scope.globalHeaderOptions = self.globalHeaderOptions = {}
+
+                $scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
+                    console.log("clicked header button for " + self.route);
+                    var routeScope = app.scopesForRoutes[self.route];
+                    if (routeScope && b.action) {
+                        routeScope.$eval(b.action)
+                    } else if (routeScope && b.items) {
+
+                        app.setSharedUiComponentState(routeScope, "popupmenu", true, true, {
+                            element: lastTap.element,
+                            items: b.items
+                        })
+                    }
+                }
+
+            },
+            setStatePartial: function(self, initialState, finalState, progress) {
+                if (!self.globalHeaderOptions) return;
+                var v1 = self.globalHeaderOptions.v1;
+                var v2 = self.globalHeaderOptions.v2;
+                if (v1 && v1.route == initialState.route) {
+                    self.globalHeaderOptions.v1 = initialState;
+                    self.globalHeaderOptions.v2 = finalState;
+                    self.globalHeaderOptions.transitionState = progress;
+                } else {
+                    self.globalHeaderOptions.v2 = initialState;
+                    self.globalHeaderOptions.v1 = finalState;
+                    self.globalHeaderOptions.transitionState = 1 - progress;
+                }
+                if (progress < 0.5) {
+                    self.route = initialState.route;
+                    self.data = initialState.data;
+                } else {
+                    self.route = finalState.route;
+                    self.data = finalState.data;
+                }
+            },
+            setState: function(self, route, active, available, data) {
+                if (!self.globalHeaderOptions) return;
+
+                self.route = route;
+                self.data = data;
+                var v1 = self.globalHeaderOptions.v1;
+                var v2 = self.globalHeaderOptions.v2;
+                if (v1 && v1.route == route) {
+                    self.globalHeaderOptions.v1 = {
+                        route: route,
+                        active: active,
+                        available: available,
+                        data: data
+                    };
+                    self.globalHeaderOptions.transitionState = 0;
+                } else {
+                    self.globalHeaderOptions.v2 = {
+                        route: route,
+                        active: active,
+                        available: available,
+                        data: data
+                    };
+                    self.globalHeaderOptions.transitionState = 1;
+                }
+
+            }
+        })
 
 
         var appCtrl = app.controller = function($scope, $location) {
@@ -130,7 +244,8 @@ Chondric.App =
                 progress: 0
             };
 
-            $scope.openViews = {}
+            $scope.openViews = {};
+            $scope.sharedUiComponents = app.sharedUiComponents;
 
             // these will usually get overridden on a child scope - otherwise names have to be globally unique
             $scope.showModal = function(name, lastTap) {
@@ -142,26 +257,25 @@ Chondric.App =
             }
 
 
-            $scope.showPopupMenu = function(popupoptions) {
-                app.scopesForRoutes[popupoptions.scope.rk] = popupoptions.scope;
-                if (window.NativeNav) {
-                    var rect = popupoptions.element[0].getBoundingClientRect();
-                    NativeNav.showPopupMenu(popupoptions.scope.rk, rect.left, rect.top, rect.width, rect.height, popupoptions.items);
-                } else {
-                    $scope.globalPopupMenu = popupoptions;
+            $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
+                app.scopesForRoutes[routeScope.rk] = routeScope;
+                var component = app.sharedUiComponents[componentId];
+                var csfr = app.componentStatesForRoutes[routeScope.rk] = app.componentStatesForRoutes[routeScope.rk] || {};
+                csfr[componentId] = {
+                    route: routeScope.rk,
+                    active: active,
+                    available: available,
+                    data: data
                 }
+                if ($scope.route == routeScope.rk) {
+                    component.setState(component, routeScope.rk, active, available, data);
+                }
+
             }
+
 
             app.scopesForRoutes = {};
-
-
-
-
-            $scope.headersForRoutes = {};
-            $scope.setSharedHeader = function(rk, headerOptions) {
-                $scope.headersForRoutes[rk] = headerOptions;
-                app.scopesForRoutes[rk] = headerOptions.scope;
-            }
+            app.componentStatesForRoutes = {};
 
             function loadView(url) {
                 if (!url) {
@@ -335,8 +449,8 @@ Chondric.App =
                         }
                     }
                     if (!keep) {
-                        for (var shik in $scope.headersForRoutes) {
-                            if (shik.indexOf(k) == 0) delete $scope.headersForRoutes[shik];
+                        for (var shik in app.componentStatesForRoutes) {
+                            if (shik.indexOf(k) == 0) delete app.componentStatesForRoutes[shik];
                         }
                         for (var shik in app.scopesForRoutes) {
                             if (shik.indexOf(k) == 0) delete app.scopesForRoutes[shik];
@@ -350,6 +464,40 @@ Chondric.App =
 
                 }
             }
+
+            $scope.$watch("transition", function(transition) {
+                if (!transition) return;
+                if (!transition.to) return;
+                var fromStates = app.componentStatesForRoutes[transition.from] || {};
+                var toStates = app.componentStatesForRoutes[transition.to] || {};
+
+                for (var k in app.sharedUiComponents) {
+                    var component = app.sharedUiComponents[k];
+                    var fromState = fromStates[k] || {
+                        route: transition.from,
+                        active: false,
+                        available: false,
+                        data: null
+                    };
+                    var toState = toStates[k] || {
+                        route: transition.to,
+                        active: false,
+                        available: false,
+                        data: null
+                    };
+                    if (component.setStatePartial) {
+                        component.setStatePartial(component, fromState, toState, transition.progress);
+                    } else {
+                        if (transition.progress > 0.5) {
+                            component.setState(component, toState.route, toState.active, toState.available, toState.data);
+                        } else {
+                            component.setState(component, fromState.route, fromState.active, fromState.available, fromState.data);
+                        }
+                    }
+                }
+
+            }, true);
+
 
             $scope.$watch("route", function(url, oldVal) {
                 if (document.activeElement) document.activeElement.blur();
@@ -2228,10 +2376,8 @@ Chondric.directive('chondricViewport', function($compile) {
                 //                template = "<div class=\"chondric-viewport\">"
                 template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
                 template += "</div>"
-                template += '<div cjs-popover="globalPopupMenu"><div class="poparrow"></div><button ng-repeat="b in globalPopupMenu.items" ng-tap="handleSharedPopupButtonClick(b)">Button</button></div>'
-                template += '<div cjs-shared-header="globalHeaderOptions"></div>'
-
-
+                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component>"
+                template += "</div>"
 
                 //                template += "</div>"
 
@@ -2257,10 +2403,33 @@ Chondric.directive('chondricViewport', function($compile) {
     }
 });
 
+Chondric.directive('cjsSharedComponent', function($compile) {
+    return {
+        scope: true,
+        link: function(scope, element, attrs) {
+            var cd = scope.componentDefinition;
+            element.addClass("sharedcomponent-" + cd.templateId);
+            var template = "";
+            template += "<div ng-controller=\"componentDefinition.controller\" >"
+            if (cd.template) {
+                template += cd.template;
+            } else if (cd.templateUrl) {
+                template += "<div ng-include src=\"componentDefinition.templateUrl\"></div>";
+            }
+            template += "</div>"
+
+            var newElement = angular.element(template);
+            $compile(newElement)(scope);
+            element.html("");
+            element.append(newElement);
+        }
+    }
+});
+
 
 Chondric.directive("cjsSharedHeader", function() {
     return {
-        template: '<div class="v1"><button class="left" ng-repeat="b in globalHeaderOptions.v1.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v1.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v1.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button></div>' + '<div class="v2"><button class="left" ng-repeat="b in globalHeaderOptions.v2.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v2.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v2.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button></div>',
+        template: '<div class="v1" ng-style="{opacity:(1-globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 1: 2)  }"><button class="left" ng-repeat="b in globalHeaderOptions.v1.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v1.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v1.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button></div>' + '<div class="v2" ng-style="{opacity:(globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 2: 1)}"><button class="left" ng-repeat="b in globalHeaderOptions.v2.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v2.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v2.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button></div>',
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var useOverlay = attrs.noOverlay === undefined;
@@ -2292,22 +2461,11 @@ Chondric.directive("cjsSharedHeader", function() {
             var current = "v1";
             var other = "v2";
 
-            scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
-                //
-                if (b.action) {
-                    headerOptions.scope.$eval(b.action)
-                } else if (b.items) {
-                    scope.showPopupMenu({
-                        scope: headerOptions.scope,
-                        element: lastTap.element,
-                        items: b.items
-                    })
-                }
-            }
+
 
             scope.$watch('transition', function(transition, old) {
 
-
+                /*
                 var fromHeader = scope.headersForRoutes[transition.from];
                 var toHeader = scope.headersForRoutes[transition.to];
 
@@ -2350,7 +2508,7 @@ Chondric.directive("cjsSharedHeader", function() {
                 }
                 $("." + other, element).css("z-index", 1);
                 $("." + current, element).css("z-index", 2);
-
+*/
 
             }, true);
 
