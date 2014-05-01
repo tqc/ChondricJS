@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-05-01 */
+/*! chondric-tools 2014-05-02 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -124,7 +124,7 @@ Chondric.App =
 
         app.registerSharedUiComponent({
             id: "popupmenu",
-            template: '<div cjs-popover="componentDefinition.popuptrigger"><div class="poparrow"></div><button ng-repeat="b in componentDefinition.data.items" ng-tap="handleSharedPopupButtonClick(b)">Button</button></div>',
+            template: '<div cjs-popover="componentDefinition.popuptrigger"><div class="poparrow"></div><button ng-repeat="b in componentDefinition.data.items" ng-tap="handleSharedPopupButtonClick(b)">{{b.title}}</button></div>',
             controller: function($scope) {
                 var self = $scope.componentDefinition;
                 $scope.hideModal = function() {
@@ -2408,7 +2408,7 @@ Chondric.directive('cjsSharedComponent', function($compile) {
         scope: true,
         link: function(scope, element, attrs) {
             var cd = scope.componentDefinition;
-            element.addClass("sharedcomponent-" + cd.templateId);
+            element.addClass("sharedcomponent-" + cd.id);
             var template = "";
             template += "<div ng-controller=\"componentDefinition.controller\" >"
             if (cd.template) {
@@ -2429,7 +2429,7 @@ Chondric.directive('cjsSharedComponent', function($compile) {
 
 Chondric.directive("cjsSharedHeader", function() {
     return {
-        template: '<div class="v1" ng-style="{opacity:(1-globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 1: 2)  }"><button class="left" ng-repeat="b in globalHeaderOptions.v1.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v1.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v1.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button></div>' + '<div class="v2" ng-style="{opacity:(globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 2: 1)}"><button class="left" ng-repeat="b in globalHeaderOptions.v2.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v2.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v2.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button></div>',
+        template: '<div class="navbar" ng-style="{top: (-60 + (((globalHeaderOptions.v1 && 60 || 0) * (1 - globalHeaderOptions.transitionState)) + ((globalHeaderOptions.v2 && 60 || 0) * (globalHeaderOptions.transitionState))))+\'px\' }" ><div class="v1" ng-style="{opacity:(1-globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 1: 2)  }"><button class="left" ng-repeat="b in globalHeaderOptions.v1.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v1.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v1.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button></div>' + '<div class="v2" ng-style="{opacity:(globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 2: 1)}"><button class="left" ng-repeat="b in globalHeaderOptions.v2.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v2.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v2.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button></div></div>',
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var useOverlay = attrs.noOverlay === undefined;
@@ -2446,7 +2446,9 @@ Chondric.directive("cjsSharedHeader", function() {
             }
 
 
-            element.addClass("navbar sharedheader");
+
+
+
 
             scope.$watch(attrs.cjsSharedHeader, function(val) {
                 if (document.activeElement) document.activeElement.blur();

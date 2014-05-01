@@ -123,7 +123,7 @@ Chondric.App =
 
         app.registerSharedUiComponent({
             id: "popupmenu",
-            template: '<div cjs-popover="componentDefinition.popuptrigger"><div class="poparrow"></div><button ng-repeat="b in componentDefinition.data.items" ng-tap="handleSharedPopupButtonClick(b)">Button</button></div>',
+            template: '<div cjs-popover="componentDefinition.popuptrigger"><div class="poparrow"></div><button ng-repeat="b in componentDefinition.data.items" ng-tap="handleSharedPopupButtonClick(b)">{{b.title}}</button></div>',
             controller: function($scope) {
                 var self = $scope.componentDefinition;
                 $scope.hideModal = function() {
