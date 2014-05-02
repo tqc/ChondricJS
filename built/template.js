@@ -9,6 +9,13 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('cjs-left-panel.html',
+    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
+    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('cjs-loading-overlay.html',
     "<div class=\"loadingoverlay\" ng-show=\"dataLoadStatus.waitingForData\">\n" +
     "    <div ng-show=\"!dataLoadStatus.error\" class=\"progress large\">\n" +
@@ -52,6 +59,20 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
     "    <button ng-tap='updatePreviewSettings(320,548, false)'>iPhone5 portrait iOS6</button>\n" +
     "    <button ng-tap='reloadPreview()'>Reload</button>\n" +
     "</div>\n"
+  );
+
+
+  $templateCache.put('cjs-right-panel.html',
+    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
+    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('cjs-shared-popup.html',
+    "<div cjs-popup=\"componentDefinition.popuptrigger\">\n" +
+    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "</div>"
   );
 
 }]);

@@ -7,7 +7,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = null;
             var routeScope = app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "popupmenu", false, true, null);
+            app.setSharedUiComponentState(routeScope, "cjs-action-sheet", false, true, null);
         }
         $scope.handleSharedPopupButtonClick = function(b) {
             self.popuptrigger = null;

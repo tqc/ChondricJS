@@ -254,6 +254,13 @@ Chondric.directive("cjsSidepanel", function() {
 
 
             var parentPageElement = element.closest(".chondric-page");
+            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
+            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+            var overlay = $(".modal-overlay", parentPageElement);
+            if (overlay.length == 0) {
+                overlay = angular.element('<div class="modal-overlay"></div>');
+                parentPageElement.append(overlay);
+            }
             var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');

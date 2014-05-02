@@ -266,6 +266,13 @@ Chondric.App =
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
+
+
+                for (var k in app.sharedUiComponents) {
+                    var component = app.sharedUiComponents[k];
+                    if (component.updateSwipe) component.updateSwipe(component, swipeState);
+                }
+
                 // default handler covers left and right border swipe
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
@@ -294,6 +301,13 @@ Chondric.App =
             $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
                 console.log("ending swipe");
+
+                for (var k in app.sharedUiComponents) {
+                    var component = app.sharedUiComponents[k];
+                    if (component.endSwipe) component.endSwipe(component, swipeState);
+                }
+
+
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
                         console.log("ending swipe - " + p);
@@ -307,7 +321,6 @@ Chondric.App =
                             } else {
                                 // cancel page change
                                 $scope.transition.progress = 0;
-
                             }
 
                         } else if (swipeNav[p].panel) {

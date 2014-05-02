@@ -267,6 +267,13 @@ Chondric.App =
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
+
+
+                for (var k in app.sharedUiComponents) {
+                    var component = app.sharedUiComponents[k];
+                    if (component.updateSwipe) component.updateSwipe(component, swipeState);
+                }
+
                 // default handler covers left and right border swipe
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
@@ -295,6 +302,13 @@ Chondric.App =
             $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
                 console.log("ending swipe");
+
+                for (var k in app.sharedUiComponents) {
+                    var component = app.sharedUiComponents[k];
+                    if (component.endSwipe) component.endSwipe(component, swipeState);
+                }
+
+
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
                         console.log("ending swipe - " + p);
@@ -308,7 +322,6 @@ Chondric.App =
                             } else {
                                 // cancel page change
                                 $scope.transition.progress = 0;
-
                             }
 
                         } else if (swipeNav[p].panel) {
@@ -996,6 +1009,13 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('cjs-left-panel.html',
+    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
+    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "</div>"
+  );
+
+
   $templateCache.put('cjs-loading-overlay.html',
     "<div class=\"loadingoverlay\" ng-show=\"dataLoadStatus.waitingForData\">\n" +
     "    <div ng-show=\"!dataLoadStatus.error\" class=\"progress large\">\n" +
@@ -1039,6 +1059,20 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
     "    <button ng-tap='updatePreviewSettings(320,548, false)'>iPhone5 portrait iOS6</button>\n" +
     "    <button ng-tap='reloadPreview()'>Reload</button>\n" +
     "</div>\n"
+  );
+
+
+  $templateCache.put('cjs-right-panel.html',
+    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
+    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "</div>"
+  );
+
+
+  $templateCache.put('cjs-shared-popup.html',
+    "<div cjs-popup=\"componentDefinition.popuptrigger\">\n" +
+    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "</div>"
   );
 
 }]);
@@ -2011,6 +2045,13 @@ Chondric.directive("cjsSidepanel", function() {
 
 
             var parentPageElement = element.closest(".chondric-page");
+            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
+            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+            var overlay = $(".modal-overlay", parentPageElement);
+            if (overlay.length == 0) {
+                overlay = angular.element('<div class="modal-overlay"></div>');
+                parentPageElement.append(overlay);
+            }
             var overlay = $(".modal-overlay", parentPageElement);
             if (overlay.length == 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
@@ -2387,7 +2428,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = null;
             var routeScope = app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "popupmenu", false, true, null);
+            app.setSharedUiComponentState(routeScope, "cjs-action-sheet", false, true, null);
         }
         $scope.handleSharedPopupButtonClick = function(b) {
             self.popuptrigger = null;
@@ -2482,6 +2523,189 @@ Chondric.registerSharedUiComponent({
             };
             self.globalHeaderOptions.transitionState = 1;
         }
+
+    }
+})
+Chondric.registerSharedUiComponent({
+    id: "cjs-shared-popup",
+    templateUrl: "cjs-shared-popup.html",
+    controller: function($scope) {
+        var self = $scope.componentDefinition;
+        self.scope = $scope;
+        self.defaultController = function() {};
+        $scope.hideModal = function() {
+            self.popuptrigger = null;
+            var routeScope = app.scopesForRoutes[self.route];
+            // need to reset this so the popup doesnt reopen if the page is reactivated.
+            app.setSharedUiComponentState(routeScope, "cjs-shared-popup", false, true, null);
+        }
+        $scope.handleAction = function(funcName, params) {
+            self.popuptrigger = null;
+            var routeScope = app.scopesForRoutes[self.route];
+            if (routeScope) {
+                routeScope.$eval(funcName)(params);
+            }
+        }
+    },
+    setState: function(self, route, active, available, data) {
+        self.data = data;
+        self.route = route;
+
+        if (!active) {
+            self.popuptrigger = null;
+        } else {
+            self.popuptrigger = {}
+        }
+
+    }
+})
+Chondric.registerSharedUiComponent({
+    id: "cjs-right-panel",
+    templateUrl: "cjs-right-panel.html",
+    controller: function($scope) {
+        var self = $scope.componentDefinition;
+        self.scope = $scope;
+        self.defaultController = function() {};
+        $scope.hideModal = function() {
+            var routeScope = app.scopesForRoutes[self.route];
+            // need to reset this so the popup doesnt reopen if the page is reactivated.
+            app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
+        }
+        $scope.handleAction = function(funcName, params) {
+            self.popuptrigger = null;
+            var routeScope = app.scopesForRoutes[self.route];
+            if (routeScope) {
+                routeScope.$eval(funcName)(params);
+            }
+        }
+    },
+    setState: function(self, route, active, available, data) {
+        self.data = data;
+        self.route = route;
+        self.active = active;
+        self.available = available;
+
+        if (!active) {
+            self.popuptrigger = {
+                progress: 0,
+                transition: "coverRight"
+            };
+        } else {
+            self.popuptrigger = {
+                progress: 1,
+                transition: "coverRight"
+            }
+        }
+
+    },
+    updateSwipe: function(self, swipeState) {
+        if (!self.available) return;
+        if (self.active) return;
+
+        if (swipeState.rightBorder) {
+            self.popuptrigger = {
+                progress: swipeState.rightBorder,
+                transition: "coverRight"
+            }
+            self.scope.$apply();
+        }
+
+    },
+    endSwipe: function(self, swipeState) {
+        if (!self.available) return;
+        if (self.active) return;
+
+        if (swipeState.rightBorder) {
+            if (swipeState.rightBorder < 0.1) {
+                self.popuptrigger = {
+                    progress: 0,
+                    transition: "coverRight"
+                }
+                self.scope.$apply();
+            } else {
+                self.popuptrigger = {
+                    progress: 1,
+                    transition: "coverRight"
+                }
+                self.scope.$apply();
+            }
+        }
+
+
+    }
+})
+Chondric.registerSharedUiComponent({
+    id: "cjs-left-panel",
+    templateUrl: "cjs-left-panel.html",
+    controller: function($scope) {
+        var self = $scope.componentDefinition;
+        self.scope = $scope;
+        self.defaultController = function() {};
+        $scope.hideModal = function() {
+            var routeScope = app.scopesForRoutes[self.route];
+            // need to reset this so the popup doesnt reopen if the page is reactivated.
+            app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
+        }
+        $scope.handleAction = function(funcName, params) {
+            self.popuptrigger = null;
+            var routeScope = app.scopesForRoutes[self.route];
+            if (routeScope) {
+                routeScope.$eval(funcName)(params);
+            }
+        }
+    },
+    setState: function(self, route, active, available, data) {
+        self.data = data;
+        self.route = route;
+        self.active = active;
+        self.available = available;
+
+        if (!active) {
+            self.popuptrigger = {
+                progress: 0,
+                transition: "coverLeft"
+            };
+        } else {
+            self.popuptrigger = {
+                progress: 1,
+                transition: "coverLeft"
+            }
+        }
+
+    },
+    updateSwipe: function(self, swipeState) {
+        if (!self.available) return;
+        if (self.active) return;
+
+        if (swipeState.leftBorder) {
+            self.popuptrigger = {
+                progress: swipeState.leftBorder,
+                transition: "coverLeft"
+            }
+            self.scope.$apply();
+        }
+
+    },
+    endSwipe: function(self, swipeState) {
+        if (!self.available) return;
+        if (self.active) return;
+
+        if (swipeState.leftBorder) {
+            if (swipeState.leftBorder < 0.1) {
+                self.popuptrigger = {
+                    progress: 0,
+                    transition: "coverLeft"
+                }
+                self.scope.$apply();
+            } else {
+                self.popuptrigger = {
+                    progress: 1,
+                    transition: "coverLeft"
+                }
+                self.scope.$apply();
+            }
+        }
+
 
     }
 })
