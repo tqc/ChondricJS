@@ -37,7 +37,7 @@ Chondric.directive('chondricViewport', function($compile) {
 
             } else if (rv.templateUrl) {
                 template = "<div  ng-controller=\"rv.controller\" cjs-swipe> <div ng-include src=\"rv.templateUrl\"></div>";
-                template += '<div loading-overlay></div></div>'
+                template += '<div cjs-loading-overlay></div></div>'
 
             } else {
                 template = "<span>Template not set</span>"
@@ -70,98 +70,6 @@ Chondric.directive('cjsSharedComponent', function($compile) {
             $compile(newElement)(scope);
             element.html("");
             element.append(newElement);
-        }
-    }
-});
-
-
-Chondric.directive("cjsSharedHeader", function() {
-    return {
-        template: '<div class="navbar" ng-style="{top: (-60 + (((globalHeaderOptions.v1.active && 60 || 0) * (1 - globalHeaderOptions.transitionState)) + ((globalHeaderOptions.v2.active && 60 || 0) * (globalHeaderOptions.transitionState))))+\'px\' }" ><div class="v1" ng-style="{opacity:(1-globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 1: 2)  }"><button class="left" ng-repeat="b in globalHeaderOptions.v1.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v1.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v1.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)">{{b.title}}</button></div>' + '<div class="v2" ng-style="{opacity:(globalHeaderOptions.transitionState), \'z-index\': ((globalHeaderOptions.transitionState > 0.5) ? 2: 1)}"><button class="left" ng-repeat="b in globalHeaderOptions.v2.data.leftButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button><h1>{{globalHeaderOptions.v2.data.title}}</h1><button class="right" ng-repeat="b in globalHeaderOptions.v2.data.rightButtons" ng-tap="handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)">{{b.title}}</button></div></div>',
-        //        restrict: "E",
-        link: function(scope, element, attrs) {
-            var useOverlay = attrs.noOverlay === undefined;
-            var horizontal = attrs.horizontal !== undefined;
-            var menuwidth = parseFloat(attrs.menuwidth) || 280;
-            var menuheight = parseFloat(attrs.menuheight) || 150;
-
-            var useMouse = true;
-
-            var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
-
-            if (iOS) {
-                useMouse = false;
-            }
-
-
-
-
-
-
-            scope.$watch(attrs.cjsSharedHeader, function(val) {
-                if (document.activeElement) document.activeElement.blur();
-
-                if (!val) {
-                    element.removeClass("active");
-                } else {
-                    element.addClass("active");
-                }
-            })
-
-            var current = "v1";
-            var other = "v2";
-
-
-
-            scope.$watch('transition', function(transition, old) {
-
-                /*
-                var fromHeader = scope.headersForRoutes[transition.from];
-                var toHeader = scope.headersForRoutes[transition.to];
-
-                scope.globalHeaderOptions = scope.globalHeaderOptions || {};
-                scope.globalHeaderOptions[current] = fromHeader;
-                scope.globalHeaderOptions[other] = toHeader;
-
-                $("." + other, element).css("opacity", transition.progress);
-                $("." + current, element).css("opacity", 1 - transition.progress);
-
-
-
-                if (transition.progress > 0.5) {
-                    if (!toHeader) {
-                        element.removeClass("active");
-                    } else if (toHeader) {
-                        element.addClass("active");
-                        //                        $("." + other, element).show();
-                        //                        $("." + current, element).hide();
-                    }
-                } else {
-                    if (!fromHeader) {
-                        element.removeClass("active");
-                    } else if (fromHeader) {
-                        element.addClass("active");
-                        //            $("." + current, element).show();
-                        //            $("." + other, element).hide();
-                    }
-
-                }
-
-                if (transition.progress == 1) {
-                    if (current == "v1") {
-                        current = "v2";
-                        other = "v1";
-                    } else {
-                        current = "v1";
-                        other = "v2";
-                    }
-                }
-                $("." + other, element).css("z-index", 1);
-                $("." + current, element).css("z-index", 2);
-*/
-
-            }, true);
-
         }
     }
 });

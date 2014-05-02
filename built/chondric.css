@@ -1,4 +1,4 @@
-/*! chondric-tools 2014-05-02 */
+/*! chondric-tools 0.4.1 */
 body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
@@ -279,6 +279,15 @@ button.icon-only {
     border-bottom: 1px solid #c4c4c4;
     font-size: 17px;
 }
+
+.navbar>.v1,.navbar>.v2 {
+     position: absolute;
+    top:0;
+    left: 0;
+    right:0;
+    bottom: 0;
+}
+
 .hasstatusbar .navbar {
     top:20px;
 }

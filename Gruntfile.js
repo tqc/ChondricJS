@@ -2,16 +2,19 @@ module.exports = function(grunt) {
 
     var jsfiles = [
         "src/core.js",
+        "built/template.js",
         "src/view.js",
         "src/versioneddatabase.js",
         "src/directives/ng-tap.js",
-        "src/directives/loading-overlay.js",
+        "src/directives/cjs-loading-overlay.js",
         "src/directives/cjs-popover.js",
         "src/directives/cjs-popup.js",
         "src/directives/cjs-sidepanel.js",
         "src/directives/cjs-swipe.js",
-        "src/directives/preview-controls.js",
+        "src/directives/cjs-preview-controls.js",
         "src/directives/chondric-viewport.js",
+        "src/sharedui/cjs-action-sheet.js",
+        "src/sharedui/cjs-navigation-bar.js",
         "src/transitions/crossfade.js",
         "src/transitions/sidepanel.js",
         "src/transitions/slide.js",
@@ -31,9 +34,17 @@ module.exports = function(grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        ngtemplates: {
+            chondric: {
+                cwd: 'src/html',
+                src: '**.html',
+                dest: 'built/template.js',
+                options: {}
+            }
+        },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n'
             },
             min: {
                 options: {
@@ -56,7 +67,7 @@ module.exports = function(grunt) {
         },
         concat: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n'
             },
             max: {
                 files: {
@@ -74,12 +85,12 @@ module.exports = function(grunt) {
         }
     });
 
-    // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     //    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-angular-templates');
     // Default task(s).
-    grunt.registerTask('default', ['uglify:min', "concat", "cssmin"]);
+    grunt.registerTask('default', ['ngtemplates', 'uglify:min', "concat", "cssmin"]);
 
 };

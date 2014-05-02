@@ -9,6 +9,11 @@ if (!window.console) {
 
 var Chondric = angular.module('chondric', [])
 Chondric.allTransitions = {};
+Chondric.sharedUiComponents = {};
+Chondric.registerSharedUiComponent = function(component) {
+    Chondric.sharedUiComponents[component.id] = component;
+}
+
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
@@ -115,122 +120,8 @@ Chondric.App =
             }
         }
 
-        app.sharedUiComponents = {};
-        app.registerSharedUiComponent = function(component) {
-            app.sharedUiComponents[component.id] = component;
-        }
-
-
-        app.registerSharedUiComponent({
-            id: "popupmenu",
-            template: '<div cjs-popover="componentDefinition.popuptrigger"><div class="poparrow"></div><button ng-repeat="b in componentDefinition.data.items" ng-tap="handleSharedPopupButtonClick(b)">{{b.title}}</button></div>',
-            controller: function($scope) {
-                var self = $scope.componentDefinition;
-                $scope.hideModal = function() {
-                    self.popuptrigger = null;
-                    var routeScope = app.scopesForRoutes[self.route];
-                    // need to reset this so the popup doesnt reopen if the page is reactivated.
-                    app.setSharedUiComponentState(routeScope, "popupmenu", false, true, null);
-                }
-                $scope.handleSharedPopupButtonClick = function(b) {
-                    self.popuptrigger = null;
-                    var routeScope = app.scopesForRoutes[self.route];
-                    if (routeScope && b.action) {
-                        routeScope.$eval(b.action)
-                    }
-                }
-            },
-            setState: function(self, route, active, available, data) {
-                self.data = data;
-                self.route = route;
-
-                if (window.NativeNav) {
-                    var rect = popupoptions.element[0].getBoundingClientRect();
-                    NativeNav.showPopupMenu(popupoptions.scope.rk, rect.left, rect.top, rect.width, rect.height, popupoptions.items);
-                } else {
-                    if (!active) {
-                        self.popuptrigger = null;
-                    } else {
-                        self.popuptrigger = {
-                            element: data.element
-                        }
-                    }
-                }
-            }
-        })
-
-
-        app.registerSharedUiComponent({
-            id: "standardnavigationbar",
-            template: '<div cjs-shared-header="componentDefinition.globalHeaderOptions"></div>',
-            controller: function($scope) {
-                var self = $scope.componentDefinition;
-                $scope.globalHeaderOptions = self.globalHeaderOptions = {}
-
-                $scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
-                    console.log("clicked header button for " + self.route);
-                    var routeScope = app.scopesForRoutes[self.route];
-                    if (routeScope && b.action) {
-                        routeScope.$eval(b.action)
-                    } else if (routeScope && b.items) {
-
-                        app.setSharedUiComponentState(routeScope, "popupmenu", true, true, {
-                            element: lastTap.element,
-                            items: b.items
-                        })
-                    }
-                }
-
-            },
-            setStatePartial: function(self, initialState, finalState, progress) {
-                if (!self.globalHeaderOptions) return;
-                var v1 = self.globalHeaderOptions.v1;
-                var v2 = self.globalHeaderOptions.v2;
-                if (v1 && v1.route == initialState.route) {
-                    self.globalHeaderOptions.v1 = initialState;
-                    self.globalHeaderOptions.v2 = finalState;
-                    self.globalHeaderOptions.transitionState = progress;
-                } else {
-                    self.globalHeaderOptions.v2 = initialState;
-                    self.globalHeaderOptions.v1 = finalState;
-                    self.globalHeaderOptions.transitionState = 1 - progress;
-                }
-                if (progress < 0.5) {
-                    self.route = initialState.route;
-                    self.data = initialState.data;
-                } else {
-                    self.route = finalState.route;
-                    self.data = finalState.data;
-                }
-            },
-            setState: function(self, route, active, available, data) {
-                if (!self.globalHeaderOptions) return;
-
-                self.route = route;
-                self.data = data;
-                var v1 = self.globalHeaderOptions.v1;
-                var v2 = self.globalHeaderOptions.v2;
-                if (v1 && v1.route == route) {
-                    self.globalHeaderOptions.v1 = {
-                        route: route,
-                        active: active,
-                        available: available,
-                        data: data
-                    };
-                    self.globalHeaderOptions.transitionState = 0;
-                } else {
-                    self.globalHeaderOptions.v2 = {
-                        route: route,
-                        active: active,
-                        available: available,
-                        data: data
-                    };
-                    self.globalHeaderOptions.transitionState = 1;
-                }
-
-            }
-        })
-
+        app.sharedUiComponents = Chondric.sharedUiComponents;
+        app.registerSharedUiComponent = Chondric.registerSharedUiComponent;
 
         var appCtrl = app.controller = function($scope, $location) {
             app.scope = $scope;
@@ -259,6 +150,11 @@ Chondric.App =
             $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
                 app.scopesForRoutes[routeScope.rk] = routeScope;
                 var component = app.sharedUiComponents[componentId];
+                if (!component) {
+                    throw new Error(
+                        "Shared UI Component " + componentId + " not found"
+                    );
+                }
                 var csfr = app.componentStatesForRoutes[routeScope.rk] = app.componentStatesForRoutes[routeScope.rk] || {};
                 csfr[componentId] = {
                     route: routeScope.rk,
