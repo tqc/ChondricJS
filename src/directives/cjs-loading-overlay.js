@@ -39,18 +39,17 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
 
                 scope.currentTask = currentTask;
                 if (!currentTask) {
-                    // finished
+                    // finished                    
                     scope.message = "finished";
                     contentElement.addClass("ui-show").removeClass("ui-hide");
                     overlay.addClass("ui-hide").removeClass("ui-show");
                 } else {
                     contentElement.addClass("ui-hide").removeClass("ui-show");
                     overlay.addClass("ui-show").removeClass("ui-hide");
+                    scope.title = currentTask.title;
                     scope.error = currentTask.error;
                     scope.message = currentTask.progressCurrent + " / " + currentTask.progressTotal;
                 }
-
-
 
             }, true);
 

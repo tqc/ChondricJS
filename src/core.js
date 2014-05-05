@@ -123,7 +123,9 @@ Chondric.App =
                 templateUrl: sc.templateUrl,
                 controller: sc.controller,
                 setState: sc.setState,
-                setStatePartial: sc.setStatePartial
+                setStatePartial: sc.setStatePartial,
+                updateSwipe: sc.updateSwipe,
+                endSwipe: sc.endSwipe
             };
         }
 
@@ -165,12 +167,14 @@ Chondric.App =
                     );
                 }
                 var csfr = app.componentStatesForRoutes[routeScope.rk] = app.componentStatesForRoutes[routeScope.rk] || {};
-                csfr[componentId] = {
-                    route: routeScope.rk,
-                    active: active,
-                    available: available,
-                    data: data
+                var cs = csfr[componentId] || {
+                    route: routeScope.rk
                 };
+                // if parameters are undefined, the previous value will be used
+                if (active === true || active === false) cs.active = active;
+                if (available === true || available === false) cs.available = available;
+                if (data !== undefined) cs.data = data;
+                csfr[componentId] = cs;
                 if ($scope.route == routeScope.rk) {
                     component.setState(component, routeScope.rk, active, available, data);
                 }
@@ -271,13 +275,14 @@ Chondric.App =
             };
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
-                if (!swipeState || !swipeNav) return;
-
+                if (!swipeState) return;
 
                 for (var k in app.sharedUiComponents) {
                     var component = app.sharedUiComponents[k];
                     if (component.updateSwipe) component.updateSwipe(component, swipeState);
                 }
+
+                if (!swipeNav) return;
 
                 // default handler covers left and right border swipe
                 for (var p in swipeState) {
@@ -304,13 +309,14 @@ Chondric.App =
             };
 
             $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
-                if (!swipeState || !swipeNav) return;
+                if (!swipeState) return;
 
                 for (var k in app.sharedUiComponents) {
                     var component = app.sharedUiComponents[k];
                     if (component.endSwipe) component.endSwipe(component, swipeState);
                 }
 
+                if (!swipeNav) return;
 
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {

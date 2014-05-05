@@ -36,8 +36,9 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
     "    <div ng-show=\"!error\" class=\"progress large\">\n" +
     "        <div></div>\n" +
     "    </div>\n" +
-    "    <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
-    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "    <div class=\"title\" ng-show=\"title && !error\">{{title}}</div>\n" +
+    "     <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
+    "   <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
     "    <div class=\"buttons\">\n" +
     "        <button ng-show=\"retry && error\" ng-tap=\"retry()\">Retry</button>\n" +
     "        <button ng-show=\"cancel\" ng-tap=\"cancel()\">Cancel</button>\n" +

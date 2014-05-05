@@ -124,7 +124,9 @@ Chondric.App =
                 templateUrl: sc.templateUrl,
                 controller: sc.controller,
                 setState: sc.setState,
-                setStatePartial: sc.setStatePartial
+                setStatePartial: sc.setStatePartial,
+                updateSwipe: sc.updateSwipe,
+                endSwipe: sc.endSwipe
             };
         }
 
@@ -166,12 +168,14 @@ Chondric.App =
                     );
                 }
                 var csfr = app.componentStatesForRoutes[routeScope.rk] = app.componentStatesForRoutes[routeScope.rk] || {};
-                csfr[componentId] = {
-                    route: routeScope.rk,
-                    active: active,
-                    available: available,
-                    data: data
+                var cs = csfr[componentId] || {
+                    route: routeScope.rk
                 };
+                // if parameters are undefined, the previous value will be used
+                if (active === true || active === false) cs.active = active;
+                if (available === true || available === false) cs.available = available;
+                if (data !== undefined) cs.data = data;
+                csfr[componentId] = cs;
                 if ($scope.route == routeScope.rk) {
                     component.setState(component, routeScope.rk, active, available, data);
                 }
@@ -272,13 +276,14 @@ Chondric.App =
             };
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
-                if (!swipeState || !swipeNav) return;
-
+                if (!swipeState) return;
 
                 for (var k in app.sharedUiComponents) {
                     var component = app.sharedUiComponents[k];
                     if (component.updateSwipe) component.updateSwipe(component, swipeState);
                 }
+
+                if (!swipeNav) return;
 
                 // default handler covers left and right border swipe
                 for (var p in swipeState) {
@@ -305,13 +310,14 @@ Chondric.App =
             };
 
             $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
-                if (!swipeState || !swipeNav) return;
+                if (!swipeState) return;
 
                 for (var k in app.sharedUiComponents) {
                     var component = app.sharedUiComponents[k];
                     if (component.endSwipe) component.endSwipe(component, swipeState);
                 }
 
+                if (!swipeNav) return;
 
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
@@ -721,8 +727,9 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
     "    <div ng-show=\"!error\" class=\"progress large\">\n" +
     "        <div></div>\n" +
     "    </div>\n" +
-    "    <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
-    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "    <div class=\"title\" ng-show=\"title && !error\">{{title}}</div>\n" +
+    "     <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
+    "   <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
     "    <div class=\"buttons\">\n" +
     "        <button ng-show=\"retry && error\" ng-tap=\"retry()\">Retry</button>\n" +
     "        <button ng-show=\"cancel\" ng-tap=\"cancel()\">Cancel</button>\n" +
@@ -1012,18 +1019,17 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
 
                 scope.currentTask = currentTask;
                 if (!currentTask) {
-                    // finished
+                    // finished                    
                     scope.message = "finished";
                     contentElement.addClass("ui-show").removeClass("ui-hide");
                     overlay.addClass("ui-hide").removeClass("ui-show");
                 } else {
                     contentElement.addClass("ui-hide").removeClass("ui-show");
                     overlay.addClass("ui-show").removeClass("ui-hide");
+                    scope.title = currentTask.title;
                     scope.error = currentTask.error;
                     scope.message = currentTask.progressCurrent + " / " + currentTask.progressTotal;
                 }
-
-
 
             }, true);
 
@@ -2036,15 +2042,22 @@ Chondric.registerSharedUiComponent({
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            self.app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
+            self.app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
         };
-        $scope.handleAction = function(funcName, params) {
-            self.popuptrigger = null;
+        $scope.runOnMainScope = function(funcName, params) {
             var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
-                routeScope.$eval(funcName)(params);
+                routeScope.$eval(funcName).apply(undefined, params);
             }
         };
+        $scope.runOnMainScopeAndClose = function(funcName, params) {
+            $scope.hideModal();
+            var routeScope = self.app.scopesForRoutes[self.route];
+            if (routeScope) {
+                routeScope.$eval(funcName).apply(undefined, params);
+            }
+        };
+
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
@@ -2113,11 +2126,17 @@ Chondric.registerSharedUiComponent({
             // need to reset this so the popup doesnt reopen if the page is reactivated.
             self.app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
         };
-        $scope.handleAction = function(funcName, params) {
-            self.popuptrigger = null;
+        $scope.runOnMainScope = function(funcName, params) {
             var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
-                routeScope.$eval(funcName)(params);
+                routeScope.$eval(funcName).apply(undefined, params);
+            }
+        };
+        $scope.runOnMainScopeAndClose = function(funcName, params) {
+            $scope.hideModal();
+            var routeScope = self.app.scopesForRoutes[self.route];
+            if (routeScope) {
+                routeScope.$eval(funcName).apply(undefined, params);
             }
         };
     },

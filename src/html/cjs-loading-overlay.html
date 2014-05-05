@@ -2,8 +2,9 @@
     <div ng-show="!error" class="progress large">
         <div></div>
     </div>
-    <div class="message" ng-show="!error">{{message || "Loading"}}</div>
-    <div class="error" ng-show="error">{{error}}</div>
+    <div class="title" ng-show="title && !error">{{title}}</div>
+     <div class="message" ng-show="!error">{{message || "Loading"}}</div>
+   <div class="error" ng-show="error">{{error}}</div>
     <div class="buttons">
         <button ng-show="retry && error" ng-tap="retry()">Retry</button>
         <button ng-show="cancel" ng-tap="cancel()">Cancel</button>
