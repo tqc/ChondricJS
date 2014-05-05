@@ -6,17 +6,17 @@ Chondric.registerSharedUiComponent({
         self.scope = $scope;
         self.defaultController = function() {};
         $scope.hideModal = function() {
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
-        }
+            self.app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
+        };
         $scope.handleAction = function(funcName, params) {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
                 routeScope.$eval(funcName)(params);
             }
-        }
+        };
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
@@ -33,7 +33,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = {
                 progress: 1,
                 transition: "coverRight"
-            }
+            };
         }
 
     },
@@ -45,7 +45,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = {
                 progress: swipeState.rightBorder,
                 transition: "coverRight"
-            }
+            };
             self.scope.$apply();
         }
 
@@ -59,17 +59,17 @@ Chondric.registerSharedUiComponent({
                 self.popuptrigger = {
                     progress: 0,
                     transition: "coverRight"
-                }
+                };
                 self.scope.$apply();
             } else {
                 self.popuptrigger = {
                     progress: 1,
                     transition: "coverRight"
-                }
+                };
                 self.scope.$apply();
             }
         }
 
 
     }
-})
+});

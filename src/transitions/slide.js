@@ -4,11 +4,11 @@ Chondric.allTransitions.slideleft = {
             // show element and move to left
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(100%, 0)"
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             // move element to left with transition
@@ -17,7 +17,7 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(100%, 0)"
-            })
+            });
 
             return time;
         },
@@ -27,18 +27,18 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
-            })
+            });
         }
     },
     transitionOut: {
@@ -47,7 +47,7 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
 
         },
         cancel: function(element, prevProgress) {
@@ -56,7 +56,7 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         complete: function(element, prevProgress) {
@@ -65,29 +65,29 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(-100%, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
-            })
+            });
         }
     },
     reset: function(element) {
         // remove transition, transform and display settings from relevant subelements
         element.css({
             "display": ""
-        })
+        });
         $(".body", element).css({
             "-webkit-transition": "",
             "-webkit-transform": ""
-        })
+        });
     }
 };
 Chondric.allTransitions.slideright = {
@@ -96,11 +96,11 @@ Chondric.allTransitions.slideright = {
             // show element and move to left
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(-100%, 0)"
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             // move element to left with transition
@@ -109,7 +109,7 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(-100%, 0)"
-            })
+            });
 
             return time;
         },
@@ -119,18 +119,18 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
-            })
+            });
         }
     },
     transitionOut: {
@@ -139,7 +139,7 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
 
         },
         cancel: function(element, prevProgress) {
@@ -148,7 +148,7 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         complete: function(element, prevProgress) {
@@ -157,28 +157,28 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(100%, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
-            })
+            });
         }
     },
     reset: function(element) {
         // remove transition, transform and display settings from relevant subelements
         element.css({
             "display": ""
-        })
+        });
         $(".body", element).css({
             "-webkit-transition": "",
             "-webkit-transform": ""
-        })
+        });
     }
-}
+};

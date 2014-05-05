@@ -1,5 +1,6 @@
-var fs=require("fs");
-var path=require("path");
+"use strict";
+var fs = require("fs");
+var path = require("path");
 
 var chondric = require("./chondric-tools.js");
 

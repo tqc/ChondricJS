@@ -1,0 +1,11 @@
+{
+  "browser": true,
+  "esnext": true,
+  "globals": {"Chondric": true, "angular":true, "$":true},
+  "globalstrict": false,
+  "quotmark": false,
+  "smarttabs": true,
+  "trailing": true,
+  "undef": true,
+  "unused": true
+}

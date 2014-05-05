@@ -2,7 +2,7 @@ Chondric.directive("cjsSwipe", function() {
 
     return {
         //        restrict: "E",
-        link: function(scope, element, attrs) {
+        link: function(scope, element) {
             var useMouse = true;
             var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
             if (iOS) {
@@ -25,7 +25,7 @@ Chondric.directive("cjsSwipe", function() {
                 rightborder: 0,
                 topborder: 0,
                 bottomborder: 0
-            }
+            };
             var tracking = false;
 
             var updateSwipe = scope.$eval("updateSwipe");
@@ -47,8 +47,6 @@ Chondric.directive("cjsSwipe", function() {
                 dy = 0;
                 width = element.width();
                 height = element.height();
-                console.log(width);
-                console.log(height);
 
                 swipeState = {
                     left: 0,
@@ -59,7 +57,7 @@ Chondric.directive("cjsSwipe", function() {
                     rightBorder: 0,
                     topBorder: 0,
                     bottomBorder: 0
-                }
+                };
 
                 $(document).on(useMouse ? "mousemove" : "touchmove", move);
                 $(document).on(useMouse ? "mouseup" : "touchend", end);
@@ -105,13 +103,13 @@ Chondric.directive("cjsSwipe", function() {
 
                 if (updateSwipe) updateSwipe(swipeState, swipeNav, scope);
 
-            };
+            }
 
-            function end(e) {
+            function end() {
                 if (!tracking) return;
                 tracking = false;
-                $(document).off(useMouse ? "mousemove" : "touchmove", move)
-                $(document).off(useMouse ? "mouseup" : "touchend", end)
+                $(document).off(useMouse ? "mousemove" : "touchmove", move);
+                $(document).off(useMouse ? "mouseup" : "touchend", end);
 
                 if (endSwipe) endSwipe(swipeState, swipeNav, scope);
 
@@ -124,14 +122,14 @@ Chondric.directive("cjsSwipe", function() {
                     rightBorder: 0,
                     topBorder: 0,
                     bottomBorder: 0
-                }
+                };
 
             }
 
 
         }
-    }
-})
+    };
+});
 
 Chondric.directive("cjsTransitionStyle", function() {
 
@@ -142,26 +140,26 @@ Chondric.directive("cjsTransitionStyle", function() {
                 //                console.log("transition: ", transition);
                 //                console.log("old: ", old);
                 if (!transition) return;
-                var td = app.allTransitions[transition.type];
+                var td = Chondric.allTransitions[transition.type];
                 if (!td) return;
 
-                var isNewTransition = !old || transition.from != old.from || transition.to != old.to || (old.progress == 0 || old.progress == 1);
-
-                if (attrs["route"] == transition.to) {
+                var isNewTransition = !old || transition.from != old.from || transition.to != old.to || (old.progress === 0 || old.progress == 1);
+                var time;
+                if (attrs.route == transition.to) {
                     // apply styles to next page
-                    if (transition.progress == 0 && isNewTransition) {
+                    if (transition.progress === 0 && isNewTransition) {
                         // set initial style
                         td.transitionIn.start(element);
-                    } else if (transition.progress == 0 && !isNewTransition) {
+                    } else if (transition.progress === 0 && !isNewTransition) {
                         // existing transition cancelled - reset to initial state and remove styles after timeout
-                        var time = td.transitionIn.cancel(element, old.progress);
+                        time = td.transitionIn.cancel(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
                     } else if (transition.progress == 1) {
                         // transition completed - set page as active and remove styles after timeout.
                         // transition function returns time in milliseconds
-                        var time = td.transitionIn.complete(element, old.progress);
+                        time = td.transitionIn.complete(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
@@ -170,21 +168,21 @@ Chondric.directive("cjsTransitionStyle", function() {
                         td.transitionIn.progress(element, transition.progress);
                     }
 
-                } else if (attrs["route"] == transition.from) {
+                } else if (attrs.route == transition.from) {
                     // apply styles to prev page
-                    if (transition.progress == 0 && isNewTransition) {
+                    if (transition.progress === 0 && isNewTransition) {
                         // set initial style
                         td.transitionOut.start(element);
-                    } else if (transition.progress == 0 && !isNewTransition) {
+                    } else if (transition.progress === 0 && !isNewTransition) {
                         // existing transition cancelled - reset to initial state and remove styles after timeout
-                        var time = td.transitionOut.cancel(element, old.progress);
+                        time = td.transitionOut.cancel(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
                     } else if (transition.progress == 1) {
                         // transition completed - set page as active and remove styles after timeout.
                         // transition function returns time in milliseconds
-                        var time = td.transitionOut.complete(element, old.progress);
+                        time = td.transitionOut.complete(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
@@ -194,7 +192,7 @@ Chondric.directive("cjsTransitionStyle", function() {
                     }
                 }
 
-            }, true)
+            }, true);
         }
-    }
+    };
 });

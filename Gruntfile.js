@@ -1,9 +1,9 @@
+"use strict";
 module.exports = function(grunt) {
 
     var jsfiles = [
         "src/core.js",
         "built/template.js",
-        "src/view.js",
         "src/versioneddatabase.js",
         "src/directives/ng-tap.js",
         "src/directives/cjs-loading-overlay.js",
@@ -16,7 +16,7 @@ module.exports = function(grunt) {
         "src/sharedui/cjs-action-sheet.js",
         "src/sharedui/cjs-navigation-bar.js",
         "src/sharedui/cjs-shared-popup.js",
-    "src/sharedui/cjs-right-panel.js",
+        "src/sharedui/cjs-right-panel.js",
         "src/sharedui/cjs-left-panel.js",
         "src/transitions/crossfade.js",
         "src/transitions/sidepanel.js",
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
         "src/css/transitions/crossfade.css",
         "src/css/transitions/slideleft.css",
         "src/css/transitions/slideright.css",
-    ]
+    ];
 
     // Project configuration.
     grunt.initConfig({

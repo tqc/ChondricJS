@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
+"use strict";
 var path = require('path');
 var fs = require('fs');
-var mkdirp = require("mkdirp");
 var pkg = require(path.join(__dirname, 'package.json'));
-var chondric = require("./chondric-tools.js")
+var chondric = require("./chondric-tools.js");
 
 process.bin = process.title = 'chondric';
 process.stdout.write(pkg.version + '\n');

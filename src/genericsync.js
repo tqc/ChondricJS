@@ -183,7 +183,7 @@ Chondric.Syncable = function(options) {
 
                     function() {
                         processItem(i + 1);
-                    })
+                    });
 
             });
 

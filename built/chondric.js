@@ -4,22 +4,23 @@
 if (!window.console) {
     window.console = {
         log: function() {},
-        error: alert
+        warn: window.alert,
+        error: window.alert
     };
 }
 
-var Chondric = angular.module('chondric', [])
+var Chondric = angular.module('chondric', []);
 Chondric.allTransitions = {};
 Chondric.sharedUiComponents = {};
 Chondric.registerSharedUiComponent = function(component) {
     Chondric.sharedUiComponents[component.id] = component;
-}
+};
 
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
         var controllerPreload = {};
-        var appModule = app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []),
+        app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []),
             function($controllerProvider) {
                 app.controllerProvider = $controllerProvider;
                 for (var cn in controllerPreload || {}) {
@@ -36,16 +37,9 @@ Chondric.App =
             }
         }
 
-        var allRoutes = app.allRoutes = {}
+        var allRoutes = app.allRoutes = {};
 
-        var allTransitions = app.allTransitions = Chondric.allTransitions;
-
-        // these options are defined in the
-        var initialOptions = {
-
-        }
-
-
+        app.allTransitions = Chondric.allTransitions;
 
         app.createViewTemplate = function(baseView, templateId, templateFile, viewOptions) {
 
@@ -58,7 +52,6 @@ Chondric.App =
                 viewOptions = baseView;
             }
 
-            var allControllers = [];
             var page = {};
             if (viewOptions.initAngular) {
                 viewOptions.initAngular.call(page);
@@ -75,7 +68,7 @@ Chondric.App =
                 registerController(cn, viewOptions.controllers[cn]);
             }
             if (!pageController) {
-                console.error("View " + (viewOptions.templateId || viewOptions.route) + " has no controller");
+                throw new Error("View " + (viewOptions.templateId || viewOptions.route) + " has no controller");
             }
             var route = viewOptions.route || ("/" + viewOptions.templateId + "/$p1/$p2");
             var templateUrl = viewOptions.templateId + ".html";
@@ -85,9 +78,9 @@ Chondric.App =
                 controller: pageController,
                 templateUrl: templateUrl,
                 templateId: viewOptions.templateId,
-            }
+            };
             preloadTemplate(templateUrl);
-        }
+        };
 
         function preloadTemplate(templateUrl) {
             app.module.run(function($templateCache, $http) {
@@ -107,7 +100,7 @@ Chondric.App =
             for (var cn in viewOptions.controllers || {}) {
                 if (!pageController) {
                     pageController = viewOptions.controllers[cn];
-                };
+                }
                 registerController(cn, viewOptions.controllers[cn]);
             }
 
@@ -118,14 +111,30 @@ Chondric.App =
                 controller: pageController,
                 //            templateUrl: viewOptions.templateUrl,
                 //            templateId: viewOptions.templateId,
-            }
+            };
+        };
+
+        app.sharedUiComponents = {};
+        for (var k in Chondric.sharedUiComponents) {
+            var sc = Chondric.sharedUiComponents[k];
+            app.sharedUiComponents[k] = {
+                app: app,
+                id: sc.id,
+                template: sc.template,
+                templateUrl: sc.templateUrl,
+                controller: sc.controller,
+                setState: sc.setState,
+                setStatePartial: sc.setStatePartial
+            };
         }
 
-        app.sharedUiComponents = Chondric.sharedUiComponents;
-        app.registerSharedUiComponent = Chondric.registerSharedUiComponent;
+        app.registerSharedUiComponent = function(component) {
+            app.sharedUiComponents[component.id] = component;
+        };
 
-        var appCtrl = app.controller = function($scope, $location) {
+        app.controller = function($scope, $location) {
             app.scope = $scope;
+            $scope.app = app;
             $scope.allRoutes = allRoutes;
             $scope.route = null;
             $scope.nextRoute = null;
@@ -141,11 +150,11 @@ Chondric.App =
             // these will usually get overridden on a child scope - otherwise names have to be globally unique
             $scope.showModal = function(name, lastTap) {
                 $scope[name] = lastTap;
-            }
+            };
 
             $scope.hideModal = function(name) {
                 $scope[name] = null;
-            }
+            };
 
 
             $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
@@ -162,12 +171,12 @@ Chondric.App =
                     active: active,
                     available: available,
                     data: data
-                }
+                };
                 if ($scope.route == routeScope.rk) {
                     component.setState(component, routeScope.rk, active, available, data);
                 }
 
-            }
+            };
 
 
             app.scopesForRoutes = {};
@@ -176,8 +185,7 @@ Chondric.App =
             function loadView(url) {
                 if (!url) {
                     // first run - load start page
-                    console.log("default route")
-                    return;
+                    throw new Error("loadView requires a valid route URL");
                 }
                 var matchingRoutes = [];
                 var parts = url.split("/");
@@ -191,15 +199,15 @@ Chondric.App =
                     matchingRoutes.push(r);
                 }
                 matchingRoutes.sort(function(a, b) {
-                    return a.length - b.length
-                })
+                    return a.length - b.length;
+                });
 
                 // matching routes list should be section heirarchy
 
                 var openViews = $scope.openViews;
-                for (var i = 0; i < matchingRoutes.length; i++) {
-                    var template = $scope.allRoutes[matchingRoutes[i]];
-                    var mrp = matchingRoutes[i].split("/");
+                for (var i2 = 0; i2 < matchingRoutes.length; i2++) {
+                    var template = $scope.allRoutes[matchingRoutes[i2]];
+                    var mrp = matchingRoutes[i2].split("/");
                     var ar = "";
                     var params = {};
                     for (var j = 0; j < mrp.length; j++) {
@@ -207,7 +215,6 @@ Chondric.App =
                         if (parts[j]) ar += "/" + parts[j];
                     }
                     if (template.isSection) {
-                        console.log("Get section with route " + ar);
                         var section = openViews[ar];
                         if (!section) {
                             section = openViews[ar] = {
@@ -215,11 +222,10 @@ Chondric.App =
                                 isSection: true,
                                 params: params,
                                 subsections: {}
-                            }
+                            };
                         }
                         openViews = section.subsections;
                     } else {
-                        console.log("Get page with route " + ar);
                         var page = openViews[ar];
                         if (!page) {
                             page = openViews[ar] = {
@@ -227,7 +233,7 @@ Chondric.App =
                                 templateUrl: template.templateUrl,
                                 templateId: template.templateId,
                                 params: params
-                            }
+                            };
                         }
                         return;
                     }
@@ -235,17 +241,17 @@ Chondric.App =
             }
 
             $scope.changePage = app.changePage = function(p, transition) {
+                var r;
                 if (p instanceof Array) {
-                    var r = "";
+                    r = "";
                     for (var i = 0; i < p.length; i++) {
                         r += "/" + p[i];
                     }
                 } else {
-                    var r = p;
+                    r = p;
                 }
                 if (!r || r.indexOf("/") < 0) {
-                    console.error("changePage syntax has changed - the first parameter is a route url instead of an id");
-                    return;
+                    throw new Error("changePage syntax has changed - the first parameter is a route url or an array of route url segments instead of an id");
                 }
                 if ($scope.route == r) return;
                 if ($scope.lastRoute == r) $scope.lastRoute = null;
@@ -261,9 +267,9 @@ Chondric.App =
                     $scope.route = r;
                     $scope.transition.progress = 1;
                     $scope.$apply();
-                }, 100)
+                }, 100);
 
-            }
+            };
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
@@ -277,7 +283,6 @@ Chondric.App =
                 // default handler covers left and right border swipe
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
-                        console.log("updating swipe - left border");
                         if (swipeNav[p].route) {
                             loadView(swipeNav[p].route);
                             $scope.nextRoute = swipeNav[p].route;
@@ -297,11 +302,10 @@ Chondric.App =
                     }
 
                 }
-            }
+            };
 
             $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
-                console.log("ending swipe");
 
                 for (var k in app.sharedUiComponents) {
                     var component = app.sharedUiComponents[k];
@@ -311,7 +315,6 @@ Chondric.App =
 
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
-                        console.log("ending swipe - " + p);
                         if (swipeNav[p].route) {
                             if (swipeState[p] > 0.6) {
                                 // continue change to next page
@@ -342,33 +345,33 @@ Chondric.App =
                     }
                 }
 
-            }
+            };
 
 
             function viewCleanup(viewCollection, preservedRoutes) {
                 for (var k in viewCollection) {
-                    if (k.indexOf("/") != 0) continue;
+                    if (k.indexOf("/") !== 0) continue;
                     var keep = false;
                     for (var i = 0; i < preservedRoutes.length; i++) {
                         var r = preservedRoutes[i];
                         if (!r) continue;
-                        if (r.indexOf(k) == 0) {
+                        if (r.indexOf(k) === 0) {
                             keep = true;
                             break;
                         }
                     }
                     if (!keep) {
-                        for (var shik in app.componentStatesForRoutes) {
-                            if (shik.indexOf(k) == 0) delete app.componentStatesForRoutes[shik];
+                        for (var csfrk in app.componentStatesForRoutes) {
+                            if (csfrk.indexOf(k) === 0) delete app.componentStatesForRoutes[csfrk];
                         }
-                        for (var shik in app.scopesForRoutes) {
-                            if (shik.indexOf(k) == 0) delete app.scopesForRoutes[shik];
+                        for (var sfrk in app.scopesForRoutes) {
+                            if (sfrk.indexOf(k) === 0) delete app.scopesForRoutes[sfrk];
                         }
-                        delete viewCollection[k]
+                        delete viewCollection[k];
                         continue;
                     }
                     if (viewCollection[k].subsections) {
-                        viewCleanup(viewCollection[k].subsections, preservedRoutes)
+                        viewCleanup(viewCollection[k].subsections, preservedRoutes);
                     }
 
                 }
@@ -409,23 +412,16 @@ Chondric.App =
 
 
             $scope.$watch("route", function(url, oldVal) {
+                if (!url) return;
                 if (document.activeElement) document.activeElement.blur();
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
-                console.log("Route changed to " + url + " from " + oldVal);
-                if (url) {
-                    // window.history.replaceState(null, null, "#" + url);
-                    // workaround for https://github.com/angular/angular.js/issues/1417
-                    $location.path(url).replace();
-                }
+                $location.path(url).replace();
                 loadView(url);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
-            })
+            });
             if (options.appCtrl) options.appCtrl($scope);
-        } // end appCtrl
-
-
-
+        }; // end appCtrl
 
         app.ready = false;
         app.autohidesplashscreen = false;
@@ -437,94 +433,8 @@ Chondric.App =
         app.Views = {};
         app.ViewTemplates = {};
 
-        /*
-    app.createViewTemplate = function(baseView, templateId, templateFile, options) {
-
-        if (typeof templateId == "string") {
-            // old format
-            options.baseView = baseView;
-            options.templateId = templateId;
-            options.templateFile = templateFile;
-        } else {
-            options = baseView;
-        }
-
-        var templateSettings = {
-            templateId: options.templateId,
-            templateFile: options.templateFile || (options.templateId + ".html"),
-            baseView: options.baseView || Chondric.View,
-        };
-
-        if (options.initAngular || options.angularModules) {
-            options.useAngular = true;
-        }
-
-        var template = function(viewoptions) {
-            var settings = {};
-            $.extend(settings, templateSettings, viewoptions);
-            templateSettings.baseView.call(this, settings);
-            this.settings = settings;
-        };
-
-        var functions = {};
-
-        for (var k in options) {
-            var v = options[k];
-            if (k == "baseView") continue;
-            else if (k == "templateId") continue;
-            else if (k == "templateFile") continue;
-            else if (k == "controller") templateSettings[k] = v;
-            else if (typeof v == "function") functions[k] = v;
-            else templateSettings[k] = v;
-        }
-
-        $.extend(template.prototype, templateSettings.baseView.prototype, functions);
-
-        app.ViewTemplates[options.templateId] = template;
-
-    };
-*/
-        /*
-    app.createViewTemplate(
-        Chondric.View,
-        "AppLoadTemplate",
-        "index.html", {
-            getDefaultModel: function() {
-                return {};
-            },
-            updateModel: function(dataId, existingData, callback) {
-                if (!this.model) this.model = this.getDefaultModel();
-                var m = this.model;
-
-
-                callback();
-            },
-            updateView: function() {
-
-            },
-            attachSubviews: function() {
-                var page = this;
-
-
-            }
-
-        })
-
-    app.Views.appLoadPage = new app.ViewTemplates.AppLoadTemplate({
-        id: "appLoadPage"
-    });
-
-    app.activeView = app.Views.appLoadPage;
-*/
-
         app.platform = "web";
         app.isSimulator = false;
-
-        function getByProp(arr, prop, val) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i][prop] == val) return arr[i];
-            }
-        }
 
         var settings = {
             name: "Base App",
@@ -541,10 +451,12 @@ Chondric.App =
                 callback();
             },
             updateNotificationSettings: function(deviceId, notificationsEnabled) {
+                // jshint unused: false
                 // send details to the notification server
                 console.warn("updateNotificationSettings is not implemented");
             },
             notificationReceived: function(event) {
+                // jshint unused: false
                 console.warn("notificationReceived is not implemented");
             },
             debugMode: false
@@ -566,28 +478,18 @@ Chondric.App =
 
 
 
-        function loadScripts(scriptGroupNum, callback) {
-            console.log("starting loadscripts");
-            if (scriptGroupNum >= settings.scriptGroups.length) {
-                return callback();
-            }
-            console.log("calling require");
-            require(settings.scriptGroups[scriptGroupNum], function() {
-                loadScripts(scriptGroupNum + 1, callback)
-            });
-        }
-
         function initData(callback) {
-            console.log("getting database");
-
             app.db = settings.getDatabase();
             if (!app.db) {
                 callback();
             } else {
-                app.db.updateDatabase(function() {
-
+                if (app.db.updateDatabase) {
+                    app.db.updateDatabase(function() {
+                        callback();
+                    });
+                } else {
                     callback();
-                })
+                }
             }
         }
 
@@ -603,203 +505,6 @@ Chondric.App =
             app.ready = true;
             callback();
         }
-
-        function isScriptless(pagediv) {
-            return $(pagediv).attr("data-scriptless") != undefined;
-        }
-
-
-        this.appLoadLog = function(msg) {
-            console.log(msg);
-        };
-
-        this.getView = function(viewId) {
-            var view = app.Views[viewId];
-            if (view) return view;
-            var ind = viewId.indexOf("_");
-            var templateId = viewId.substr(0, ind) || viewId;
-
-            if (!app.ViewTemplates[templateId]) {
-                // template doesn't exist. possibly this is a scriptless page so try creating a default template
-                app.createViewTemplate({
-                    templateId: templateId
-                });
-            }
-
-            view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-                id: viewId
-            });
-
-
-
-            return view;
-
-        };
-
-
-        var pageCleanupTimer = 0;
-        this.pageCleanup = function() {
-            var currentPage = app.activeView;
-            var lastPage = app.lastPage;
-            var preloads = app.activeView.preloads || [];
-            if (currentPage.next) preloads.push(currentPage.next);
-            if (currentPage.prev) preloads.push(currentPage.prev);
-
-            // remove any pages not in preload list
-
-            for (var k in app.Views) {
-                if (currentPage && currentPage.id == k) continue;
-                if (currentPage && currentPage.prev == k) continue;
-                if (currentPage && currentPage.next == k) continue;
-                if (lastPage && lastPage.id == k) continue;
-                if (preloads.indexOf(k) >= 0) continue;
-                var v = app.Views[k];
-                if (v) {
-                    v.unload();
-                }
-                delete app.Views[k];
-            }
-
-            // todo: load any pages in preload list that are not already loaded
-
-            for (var i = 0; i < preloads.length; i++) {
-                //                console.log("preload: " + preloads[i]);
-                app.getView(preloads[i]).ensureLoaded(null, function() {});
-            }
-
-            pageCleanupTimer = 0;
-        }
-
-        this.queuePageCleanup = function() {
-            if (!pageCleanupTimer) {
-                pageCleanupTimer = window.setTimeout(app.pageCleanup, 200);
-            }
-        }
-
-        this.transition = function(nextPageId, inPageClass, outPageClass) {
-            /*
-        if (!app.transitionClasses) {
-            app.transitionClasses= {};
-            for (var tn in transitions) {
-                app.transitionClasses[app.transitions[tn].inPageClass] = true;
-                app.transitionClasses[app.transitions[tn].outPageClass] = true;
-            }
-        }*/
-
-            if (app.transitioning) {
-                if (app.transitioningTo != nextPageId) {
-                    // transition changed
-                    // immediately complete existing transition, but do not call activated event
-                    app.transitioning = false;
-                    app.transitioningTo = undefined;
-
-                } else {
-                    // transition called twice - ignore
-                    return;
-                }
-            }
-
-            app.transitioning = true;
-            app.transitioningTo = nextPageId;
-            var thisPage = app.lastPage = app.activeView;
-            thisPage.ensureLoaded("active", function() {
-                var nextPage = app.getView(nextPageId);
-                thisPage.deactivating(nextPage);
-
-                //            $("."+inPageClass).removeClass(inPageClass);
-                nextPage.ensureLoaded(inPageClass, function() {
-                    window.setTimeout(function() {
-                        history.pushState({}, null, "#" + nextPageId);
-                        if (nextPage.loading) {
-                            nextPage.isActivating = true;
-                        } else {
-                            nextPage.activating(thisPage);
-                            if (nextPage.scope) {
-                                nextPage.scope.$apply();
-                            }
-                        }
-                    }, 0);
-
-                    thisPage.element.one("webkitTransitionEnd", function() {
-                        window.setTimeout(function() {
-                            app.transitioning = false;
-                            app.transitioningTo = undefined;
-                            if (!app.splashScreenHidden) app.hideSplashScreen();
-
-                            if (nextPage.loading) {
-                                nextPage.isActivated = true;
-                            } else {
-                                nextPage.activated();
-                                if (nextPage.scope) {
-                                    nextPage.scope.$apply();
-                                }
-                            }
-
-                            app.queuePageCleanup();
-                        }, 0);
-                    });
-
-
-                    thisPage.setSwipePosition(null, nextPage.element, null);
-
-                    //              $("."+outPageClass).removeClass(outPageClass);
-                    thisPage.element.addClass(outPageClass).removeClass("active");
-                    nextPage.element.addClass("active").removeClass(inPageClass);
-                    if (outPageClass == "behinddlg") nextPage.dlgbg = thisPage.id;
-
-                    app.activeView = nextPage;
-
-
-                });
-
-
-
-            });
-
-
-        };
-
-
-        this.transitions = {
-            pop: {
-                inPageClass: "behindsmall",
-                outPageClass: "behindfull"
-            },
-            dlgpop: {
-                inPageClass: "behindsmall",
-                outPageClass: "behinddlg"
-            },
-            dlgclose: {
-                inPageClass: "behinddlg",
-                outPageClass: "behindsmall"
-            },
-            close: {
-                inPageClass: "behindfull",
-                outPageClass: "behindsmall"
-            },
-            prev: {
-                inPageClass: "prev",
-                outPageClass: "next"
-            },
-            next: {
-                inPageClass: "next",
-                outPageClass: "prev"
-            },
-            crossfade: {
-                inPageClass: "behindfull",
-                outPageClass: "behindfull"
-            }
-        };
-        /*
-    app.changePage = function(pageId, transitionId) {
-        var transition = app.transitions[transitionId] || app.transitions.crossfade;
-        if (pageId == "dlgbg") pageId = app.activeView.dlgbg;
-        if (pageId == "prev") pageId = app.activeView.prev;
-        if (pageId == "next") pageId = app.activeView.next;
-        if (!pageId) return;
-        app.transition(pageId, transition.inPageClass, transition.outPageClass);
-    };
-*/
 
         var initEvents = function(callback) {
             callback();
@@ -839,7 +544,6 @@ Chondric.App =
                 }, function(error) {
                     console.error(error);
                     settings.updateNotificationSettings(null, false);
-                    // alert(error);
                 }, {
                     badge: "true",
                     sound: "true",
@@ -855,8 +559,8 @@ Chondric.App =
             $.ajax({
                 url: "../settings.json" + location.search,
                 dataType: "json",
-                error: function(data) {
-                    console.warn("error loading ../settings.json");
+                error: function() {
+                    console.warn("error loading ../settings.json - using default");
                     app.hostSettings = {};
                     callback();
                 },
@@ -866,12 +570,10 @@ Chondric.App =
                     callback();
                 }
             });
-
-            callback;
         };
 
-        app.init = function(callback) {
-            console.warn("no longer need to call app.init manually")
+        app.init = function() {
+            throw new Error("no longer need to call app.init manually");
         };
 
         var init = function(callback) {
@@ -887,7 +589,7 @@ Chondric.App =
                     // for now just check if height matches the full screen
                     var w = $(window).width();
                     var h = $(window).height();
-                    console.log(w + "," + h);
+                    console.log("Size changed: " + w + "x" + h);
                     if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
                         $(".viewport").addClass("hasstatusbar");
                     } else {
@@ -896,57 +598,49 @@ Chondric.App =
 
                     // for phone screens a multicolumn layout doesn't make sense
                     if (w < 768 && app.scope.maxColumns != 1) {
-                        console.log("setting singlecolumn")
+                        console.log("setting singlecolumn");
                         app.scope.maxColumns = 1;
                         $(".viewport").addClass("singlecolumn");
                         app.scope.$apply();
                     } else if (w >= 768 && app.scope.maxColumns != 3) {
-                        console.log("setting multicolumn")
+                        console.log("setting multicolumn");
                         app.scope.maxColumns = 3;
                         $(".viewport").removeClass("singlecolumn");
                         app.scope.$apply();
                     }
 
 
-                }
+                };
                 sizeChanged();
                 $(window).on("resize", sizeChanged);
-
                 console.log("begin internal init");
-                //  alert("running init")
-                loadScripts(0, function() {
-                    console.log("loaded scripts");
-                    initEvents(function() {
-                        loadHostSettings(function() {
+                initEvents(function() {
+                    loadHostSettings(function() {
 
-                            // create database
-                            initData(function() {
-                                console.log("loading context");
+                        // create database
+                        initData(function() {
+                            //load data
+                            settings.loadData.call(app, null, function() {
+                                // attach common events
+                                attachEvents(function() {
 
-                                var loadedctx = JSON.parse(localStorage["appcontext_" + settings.name] || "{}");
-                                //load data
-                                settings.loadData.call(app, loadedctx, function() {
-                                    // attach common events
-                                    attachEvents(function() {
-
-                                        if (window.NativeNav) {
-                                            NativeNav.handleAction = function(route, action) {
-                                                var routeScope = app.scopesForRoutes[route];
-                                                if (routeScope) {
-                                                    routeScope.$apply(action);
-                                                }
+                                    if (window.NativeNav) {
+                                        window.NativeNav.handleAction = function(route, action) {
+                                            var routeScope = app.scopesForRoutes[route];
+                                            if (routeScope) {
+                                                routeScope.$apply(action);
                                             }
+                                        };
 
-                                        }
+                                    }
 
-                                        // custom init function
-                                        settings.customInit.call(app, function() {
-                                            // hide splash screen and show page
-                                            loadFirstPage(function() {
+                                    // custom init function
+                                    settings.customInit.call(app, function() {
+                                        // hide splash screen and show page
+                                        loadFirstPage(function() {
 
-                                                complete(function() {
-                                                    if (callback) callback();
-                                                });
+                                            complete(function() {
+                                                if (callback) callback();
                                             });
                                         });
                                     });
@@ -962,31 +656,23 @@ Chondric.App =
                 app.isPhonegap = true;
                 app.platform = "cordova";
                 document.addEventListener("deviceready", function() {
-                        console.log("appframework deviceready");
-                        if (window.device) {
-                            console.log(device.platform);
-                            app.isSimulator = device.platform.indexOf("Simulator") > 0;
-                        }
-                        $(initInternal);
+                    console.log("appframework deviceready");
+                    if (window.device) {
+                        app.isSimulator = window.device.platform.indexOf("Simulator") > 0;
                     }
-
-                    , false);
+                    $(initInternal);
+                }, false);
             } else {
                 // no phonegap - web preview mode
-                app.platform = "web"
-
+                app.platform = "web";
                 $(initInternal);
             }
 
         };
 
-
         app.module.run(["$rootScope", "$compile", "$controller",
-            function($rootScope, $compile, $controller) {
-                //          app.compile = $compile;
-                //          app.$controller = $controller;
+            function($rootScope) {
                 app.rootScope = $rootScope;
-                console.log("angular app module run");
                 init();
             }
         ]);
@@ -994,7 +680,6 @@ Chondric.App =
         angular.element(document).ready(function() {
             angular.bootstrap(document, [app.module.name]);
         });
-
 
         return app;
 };
@@ -1016,16 +701,31 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('cjs-loading-overlay.html',
-    "<div class=\"loadingoverlay\" ng-show=\"dataLoadStatus.waitingForData\">\n" +
-    "    <div ng-show=\"!dataLoadStatus.error\" class=\"progress large\">\n" +
+  $templateCache.put('cjs-loading-overlay-compact.html',
+    "<div class=\"cjs-loading-overlay cjs-loading-overlay-compact\">\n" +
+    "    <div ng-show=\"!error\" class=\"progress small\">\n" +
     "        <div></div>\n" +
     "    </div>\n" +
-    "    <div ng-show=\"!dataLoadStatus.error\">{{dataLoadStatus.message || \"Loading\"}}</div>\n" +
-    "    <div class=\"error\" ng-show=\"dataLoadStatus.error\">{{dataLoadStatus.error}}</div>\n" +
-    "    <div>\n" +
-    "        <button ng-show=\"dataLoadStatus.retry && dataLoadStatus.error\" ng-tap=\"dataLoadStatus.retry()\">Retry</button>\n" +
-    "        <button ng-show=\"dataLoadStatus.cancel\" ng-tap=\"dataLoadStatus.cancel()\">Cancel</button>\n" +
+    "    <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
+    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "    <div class=\"buttons\">\n" +
+    "        <button ng-show=\"retry && error\" ng-tap=\"retry()\">Retry</button>\n" +
+    "        <button ng-show=\"cancel\" ng-tap=\"cancel()\">Cancel</button>\n" +
+    "    </div>\n" +
+    "</div>\n"
+  );
+
+
+  $templateCache.put('cjs-loading-overlay.html',
+    "<div class=\"cjs-loading-overlay cjs-loading-overlay-full\">\n" +
+    "    <div ng-show=\"!error\" class=\"progress large\">\n" +
+    "        <div></div>\n" +
+    "    </div>\n" +
+    "    <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
+    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "    <div class=\"buttons\">\n" +
+    "        <button ng-show=\"retry && error\" ng-tap=\"retry()\">Retry</button>\n" +
+    "        <button ng-show=\"cancel\" ng-tap=\"cancel()\">Cancel</button>\n" +
     "    </div>\n" +
     "</div>\n"
   );
@@ -1077,361 +777,71 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 }]);
 
-;;
-
-Chondric.View = function(options) {
-    var settings = {
-        id: null,
-        element: null,
-        swipe: true,
-        swipeToBlank: false
-    };
-
-    $.extend(settings, options);
-
-    this.settings = settings;
-
-    for (var k in settings) {
-        this[k] = settings[k];
-    }
-    //$.extend(this, settings);
-    this.initInternal(settings);
-}
-$.extend(Chondric.View.prototype, {
-    // obsolete - should use updateView instead
-    updateViewBackground: function() {
-        this.updateView();
-    },
-    updateView: function() {
-
-    },
-    attachEvents: function() {
-        console.log("no events to attach");
-    },
-    renderThumbnail: function(el) {},
-    getDefaultModel: function() {
-        return {};
-    },
-    updateModel: function(dataId, existingData, callback) {
-        if (!this.model) this.model = this.getDefaultModel();
-        var m = this.model;
-
-
-        callback();
-    },
-
-    // called to update the view with new data - eg download status
-    // may do nothing if the view is not loaded.
-    // if the view is loaded but not visible, the model is updated so that the change
-    // can be applied when the view is shown.
-    updateData: function(d) {
-
-    },
-    init: function(options) {
-        //  console.log("init view - " + options.testOption);
-        // default implementation
-    },
-    initAngular: function() {},
-    initInternal: function(options) {
-        console.log("init view - " + options.testOption);
-        this.init(options);
-    },
-    templateLoaded: function() {
-        console.log("template loaded");
-    },
-    activating: function() {
-        console.log("activating");
-    },
-    activated: function() {
-        console.log("activated");
-    },
-    deactivating: function(nextPage) {
-        console.log("deactivating");
-    },
-
-    setSwipePosition: function(prevPageElement, nextPageElement, dx, duration) {
-        //        console.log("default: "+dx);
-        var thisPage = this;
-        if (duration !== undefined) {
-            thisPage.element[0].style.webkitTransitionDuration = duration;
-            if (nextPageElement && nextPageElement[0]) nextPageElement[0].style.webkitTransitionDuration = duration;
-            if (prevPageElement && prevPageElement[0]) prevPageElement[0].style.webkitTransitionDuration = duration;
-
-        }
-
-        if (dx === null) {
-            thisPage.element[0].style.webkitTransform = null;
-            if (nextPageElement && nextPageElement[0]) nextPageElement[0].style.webkitTransform = null;
-            if (prevPageElement && prevPageElement[0]) prevPageElement[0].style.webkitTransform = null;
-
-        } else if (dx !== undefined) {
-            if (prevPageElement) prevPageElement.addClass("prev");
-            if (nextPageElement) nextPageElement.addClass("next");
-
-            thisPage.element[0].style.webkitTransform = "translateX(" + (dx) + "px)";
-            if (nextPageElement && nextPageElement[0] && dx < 0) {
-
-                nextPageElement[0].style.webkitTransform = "translateX(" + (app.viewportWidth + 10 + dx) + "px)";
-
-            }
-            if (prevPageElement && prevPageElement[0] && dx > 0) {
-
-                prevPageElement[0].style.webkitTransform = "translateX(" + (-app.viewportWidth - 10 + dx) + "px)";
-
-            }
-
-        }
-    },
-    unload: function() {
-        var view = this;
-        if (view.element) view.element.remove();
-        delete view.element;
-
-        if (view.scope) {
-            view.scope.$destroy();
-            delete(view.scope);
-        }
-
-    },
-
-    getViewTemplate: function(callback) {
-        var view = this;
-
-        // todo: load via ajax
-        var viewurl = view.templateFile + "?nocache=" + app.startTime;
-
-        $.get(viewurl, null, function(data) {
-            var html = $(data);
-            var pe = $(".page", html);
-
-            var content = "";
-
-            if (html.length === 0) {
-                content = "Error - Invalid page template";
-            } else if (html.hasClass("page")) {
-                content = html.html();
-            } else if (pe.length >= 1) {
-                content = pe.html();
-            } else {
-                content = data;
-            }
-
-            var ctrl = pe.attr("ng-controller") || html.attr("ng-controller");
-
-            callback(content, ctrl);
-        });
-
-    },
-    load: function() {
-        var view = this;
-
-        view.getViewTemplate(function(content, controllerName) {
-
-
-            var ind = view.id.indexOf("_");
-            var templateId = view.templateId || view.id.substr(0, ind) || view.id;
-            view.dataId = view.id.substr(ind + 1) || "";
-            view.params = view.dataId.split("_");
-
-            controllerName = controllerName || view.controllerName || templateId + "Ctrl";
-
-            var controller = null;
-
-            view.initAngular();
-
-            if (!controller && view.controller) {
-                // look for a function provided as view.controller
-                app.controllerProvider.register(controllerName, view.controller);
-            } else if (!controller && view.controllers && view.controllers[controllerName]) {
-                // look for a controller in view.controllers array
-                for (var cn in view.controllers) {
-                    app.controllerProvider.register(cn, view.controllers[cn]);
-                }
-            } else {
-                // no defined controller - don't use one
-                controllerName = null;
-            }
-
-
-
-            // todo: add data loading view to template content
-
-            var fullcontent = "";
-            if (controllerName) {
-                fullcontent = "<div ng-controller='" + controllerName + "'>" + content + "</div>";
-            } else {
-                fullcontent = "<div ng-scope>" + content + "</div>";
-            }
-
-
-            var newelement = app.compile(fullcontent)(app.rootScope);
-            view.element.append(newelement);
-
-
-
-            view.scope = newelement.scope();
-
-
-
-
-            if (view.isActivating) {
-                view.activating();
-                view.isActivating = false;
-            }
-
-            if (view.isActivated) {
-                view.activated();
-                view.isActivated = false;
-            }
-
-            view.scope.$apply();
-
-            view.updateViewBackground();
-            view.attachEvents();
-            view.loading = false;
-            view.element.removeClass("loading");
-        });
-
-
-
-    },
-    ensureDataLoaded: function(callback) {
-        var view = this;
-        if (!view.model) {
-            var ind = view.id.indexOf("_");
-            var templateId = view.id.substr(0, ind) || view.id;
-            var dataId = view.id.substr(templateId.length + 1);
-
-            view.updateModel(dataId, null, callback);
-
-        } else {
-            callback();
-        }
-    },
-
-    ensureLoaded: function(pageclass, callback) {
-        var view = this;
-
-        if (view.element && (!pageclass || view.element.attr("class") == "page " + templateId + " " + pageclass)) {
-            // page already exists and is positioned correctly - eg during next/prev swipe
-            return callback();
-        }
-
-
-        var ind = view.id.indexOf("_");
-        var templateId = view.id.substr(0, ind) || view.id;
-
-        var safeId = view.id.replace(/\/\.\|/g, "_");
-
-        view.ensureDataLoaded(function() {
-
-            view.element = $("#" + safeId);
-
-            if (view.element.length == 0) {
-                view.loading = true;
-                // page not loaded - create it
-                $(".viewport").append("<div class=\"page " + templateId + " notransition loading " + pageclass + "\" id=\"" + safeId + "\"></div>");
-                view.element = $("#" + safeId);
-                view.element.append("<div class=\"content\"></div>");
-                view.element.append("<div class=\"loadingOverlay\"><a href=\"javascript:window.location.reload()\">Reload</a></div>");
-
-                view.load();
-            }
-
-            if (pageclass) {
-                // remove pageclass from any other pages
-                $(".page." + pageclass).each(function() {
-                    if (this != view.element[0]) $(this).removeClass(pageclass);
-                });
-                view.element.attr("class", "page " + templateId + " notransition " + pageclass);
-            }
-            if (view.swipe) view.element.addClass("swipe");
-            if (view.swipeToBlank) view.element.addClass("swipetoblank");
-            if (view.loading) view.element.addClass("loading");
-
-
-            window.setTimeout(function() {
-                view.element.removeClass("notransition");
-                window.setTimeout(function() {
-                    callback();
-                }, 0);
-            }, 0);
-
-        });
-
-    },
-
-    showNextPage: function() {
-        if (!this.next) return;
-        app.changePage(this.next, "next");
-    },
-    showPreviousPage: function() {
-        if (!this.prev) return;
-        app.changePage(this.prev, "prev");
-    }
-
-});
-;;
-
 Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 
     this.sqlerror = function(t, err) {
-        if (err && err.message) console.error(err.message);
-        else if (t && t.message) console.error(t.message);
+        if (err && err.message) throw new Error(err.message);
+        else if (t && t.message) throw new Error(t.message);
         else if (err) {
-            console.error(err);
+            throw new Error(err);
         } else if (t) {
-            console.error(t);
+            throw new Error(t);
         } else {
-            console.log("sql error");
+            throw new Error("sql error");
         }
     };
     var sqlerror = this.sqlerror;
 
-        var getVersion = function(versionCallback) {
-            console.log("checking version")
+    var getVersion = function(versionCallback) {
+        console.log("checking version");
 
-            db.transaction(function(tx) {
-                tx.executeSql("SELECT * FROM settings where key=?", ["dbVersion"], function(t, result) {
-                    if (result.rows.length == 0) return versionCallback(0);
-                    var row = result.rows[0] || result.rows.item(0)
-                    window.setTimeout(function() {return versionCallback(parseFloat(row["val"]));}, 0);
-                }, function() {
-                    // error - no db
-                    window.setTimeout(function() {versionCallback(0);}, 0);
-                });
+        db.transaction(function(tx) {
+            tx.executeSql("SELECT * FROM settings where key=?", ["dbVersion"], function(t, result) {
+                if (result.rows.length === 0) return versionCallback(0);
+                var row = result.rows[0] || result.rows.item(0);
+                window.setTimeout(function() {
+                    return versionCallback(parseFloat(row.val));
+                }, 0);
             }, function() {
-                    // error - no db
-                    window.setTimeout(function() {versionCallback(0);}, 0);
-                });
-        }
+                // error - no db
+                window.setTimeout(function() {
+                    versionCallback(0);
+                }, 0);
+            });
+        }, function() {
+            // error - no db
+            window.setTimeout(function() {
+                versionCallback(0);
+            }, 0);
+        });
+    };
 
     this.updateDatabase = function(callback) {
 
 
 
         getVersion(function(currentVersion) {
-            console.log("Current database version is " + currentVersion)
+            console.log("Current database version is " + currentVersion);
 
             var existingversion = currentVersion;
 
-              var versionQueue = [];
+            var versionQueue = [];
 
-            for(vn in updatefunctions) {
+            for (var vn in updatefunctions) {
                 var vv = parseFloat(vn);
-                if(existingversion < vv) {
+                if (existingversion < vv) {
                     versionQueue.push(vn);
                 }
             }
- 
-            if (versionQueue.length == 0) return callback();
+
+            if (versionQueue.length === 0) return callback();
 
             db.transaction(function(tx) {
-                for (vn in updatefunctions) {
+                for (var vn in updatefunctions) {
                     var vv = parseFloat(vn);
                     if (existingversion < vv) {
                         updatefunctions[vn](tx);
-                        tx.executeSql('INSERT OR REPLACE INTO settings (key, val) VALUES (?, ?)', ["dbVersion", vv], function() {}, sqlerror);
+                        tx.executeSql('INSERT OR REPLACE INTO settings (key, val) VALUES (?, ?)', ["dbVersion", vv], null, sqlerror);
                         existingversion = vv;
                     }
                 }
@@ -1439,34 +849,31 @@ Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
                 callback();
             });
         });
-    }
+    };
 
 
     this.dropDatabase = function(callback) {
         db.transaction(function(tx) {
-            for (tn in tables) {
+            for (var tn in tables) {
                 tx.executeSql("DROP TABLE " + tn, [], null, sqlerror);
             }
         }, sqlerror, function() {
             callback();
         });
-    }
+    };
 
     this.resetDatabase = function(callback) {
         var that = this;
         this.dropDatabase(function() {
             that.updateDatabase(callback);
         });
-    }
+    };
 
-}
-
+};
 Chondric.directive('ngTap', function() {
 
     return function(scope, element, attrs) {
         element.addClass('tappable');
-        // eanble use of app global in angular expression if necessary
-        if (attrs.ngTap && attrs.ngTap.indexOf("app.") == 0 && !scope.app) scope.app = app;
 
         var active = false;
         var touching = false;
@@ -1474,9 +881,7 @@ Chondric.directive('ngTap', function() {
         // detect move and cancel tap if drag started
         var move = function(e) {
             cancel(e);
-            //touching = false;
-            //active = false;
-        }
+        };
 
         // called if the mouse moves too much or leaves the element
         var cancel = function() {
@@ -1494,7 +899,7 @@ Chondric.directive('ngTap', function() {
 
             touching = false;
             active = false;
-        }
+        };
 
         // called when a tap is completed
         var action = function(e) {
@@ -1503,8 +908,8 @@ Chondric.directive('ngTap', function() {
                 element: element,
                 x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetX : e.offsetX,
                 y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetY : e.offsetY
-            }
-            scope.$apply(attrs['ngTap'], element);
+            };
+            scope.$apply(attrs.ngTap, element);
 
 
             if (!useMouse) {
@@ -1522,37 +927,37 @@ Chondric.directive('ngTap', function() {
             element.addClass('deactivated');
 
 
-        }
+        };
 
-            function start() {
+        function start() {
 
-                if (!useMouse) {
-                    element.bind('touchmove', move);
-                    element.bind('touchend', action);
+            if (!useMouse) {
+                element.bind('touchmove', move);
+                element.bind('touchend', action);
 
-                } else {
-                    element.bind('mousemove', move);
-                    element.bind('mouseout', cancel);
-                    element.bind('mouseup', action);
-                }
-
-                element.addClass('active');
-                element.removeClass('deactivated');
-                active = true;
+            } else {
+                element.bind('mousemove', move);
+                element.bind('mouseout', cancel);
+                element.bind('mouseup', action);
             }
 
-            // called on mousedown or touchstart. Multiple calls are ignored.
+            element.addClass('active');
+            element.removeClass('deactivated');
+            active = true;
+        }
+
+        // called on mousedown or touchstart. Multiple calls are ignored.
         var mouseStart = function() {
             if (active || touching) return;
             touching = false;
             start();
-        }
+        };
 
         var touchStart = function() {
             if (active) return;
             touching = true;
             start();
-        }
+        };
 
         var useMouse = true;
 
@@ -1565,40 +970,33 @@ Chondric.directive('ngTap', function() {
             element.bind('mousedown', mouseStart);
         }
     };
-})
-// add a loading overlay if the scope has dataLoadStatus.waitingForData set.
-// if dataLoadStatus.error is set, it will be displayed as an error message.
-// if dataLoadStatus.retry is a function, a button wil be displayed
-// if dataLoadStatus.cancel is set, a button will be displayed.
-Chondric.directive('cjsLoadingOverlay', function($compile) {
-    return {
-        replace: true,
-        templateUrl: "cjs-loading-overlay.html"
-    }
 });
-
-Chondric.directive('cjsShowAfterLoad', function($compile) {
+Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
     return {
         restrict: 'A',
-        scope: {
-            cjsShowAfterLoad: "="
-        },
+        scope: true,
         link: function(scope, element, attrs) {
-            var contents = element.contents();
+            var contentElement;
+            if (element.children().length == 1) {
+                contentElement = element.children().first();
+            } else {
+                contentElement = element.wrapInner("<div/>").first();
+            }
 
-            var contentElement = angular.element(element[0].outerHTML);
-            contentElement.removeAttr("cjs-show-after-load");
-            contentElement.attr("ui-toggle", "!currentTask");
 
-            var overlay = angular.element("<div>Loading ({{message}})</div>")
-            overlay.attr("ui-toggle", "currentTask");
+            // get the contents of the element. If there is a single element, use it directly. if not, wrap it.
+            var overlay;
+            if (attrs.overlayType == "compact") {
+                overlay = angular.element($templateCache.get("cjs-loading-overlay-compact.html"));
+            } else {
+                overlay = angular.element($templateCache.get("cjs-loading-overlay.html"));
+            }
 
-            var wrapper = angular.element("<div></div>");
-            wrapper.append(overlay);
-            wrapper.append(contentElement);
-            $compile(wrapper)(scope);
-            element.replaceWith(wrapper);
-            scope.$watch("cjsShowAfterLoad", function(status) {
+            element.append(overlay);
+
+            $compile(overlay)(scope);
+
+            scope.$watch(attrs.cjsLoadingOverlay, function(status) {
                 if (!status) return;
                 var currentTask = null;
                 for (var i = 0; i < status.tasks.length; i++) {
@@ -1616,16 +1014,46 @@ Chondric.directive('cjsShowAfterLoad', function($compile) {
                 if (!currentTask) {
                     // finished
                     scope.message = "finished";
-                } else if (currentTask.error) {
-                    scope.message = "error";
+                    contentElement.addClass("ui-show").removeClass("ui-hide");
+                    overlay.addClass("ui-hide").removeClass("ui-show");
                 } else {
+                    contentElement.addClass("ui-hide").removeClass("ui-show");
+                    overlay.addClass("ui-show").removeClass("ui-hide");
+                    scope.error = currentTask.error;
                     scope.message = currentTask.progressCurrent + " / " + currentTask.progressTotal;
                 }
 
 
 
-            }, true)
+            }, true);
 
+        }
+    };
+});
+
+Chondric.directive('cjsShowAfterLoad', function() {
+    return {
+        link: function(scope, element, attrs) {
+            scope.$watch(attrs.cjsShowAfterLoad, function(status) {
+                if (!status) return;
+                var currentTask = null;
+                for (var i = 0; i < status.tasks.length; i++) {
+                    var task = status.tasks[i];
+                    if (task.error) {
+                        currentTask = task;
+                        break;
+                    }
+                    if (task.progressCurrent < task.progressTotal && (!currentTask || task.progressTotal > currentTask.progressTotal)) {
+                        currentTask = task;
+                    }
+                }
+
+                if (!currentTask) {
+                    element.addClass("ui-show").removeClass("ui-hide");
+                } else {
+                    element.addClass("ui-hide").removeClass("ui-show");
+                }
+            }, true);
         }
     };
 });
@@ -1653,17 +1081,15 @@ Chondric.directive("cjsPopover", function() {
 
             function ensureOverlay(element, useOverlay) {
                 var parentPageElement = element.closest(".chondric-page");
-                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
-                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+                if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
+                if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
                 if (useOverlay) {
                     var overlay = $(".modal-overlay", parentPageElement);
-                    if (overlay.length == 0) {
+                    if (overlay.length === 0) {
                         overlay = angular.element('<div class="modal-overlay"></div>');
                         parentPageElement.append(overlay);
                     }
                     var hide = function() {
-                        console.log("overlay touch");
-
                         scope.$apply("hideModal('" + attrs.cjsPopover + "')");
                         overlay.off(useMouse ? "mousedown" : "touchstart", hide);
                     };
@@ -1738,22 +1164,22 @@ Chondric.directive("cjsPopover", function() {
                     if (horizontal) {
                         if (actualX < horizontalCutoff) {
                             menupos.left = (actualX + 13) + "px";
-                            menupos.right = "auto"
+                            menupos.right = "auto";
                             element.addClass("right").removeClass("left");
                         } else {
                             menupos.right = (sw - actualX + 13) + "px";
-                            menupos.left = "auto"
+                            menupos.left = "auto";
                             element.addClass("left").removeClass("right");
                         }
                         menupos.top = (actualY - menuheight / 2) + "px";
                     } else {
                         if (actualY < verticalCutoff) {
                             menupos.top = (actualY + 13) + "px";
-                            menupos.bottom = "auto"
+                            menupos.bottom = "auto";
                             element.addClass("down").removeClass("up");
                         } else {
                             menupos.bottom = (sh - actualY + 13) + "px";
-                            menupos.top = "auto"
+                            menupos.top = "auto";
                             element.addClass("up").removeClass("down");
                         }
                         menupos.left = (actualX - menuwidth / 2) + "px";
@@ -1796,9 +1222,9 @@ Chondric.directive("cjsPopover", function() {
                     element.addClass("active");
                     element.css(menupos);
                 }
-            })
+            });
         }
-    }
+    };
 });
 Chondric.directive("cjsPopup", function() {
 
@@ -1817,16 +1243,15 @@ Chondric.directive("cjsPopup", function() {
             element.addClass("modal");
             element.addClass("popup");
             var parentPageElement = element.closest(".chondric-page");
-            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
-            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+            if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
+            if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
             var overlay = $(".modal-overlay", parentPageElement);
-            if (overlay.length == 0) {
+            if (overlay.length === 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
                 parentPageElement.append(overlay);
             }
 
             overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                console.log("overlay touch");
                 scope.$apply("hideModal('" + attrs.cjsPopup + "')");
             });
             scope.$watch(attrs.cjsPopup, function(val) {
@@ -1838,9 +1263,9 @@ Chondric.directive("cjsPopup", function() {
                     overlay.addClass("active");
                     element.addClass("active");
                 }
-            })
+            });
         }
-    }
+    };
 });
 Chondric.directive("cjsSidepanel", function() {
 
@@ -1870,14 +1295,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "right": 0,
                     "left": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
-                })
+                });
             },
             progress: function(panel, page, overlay, progress) {
                 // set intermediate position
@@ -1886,14 +1311,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": (progress * 0.3)
-                })
+                });
                 panel.css({
                     "right": 0,
                     "left": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (spwidth - progress * spwidth) + "px, 0)"
-                })
+                });
             },
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
@@ -1903,12 +1328,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
-                })
+                });
                 return time;
             },
             complete: function(panel, page, overlay, prevProgress) {
@@ -1918,12 +1343,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0.3"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + 0 + "px, 0)"
-                })
+                });
                 return time;
             },
             reset: function(panel, page, overlay) {
@@ -1932,12 +1357,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "",
                     "-webkit-transition": "",
                     "opacity": ""
-                })
+                });
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
                     "-webkit-transform": ""
-                })
+                });
             }
         },
         slideRight: {
@@ -1982,14 +1407,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "left": 0,
                     "right": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (-spwidth) + "px, 0)"
-                })
+                });
             },
             progress: function(panel, page, overlay, progress) {
                 // set intermediate position
@@ -1998,14 +1423,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": (progress * 0.3)
-                })
+                });
                 panel.css({
                     "left": 0,
                     "right": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (-spwidth + progress * spwidth) + "px, 0)"
-                })
+                });
             },
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
@@ -2015,12 +1440,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + (-spwidth) + "px, 0)"
-                })
+                });
                 return time;
             },
             complete: function(panel, page, overlay, prevProgress) {
@@ -2030,12 +1455,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0.3"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + 0 + "px, 0)"
-                })
+                });
                 return time;
             },
             reset: function(panel, page, overlay) {
@@ -2044,12 +1469,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "",
                     "-webkit-transition": "",
                     "opacity": ""
-                })
+                });
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
                     "-webkit-transform": ""
-                })
+                });
             }
         },
         slideLeft: {
@@ -2098,15 +1523,10 @@ Chondric.directive("cjsSidepanel", function() {
 
 
             var parentPageElement = element.closest(".chondric-page");
-            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
-            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+            if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
+            if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
             var overlay = $(".modal-overlay", parentPageElement);
-            if (overlay.length == 0) {
-                overlay = angular.element('<div class="modal-overlay"></div>');
-                parentPageElement.append(overlay);
-            }
-            var overlay = $(".modal-overlay", parentPageElement);
-            if (overlay.length == 0) {
+            if (overlay.length === 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
                 parentPageElement.append(overlay);
             }
@@ -2138,7 +1558,6 @@ Chondric.directive("cjsSidepanel", function() {
                 } else {
                     progress = 0;
                 }
-                console.log(progress);
                 if (oldval && oldval.progress) {
                     // progress will be % of screen width
                     // convert back to px and make 100% at side panel width
@@ -2155,28 +1574,28 @@ Chondric.directive("cjsSidepanel", function() {
                     }
                     window.setTimeout(function() {
                         var time = panelTransitions[transition].complete(element, parentPageElement, overlay, oldprogress);
-                    }, 0)
+                    }, 0);
 
-                } else if (progress == 0) {
+                } else if (progress === 0) {
                     var time = panelTransitions[transition].cancel(element, parentPageElement, overlay, oldprogress);
                     window.setTimeout(function() {
                         panelTransitions[transition].reset(element, parentPageElement, overlay);
-                    }, time)
+                    }, time);
                     overlay.removeClass("active");
                 } else {
                     panelTransitions[transition].progress(element, parentPageElement, overlay, progress);
                     overlay.addClass("active");
                 }
 
-            })
+            });
         }
-    }
+    };
 });
 Chondric.directive("cjsSwipe", function() {
 
     return {
         //        restrict: "E",
-        link: function(scope, element, attrs) {
+        link: function(scope, element) {
             var useMouse = true;
             var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
             if (iOS) {
@@ -2199,7 +1618,7 @@ Chondric.directive("cjsSwipe", function() {
                 rightborder: 0,
                 topborder: 0,
                 bottomborder: 0
-            }
+            };
             var tracking = false;
 
             var updateSwipe = scope.$eval("updateSwipe");
@@ -2221,8 +1640,6 @@ Chondric.directive("cjsSwipe", function() {
                 dy = 0;
                 width = element.width();
                 height = element.height();
-                console.log(width);
-                console.log(height);
 
                 swipeState = {
                     left: 0,
@@ -2233,7 +1650,7 @@ Chondric.directive("cjsSwipe", function() {
                     rightBorder: 0,
                     topBorder: 0,
                     bottomBorder: 0
-                }
+                };
 
                 $(document).on(useMouse ? "mousemove" : "touchmove", move);
                 $(document).on(useMouse ? "mouseup" : "touchend", end);
@@ -2279,13 +1696,13 @@ Chondric.directive("cjsSwipe", function() {
 
                 if (updateSwipe) updateSwipe(swipeState, swipeNav, scope);
 
-            };
+            }
 
-            function end(e) {
+            function end() {
                 if (!tracking) return;
                 tracking = false;
-                $(document).off(useMouse ? "mousemove" : "touchmove", move)
-                $(document).off(useMouse ? "mouseup" : "touchend", end)
+                $(document).off(useMouse ? "mousemove" : "touchmove", move);
+                $(document).off(useMouse ? "mouseup" : "touchend", end);
 
                 if (endSwipe) endSwipe(swipeState, swipeNav, scope);
 
@@ -2298,14 +1715,14 @@ Chondric.directive("cjsSwipe", function() {
                     rightBorder: 0,
                     topBorder: 0,
                     bottomBorder: 0
-                }
+                };
 
             }
 
 
         }
-    }
-})
+    };
+});
 
 Chondric.directive("cjsTransitionStyle", function() {
 
@@ -2316,26 +1733,26 @@ Chondric.directive("cjsTransitionStyle", function() {
                 //                console.log("transition: ", transition);
                 //                console.log("old: ", old);
                 if (!transition) return;
-                var td = app.allTransitions[transition.type];
+                var td = Chondric.allTransitions[transition.type];
                 if (!td) return;
 
-                var isNewTransition = !old || transition.from != old.from || transition.to != old.to || (old.progress == 0 || old.progress == 1);
-
-                if (attrs["route"] == transition.to) {
+                var isNewTransition = !old || transition.from != old.from || transition.to != old.to || (old.progress === 0 || old.progress == 1);
+                var time;
+                if (attrs.route == transition.to) {
                     // apply styles to next page
-                    if (transition.progress == 0 && isNewTransition) {
+                    if (transition.progress === 0 && isNewTransition) {
                         // set initial style
                         td.transitionIn.start(element);
-                    } else if (transition.progress == 0 && !isNewTransition) {
+                    } else if (transition.progress === 0 && !isNewTransition) {
                         // existing transition cancelled - reset to initial state and remove styles after timeout
-                        var time = td.transitionIn.cancel(element, old.progress);
+                        time = td.transitionIn.cancel(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
                     } else if (transition.progress == 1) {
                         // transition completed - set page as active and remove styles after timeout.
                         // transition function returns time in milliseconds
-                        var time = td.transitionIn.complete(element, old.progress);
+                        time = td.transitionIn.complete(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
@@ -2344,21 +1761,21 @@ Chondric.directive("cjsTransitionStyle", function() {
                         td.transitionIn.progress(element, transition.progress);
                     }
 
-                } else if (attrs["route"] == transition.from) {
+                } else if (attrs.route == transition.from) {
                     // apply styles to prev page
-                    if (transition.progress == 0 && isNewTransition) {
+                    if (transition.progress === 0 && isNewTransition) {
                         // set initial style
                         td.transitionOut.start(element);
-                    } else if (transition.progress == 0 && !isNewTransition) {
+                    } else if (transition.progress === 0 && !isNewTransition) {
                         // existing transition cancelled - reset to initial state and remove styles after timeout
-                        var time = td.transitionOut.cancel(element, old.progress);
+                        time = td.transitionOut.cancel(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
                     } else if (transition.progress == 1) {
                         // transition completed - set page as active and remove styles after timeout.
                         // transition function returns time in milliseconds
-                        var time = td.transitionOut.complete(element, old.progress);
+                        time = td.transitionOut.complete(element, old.progress);
                         window.setTimeout(function() {
                             td.reset(element);
                         }, time);
@@ -2368,9 +1785,9 @@ Chondric.directive("cjsTransitionStyle", function() {
                     }
                 }
 
-            }, true)
+            }, true);
         }
-    }
+    };
 });
 Chondric.directive("cjsPreviewControls", function() {
 
@@ -2378,7 +1795,7 @@ Chondric.directive("cjsPreviewControls", function() {
         restrict: "AE",
         replace: true,
         templateUrl: "cjs-preview-controls.html",
-        link: function(scope, element, attrs) {
+        link: function(scope) {
             scope.previewSettings = {
                 width: 1024,
                 height: 768,
@@ -2386,7 +1803,7 @@ Chondric.directive("cjsPreviewControls", function() {
             };
             scope.reloadPreview = function() {
                 document.getElementById("preview").contentDocument.location.reload(true);
-            }
+            };
             scope.updatePreviewSettings = function(w, h, overlayStatusBar) {
                 scope.previewSettings = {
                     width: w,
@@ -2395,7 +1812,7 @@ Chondric.directive("cjsPreviewControls", function() {
                 };
             };
         }
-    }
+    };
 });
 Chondric.directive('chondricViewport', function($compile) {
     return {
@@ -2414,32 +1831,32 @@ Chondric.directive('chondricViewport', function($compile) {
                 // first level
                 scope.handleSharedPopupButtonClick = function(b) {
                     var options = scope.globalPopupMenu;
-                    scope.hideModal("globalPopupMenu")
+                    scope.hideModal("globalPopupMenu");
                     if (b.action) {
-                        options.scope.$eval(b.action)
+                        options.scope.$eval(b.action);
                     }
-                }
+                };
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
-                template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
-                template += "</div>"
-                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component>"
-                template += "</div>"
+                template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template += "</div>";
+                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component>";
+                template += "</div>";
 
                 //                template += "</div>"
 
             } else if (rv.isSection) {
-                template = "<div ng-controller=\"rv.controller\" >"
-                template += "<div ng-repeat=\"(rk, rv) in rv.subsections\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">"
-                template += "</div>"
-                template += "</div>"
+                template = "<div ng-controller=\"rv.controller\" >";
+                template += "<div ng-repeat=\"(rk, rv) in rv.subsections\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template += "</div>";
+                template += "</div>";
 
             } else if (rv.templateUrl) {
                 template = "<div  ng-controller=\"rv.controller\" cjs-swipe> <div ng-include src=\"rv.templateUrl\"></div>";
-                template += '<div cjs-loading-overlay></div></div>'
+                template += '</div>';
 
             } else {
-                template = "<span>Template not set</span>"
+                template = "<span>Template not set</span>";
             }
 
             var newElement = angular.element(template);
@@ -2447,30 +1864,30 @@ Chondric.directive('chondricViewport', function($compile) {
             element.html("");
             element.append(newElement);
         }
-    }
+    };
 });
 
 Chondric.directive('cjsSharedComponent', function($compile) {
     return {
         scope: true,
-        link: function(scope, element, attrs) {
+        link: function(scope, element) {
             var cd = scope.componentDefinition;
             element.addClass("sharedcomponent-" + cd.id);
             var template = "";
-            template += "<div ng-controller=\"componentDefinition.controller\" >"
+            template += "<div ng-controller=\"componentDefinition.controller\" >";
             if (cd.template) {
                 template += cd.template;
             } else if (cd.templateUrl) {
                 template += "<div ng-include src=\"componentDefinition.templateUrl\"></div>";
             }
-            template += "</div>"
+            template += "</div>";
 
             var newElement = angular.element(template);
             $compile(newElement)(scope);
             element.html("");
             element.append(newElement);
         }
-    }
+    };
 });
 Chondric.registerSharedUiComponent({
     id: "cjs-action-sheet",
@@ -2479,62 +1896,60 @@ Chondric.registerSharedUiComponent({
         var self = $scope.componentDefinition;
         $scope.hideModal = function() {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "cjs-action-sheet", false, true, null);
-        }
+            self.app.setSharedUiComponentState(routeScope, "cjs-action-sheet", false, true, null);
+        };
         $scope.handleSharedPopupButtonClick = function(b) {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope && b.action) {
-                routeScope.$eval(b.action)
+                routeScope.$eval(b.action);
             }
-        }
+        };
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
         self.route = route;
 
         if (window.NativeNav) {
-            var rect = popupoptions.element[0].getBoundingClientRect();
-            NativeNav.showPopupMenu(popupoptions.scope.rk, rect.left, rect.top, rect.width, rect.height, popupoptions.items);
+            var rect = data.element[0].getBoundingClientRect();
+            window.NativeNav.showPopupMenu(route, rect.left, rect.top, rect.width, rect.height, data.items);
         } else {
             if (!active) {
                 self.popuptrigger = null;
             } else {
                 self.popuptrigger = {
                     element: data.element
-                }
+                };
             }
         }
     }
-})
+});
 Chondric.registerSharedUiComponent({
     id: "cjs-navigation-bar",
     templateUrl: "cjs-navigation-bar.html",
     controller: function($scope) {
         var self = $scope.componentDefinition;
-        $scope.globalHeaderOptions = self.globalHeaderOptions = {}
+        $scope.globalHeaderOptions = self.globalHeaderOptions = {};
 
         $scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
-            console.log("clicked header button for " + self.route);
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope && b.action) {
-                routeScope.$eval(b.action)
+                routeScope.$eval(b.action);
             } else if (routeScope && b.items) {
 
-                app.setSharedUiComponentState(routeScope, "cjs-action-sheet", true, true, {
+                self.app.setSharedUiComponentState(routeScope, "cjs-action-sheet", true, true, {
                     element: lastTap.element,
                     items: b.items
-                })
+                });
             }
-        }
+        };
 
     },
     setStatePartial: function(self, initialState, finalState, progress) {
         if (!self.globalHeaderOptions) return;
         var v1 = self.globalHeaderOptions.v1;
-        var v2 = self.globalHeaderOptions.v2;
         if (v1 && v1.route == initialState.route) {
             self.globalHeaderOptions.v1 = initialState;
             self.globalHeaderOptions.v2 = finalState;
@@ -2558,7 +1973,6 @@ Chondric.registerSharedUiComponent({
         self.route = route;
         self.data = data;
         var v1 = self.globalHeaderOptions.v1;
-        var v2 = self.globalHeaderOptions.v2;
         if (v1 && v1.route == route) {
             self.globalHeaderOptions.v1 = {
                 route: route,
@@ -2578,7 +1992,7 @@ Chondric.registerSharedUiComponent({
         }
 
     }
-})
+});
 Chondric.registerSharedUiComponent({
     id: "cjs-shared-popup",
     templateUrl: "cjs-shared-popup.html",
@@ -2588,17 +2002,17 @@ Chondric.registerSharedUiComponent({
         self.defaultController = function() {};
         $scope.hideModal = function() {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "cjs-shared-popup", false, true, null);
-        }
+            self.app.setSharedUiComponentState(routeScope, "cjs-shared-popup", false, true, null);
+        };
         $scope.handleAction = function(funcName, params) {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
                 routeScope.$eval(funcName)(params);
             }
-        }
+        };
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
@@ -2607,11 +2021,11 @@ Chondric.registerSharedUiComponent({
         if (!active) {
             self.popuptrigger = null;
         } else {
-            self.popuptrigger = {}
+            self.popuptrigger = {};
         }
 
     }
-})
+});
 Chondric.registerSharedUiComponent({
     id: "cjs-right-panel",
     templateUrl: "cjs-right-panel.html",
@@ -2620,17 +2034,17 @@ Chondric.registerSharedUiComponent({
         self.scope = $scope;
         self.defaultController = function() {};
         $scope.hideModal = function() {
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
-        }
+            self.app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
+        };
         $scope.handleAction = function(funcName, params) {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
                 routeScope.$eval(funcName)(params);
             }
-        }
+        };
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
@@ -2647,7 +2061,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = {
                 progress: 1,
                 transition: "coverRight"
-            }
+            };
         }
 
     },
@@ -2659,7 +2073,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = {
                 progress: swipeState.rightBorder,
                 transition: "coverRight"
-            }
+            };
             self.scope.$apply();
         }
 
@@ -2673,20 +2087,20 @@ Chondric.registerSharedUiComponent({
                 self.popuptrigger = {
                     progress: 0,
                     transition: "coverRight"
-                }
+                };
                 self.scope.$apply();
             } else {
                 self.popuptrigger = {
                     progress: 1,
                     transition: "coverRight"
-                }
+                };
                 self.scope.$apply();
             }
         }
 
 
     }
-})
+});
 Chondric.registerSharedUiComponent({
     id: "cjs-left-panel",
     templateUrl: "cjs-left-panel.html",
@@ -2695,17 +2109,17 @@ Chondric.registerSharedUiComponent({
         self.scope = $scope;
         self.defaultController = function() {};
         $scope.hideModal = function() {
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
-        }
+            self.app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
+        };
         $scope.handleAction = function(funcName, params) {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
                 routeScope.$eval(funcName)(params);
             }
-        }
+        };
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
@@ -2722,7 +2136,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = {
                 progress: 1,
                 transition: "coverLeft"
-            }
+            };
         }
 
     },
@@ -2734,7 +2148,7 @@ Chondric.registerSharedUiComponent({
             self.popuptrigger = {
                 progress: swipeState.leftBorder,
                 transition: "coverLeft"
-            }
+            };
             self.scope.$apply();
         }
 
@@ -2748,20 +2162,20 @@ Chondric.registerSharedUiComponent({
                 self.popuptrigger = {
                     progress: 0,
                     transition: "coverLeft"
-                }
+                };
                 self.scope.$apply();
             } else {
                 self.popuptrigger = {
                     progress: 1,
                     transition: "coverLeft"
-                }
+                };
                 self.scope.$apply();
             }
         }
 
 
     }
-})
+});
 Chondric.allTransitions.crossfade = {
     transitionIn: {
         start: function(element) {
@@ -2770,7 +2184,7 @@ Chondric.allTransitions.crossfade = {
                 "display": "block",
                 "opacity": 0,
                 "z-index": 9000,
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             // move element to left with transition
@@ -2778,7 +2192,7 @@ Chondric.allTransitions.crossfade = {
             $(element).css({
                 "-webkit-transition": "opacity " + time + "ms ease-in-out",
                 "opacity": 0
-            })
+            });
 
             return time;
         },
@@ -2788,7 +2202,7 @@ Chondric.allTransitions.crossfade = {
             $(element).css({
                 "-webkit-transition": "opacity " + time + "ms ease-in-out",
                 "opacity": 1
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
@@ -2796,15 +2210,15 @@ Chondric.allTransitions.crossfade = {
                 "display": "block",
                 "opacity": progress,
                 "z-index": 9000,
-            })
+            });
         }
     },
     transitionOut: {
         start: function(element) {
-            // just ensure the oldpage remains visible
+            // just ensure the old page remains visible while the new page fades in on top
             element.css({
                 "display": "block"
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             var time = (prevProgress) * 300;
@@ -2815,11 +2229,10 @@ Chondric.allTransitions.crossfade = {
             var time = (1 - prevProgress) * 300;
             return time;
         },
-        progress: function(element, progress) {
-            // set element position without transition
+        progress: function(element) {
             element.css({
                 "display": "block"
-            })
+            });
         }
     },
     reset: function(element) {
@@ -2829,7 +2242,7 @@ Chondric.allTransitions.crossfade = {
             "opacity": "",
             "z-index": "",
             "-webkit-transition": "",
-        })
+        });
     }
 };
 
@@ -2839,11 +2252,11 @@ Chondric.allTransitions.slideleft = {
             // show element and move to left
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(100%, 0)"
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             // move element to left with transition
@@ -2852,7 +2265,7 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(100%, 0)"
-            })
+            });
 
             return time;
         },
@@ -2862,18 +2275,18 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + ((1 - progress) * 100) + "%, 0)"
-            })
+            });
         }
     },
     transitionOut: {
@@ -2882,7 +2295,7 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
 
         },
         cancel: function(element, prevProgress) {
@@ -2891,7 +2304,7 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         complete: function(element, prevProgress) {
@@ -2900,29 +2313,29 @@ Chondric.allTransitions.slideleft = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(-100%, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + (progress * -100) + "%, 0)"
-            })
+            });
         }
     },
     reset: function(element) {
         // remove transition, transform and display settings from relevant subelements
         element.css({
             "display": ""
-        })
+        });
         $(".body", element).css({
             "-webkit-transition": "",
             "-webkit-transform": ""
-        })
+        });
     }
 };
 Chondric.allTransitions.slideright = {
@@ -2931,11 +2344,11 @@ Chondric.allTransitions.slideright = {
             // show element and move to left
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(-100%, 0)"
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             // move element to left with transition
@@ -2944,7 +2357,7 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(-100%, 0)"
-            })
+            });
 
             return time;
         },
@@ -2954,18 +2367,18 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + ((1 - progress) * -100) + "%, 0)"
-            })
+            });
         }
     },
     transitionOut: {
@@ -2974,7 +2387,7 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
 
         },
         cancel: function(element, prevProgress) {
@@ -2983,7 +2396,7 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(0, 0)"
-            })
+            });
             return time;
         },
         complete: function(element, prevProgress) {
@@ -2992,31 +2405,31 @@ Chondric.allTransitions.slideright = {
             $(".body", element).css({
                 "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                 "-webkit-transform": "translate(100%, 0)"
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
             // set element position without transition
             $(element).css({
                 "display": "block"
-            })
+            });
             $(".body", element).css({
                 "-webkit-transition": "none",
                 "-webkit-transform": "translate(" + (progress * 100) + "%, 0)"
-            })
+            });
         }
     },
     reset: function(element) {
         // remove transition, transform and display settings from relevant subelements
         element.css({
             "display": ""
-        })
+        });
         $(".body", element).css({
             "-webkit-transition": "",
             "-webkit-transform": ""
-        })
+        });
     }
-}
+};
 Chondric.Syncable = function(options) {
     var syncable = this;
 
@@ -3202,7 +2615,7 @@ Chondric.Syncable = function(options) {
 
                     function() {
                         processItem(i + 1);
-                    })
+                    });
 
             });
 

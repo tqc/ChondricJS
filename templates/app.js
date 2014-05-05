@@ -1,21 +1,22 @@
 var app = new Chondric.App({
     name: "__APPTITLE__",
     mightBePhoneGap: true,
-    scriptGroups: [],
-    angularModules: [],
+    angularModules: ["ui.utils"],
     firstPageTemplate: "__FIRSTPAGETEMPLATE__",
-    firstPageDataId: "",
     getDatabase: function() {
-        return new ExampleDb();
+        // optionally return a database that will be assigned to app.db
+        // return new ExampleDb();
     },
     loadData: function(loadedctx, callback) {
-        console.log("loading data");
-        app.db.getItems(function(items) {
-            console.log("items loaded");
-            app.items = items;
-            callback();
-        });
 
+        // optionally make use of the database created in getDatabase
+        // app.db.getItems(function(items) {
+        //    app.items = items;
+        //    callback();
+        // });
+
+        // no db by default - return immediately
+        callback();
     },
     updateNotificationSettings: function(deviceId, notificationsEnabled) {
         // send details to the notification server
@@ -30,6 +31,9 @@ var app = new Chondric.App({
     customInit: function(callback) {
         app.registerForNotifications();
         callback();
+    },
+    appCtrl: function($scope) {
+        // optional custom component of the app level controller
     }
 });
 

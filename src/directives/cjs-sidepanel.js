@@ -26,14 +26,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "right": 0,
                     "left": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
-                })
+                });
             },
             progress: function(panel, page, overlay, progress) {
                 // set intermediate position
@@ -42,14 +42,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": (progress * 0.3)
-                })
+                });
                 panel.css({
                     "right": 0,
                     "left": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (spwidth - progress * spwidth) + "px, 0)"
-                })
+                });
             },
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
@@ -59,12 +59,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + (spwidth) + "px, 0)"
-                })
+                });
                 return time;
             },
             complete: function(panel, page, overlay, prevProgress) {
@@ -74,12 +74,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0.3"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + 0 + "px, 0)"
-                })
+                });
                 return time;
             },
             reset: function(panel, page, overlay) {
@@ -88,12 +88,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "",
                     "-webkit-transition": "",
                     "opacity": ""
-                })
+                });
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
                     "-webkit-transform": ""
-                })
+                });
             }
         },
         slideRight: {
@@ -138,14 +138,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "left": 0,
                     "right": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (-spwidth) + "px, 0)"
-                })
+                });
             },
             progress: function(panel, page, overlay, progress) {
                 // set intermediate position
@@ -154,14 +154,14 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "none",
                     "opacity": (progress * 0.3)
-                })
+                });
                 panel.css({
                     "left": 0,
                     "right": "auto",
                     "display": "block",
                     "-webkit-transition": "none",
                     "-webkit-transform": "translate(" + (-spwidth + progress * spwidth) + "px, 0)"
-                })
+                });
             },
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
@@ -171,12 +171,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + (-spwidth) + "px, 0)"
-                })
+                });
                 return time;
             },
             complete: function(panel, page, overlay, prevProgress) {
@@ -186,12 +186,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "visible",
                     "-webkit-transition": "opacity " + time + "ms ease-in-out",
                     "opacity": "0.3"
-                })
+                });
                 panel.css({
                     "display": "block",
                     "-webkit-transition": "-webkit-transform " + time + "ms ease-in-out",
                     "-webkit-transform": "translate(" + 0 + "px, 0)"
-                })
+                });
                 return time;
             },
             reset: function(panel, page, overlay) {
@@ -200,12 +200,12 @@ Chondric.directive("cjsSidepanel", function() {
                     "visibility": "",
                     "-webkit-transition": "",
                     "opacity": ""
-                })
+                });
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
                     "-webkit-transform": ""
-                })
+                });
             }
         },
         slideLeft: {
@@ -254,15 +254,10 @@ Chondric.directive("cjsSidepanel", function() {
 
 
             var parentPageElement = element.closest(".chondric-page");
-            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
-            if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+            if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
+            if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
             var overlay = $(".modal-overlay", parentPageElement);
-            if (overlay.length == 0) {
-                overlay = angular.element('<div class="modal-overlay"></div>');
-                parentPageElement.append(overlay);
-            }
-            var overlay = $(".modal-overlay", parentPageElement);
-            if (overlay.length == 0) {
+            if (overlay.length === 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
                 parentPageElement.append(overlay);
             }
@@ -294,7 +289,6 @@ Chondric.directive("cjsSidepanel", function() {
                 } else {
                     progress = 0;
                 }
-                console.log(progress);
                 if (oldval && oldval.progress) {
                     // progress will be % of screen width
                     // convert back to px and make 100% at side panel width
@@ -311,20 +305,20 @@ Chondric.directive("cjsSidepanel", function() {
                     }
                     window.setTimeout(function() {
                         var time = panelTransitions[transition].complete(element, parentPageElement, overlay, oldprogress);
-                    }, 0)
+                    }, 0);
 
-                } else if (progress == 0) {
+                } else if (progress === 0) {
                     var time = panelTransitions[transition].cancel(element, parentPageElement, overlay, oldprogress);
                     window.setTimeout(function() {
                         panelTransitions[transition].reset(element, parentPageElement, overlay);
-                    }, time)
+                    }, time);
                     overlay.removeClass("active");
                 } else {
                     panelTransitions[transition].progress(element, parentPageElement, overlay, progress);
                     overlay.addClass("active");
                 }
 
-            })
+            });
         }
-    }
+    };
 });

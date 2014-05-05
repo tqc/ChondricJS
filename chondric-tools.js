@@ -1,7 +1,7 @@
+"use strict";
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require("mkdirp");
-//var bower = require("bower");
 var crypto = require('crypto');
 var https = require('https');
 
@@ -28,13 +28,13 @@ exports.update = function(apphostdir, appdef) {
         var targetExists = fs.existsSync(targetPath);
         var previouslyGenerated = genlog[relativePath];
 
+        var result;
         var resulthash;
         var filehash;
 
         if (!targetExists || previouslyGenerated) {
-            var result = generator();
+            result = generator();
             resulthash = crypto.createHash('sha1').update(result).digest('hex');
-
         }
 
         if (targetExists && !previouslyGenerated) {
@@ -72,7 +72,7 @@ exports.update = function(apphostdir, appdef) {
         fs.writeFileSync(targetPath, result);
         genlog[relativePath] = resulthash;
         return true;
-    }
+    };
 
     var noSubstitution = function(s) {
         return s;
@@ -117,7 +117,7 @@ exports.update = function(apphostdir, appdef) {
             return substitute(template, appdef, pagedef || {});
         });
 
-    }
+    };
 
 
     if (appdef.appHost) {
@@ -128,21 +128,20 @@ exports.update = function(apphostdir, appdef) {
         updateFile(apphostdir, ".gitignore", "template.gitignore", noSubstitution);
         updateFile(apphostdir, ".bowerrc", "bowerrc.json", standardSubstitution);
         updateFile(apphostdir, "bower.json", "bower.json", standardSubstitution);
-        updateFile(appdir, "app.js", "app.js", standardSubstitution);
-        updateFile(appdir, "db.js", "db.js", standardSubstitution);
+        updateFile(apphostdir, ".jshintrc", "template.node.jshintrc", standardSubstitution);
     }
+
 
 
     mkdirp.sync(path.resolve(appdir, "lib"));
 
+    updateFile(appdir, ".jshintrc", "template.apphtml.jshintrc", standardSubstitution);
+    updateFile(appdir, "app.js", "app.js", standardSubstitution);
+    updateFile(appdir, "db.js", "db.js", standardSubstitution);
     updateFile(appdir, "splash.html", "splash.html", standardSubstitution);
     updateFile(appdir, "icon.html", "icon.html", standardSubstitution);
     updateFile(appdir, "preview.html", "preview.html", standardSubstitution);
     updateFile(appdir, "app.css", "app.css", standardSubstitution);
-
-
-    var pagetemplatepath = appdef.pageTemplate ? path.resolve(path.dirname(require.main.filename), appdef.pageTemplate) : path.resolve(chondricdir, "templates/page.html");
-
 
     var frameworkscriptrefs = "<script src=\"bower_components/jquery/dist/jquery.min.js\"></script>\n";
     frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";
@@ -150,19 +149,12 @@ exports.update = function(apphostdir, appdef) {
     frameworkscriptrefs += "<script src=\"bower_components/angular-ui-utils/ui-utils.min.js\"></script>\n";
     frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
 
-    var angularUsed = appdef.useAngular;
-
-
-
-    var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
-    var apphtmltemplate = fs.readFileSync(apphtmltemplatepath, "utf8");
-
     var scriptrefs = "";
     // create pages
     for (var i = 0; i < appdef.pages.length; i++) {
         var pagedef = appdef.pages[i];
 
-        var angularController = pagedef.angularController = pagedef.angularController || (pagedef.id + "Ctrl");
+        pagedef.angularController = pagedef.angularController || (pagedef.id + "Ctrl");
 
         pagedef.type = pagedef.type || "page";
 
@@ -178,7 +170,6 @@ exports.update = function(apphostdir, appdef) {
         updateFile(appdir, htmlpath, pagedef.type + ".html", standardSubstitution, pagedef);
 
     }
-
 
 
     var apphtmltemplatepath = fs.existsSync(path.resolve(appdir, "index.html")) ? path.resolve(appdir, "index.html") : path.resolve(chondricdir, "templates/app.html");
@@ -242,10 +233,9 @@ exports.hostApp = function(options) {
 
     if (options.frameworkDebug) {
         if (typeof(options.frameworkDebug) != "object") options.frameworkDebug = {};
-        console.log("Framework debug mode - chondric scripts will be served from module folder")
         var builtDir = path.resolve(__dirname, "built");
         var srcDir = path.resolve(__dirname, "src");
-
+        console.log("Framework debug mode - chondric scripts will be served from module folder:\n" + srcDir);
         app.use("/chondric-source", express.static(srcDir));
         /*
         "/demo/lib/dragon-drop.js": "../../dragon-drop/dragon-drop.js",
@@ -266,7 +256,6 @@ exports.hostApp = function(options) {
         options.frameworkDebug["/demo/lib/chondric.js"] = [
             srcDir + "/core.js",
             builtDir + "/template.js",
-            srcDir + "/view.js",
             srcDir + "/versioneddatabase.js",
             srcDir + "/genericsync.js",
             srcDir + "/directives/ng-tap.js",
@@ -285,44 +274,37 @@ exports.hostApp = function(options) {
             srcDir + "/transitions/crossfade.js",
             srcDir + "/transitions/sidepanel.js",
             srcDir + "/transitions/slide.js"
-        ]
+        ];
 
         app.use(function(req, res, next) {
+
+            function sendMappedFile(filename) {
+                fs.readFile(path.resolve(process.cwd(), filename), "utf8", function(err, d) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    if (filename.indexOf(".css") > 0) res.type("text/css");
+                    else if (filename.indexOf(".js") > 0) res.type("application/javascript");
+                    return res.send(d);
+                });
+            }
 
             for (var k in options.frameworkDebug) {
                 var mapping = options.frameworkDebug[k];
                 if (typeof(mapping) == "string") {
                     // just send the file
-                    if (req.originalUrl.indexOf(k) == 0) {
-
-                        console.log("Getting " + req.originalUrl);
-                        fs.readFile(path.resolve(process.cwd(), mapping), "utf8", function(err, d) {
-                            if (err) {
-                                console.log(err);
-                            }
-                            if (mapping.indexOf(".css") > 0) res.type("text/css");
-                            else if (mapping.indexOf(".js") > 0) res.type("application/javascript");
-                            return res.send(d);
-                        });
+                    if (req.originalUrl.indexOf(k) === 0) {
+                        sendMappedFile(mapping);
                         return;
                     }
                 } else {
                     var underscored = k.replace(".js", "_js").replace(".css", "_css");
-                    if (req.originalUrl.indexOf(underscored) == 0) {
-                        var partial = req.originalUrl.substr();
+                    if (req.originalUrl.indexOf(underscored) === 0) {
                         var rrel = path.basename(req.originalUrl);
                         for (var i = 0; i < mapping.length; i++) {
                             var mrel = path.basename(mapping[i]);
                             if (rrel == mrel) {
-                                console.log("Getting " + req.originalUrl);
-                                fs.readFile(path.resolve(process.cwd(), mapping[i]), "utf8", function(err, d) {
-                                    if (err) {
-                                        console.log(err);
-                                    }
-                                    if (mapping[i].indexOf(".css") > 0) res.type("text/css");
-                                    else if (mapping[i].indexOf(".js") > 0) res.type("application/javascript");
-                                    return res.send(d);
-                                });
+                                sendMappedFile(mapping[i]);
                                 return;
                             }
                         }
@@ -333,9 +315,9 @@ exports.hostApp = function(options) {
 
 
             return next();
-        })
+        });
 
-        function updatescripts(req, res, filename) {
+        var updatescripts = function(req, res, filename) {
             //console.log("serving framework script")
             fs.readFile(path.resolve(process.cwd(), "apphtml/" + filename), "utf8", function(err, d) {
 
@@ -347,7 +329,6 @@ exports.hostApp = function(options) {
                     } else {
                         var origPath = k;
                         var relPath = path.relative(path.dirname("/demo/" + filename), origPath).replace('\\', '/');
-                        console.log(relPath);
                         var allscripts = "";
                         for (var i = 0; i < mapping.length; i++) {
                             var rel = path.basename(mapping[i]);
@@ -358,11 +339,11 @@ exports.hostApp = function(options) {
                             }
                         }
 
-                        d = d.replace('<script src="' + origPath + '" type="text/javascript"></script>', allscripts)
-                        d = d.replace('<script src="' + relPath + '" type="text/javascript"></script>', allscripts)
+                        d = d.replace('<script src="' + origPath + '" type="text/javascript"></script>', allscripts);
+                        d = d.replace('<script src="' + relPath + '" type="text/javascript"></script>', allscripts);
 
-                        d = d.replace('<link rel="stylesheet" href="' + origPath + '" />', allscripts)
-                        d = d.replace('<link rel="stylesheet" href="' + relPath + '" />', allscripts)
+                        d = d.replace('<link rel="stylesheet" href="' + origPath + '" />', allscripts);
+                        d = d.replace('<link rel="stylesheet" href="' + relPath + '" />', allscripts);
 
 
                     }
@@ -370,7 +351,7 @@ exports.hostApp = function(options) {
 
                 res.type("text/html");
                 res.send(d);
-            })
+            });
         };
 
         app.get('/demo/',
@@ -393,7 +374,7 @@ exports.hostApp = function(options) {
                 fs.readFile(path.resolve(builtDir, "chondric.js"), "utf8", function(err, d) {
                     res.type("application/javascript");
                     res.send(d);
-                })
+                });
             });
         app.get('/demo/lib/chondric.css',
             function(req, res) {
@@ -402,7 +383,7 @@ exports.hostApp = function(options) {
                 fs.readFile(path.resolve(srcDir, "css/include.css"), "utf8", function(err, d) {
                     res.type("text/css");
                     res.send(d);
-                })
+                });
             });
     }
 
@@ -425,7 +406,7 @@ exports.hostApp = function(options) {
     exports.listen = function() {
         var port = process.env.PORT || 5000;
         if (options.sslOptions) {
-            var server = https.createServer(options.sslOptions, app).listen(port, function() {
+            https.createServer(options.sslOptions, app).listen(port, function() {
                 console.log("https server listening on port " + port);
             });
         } else {

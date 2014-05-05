@@ -3,27 +3,25 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-navigation-bar.html",
     controller: function($scope) {
         var self = $scope.componentDefinition;
-        $scope.globalHeaderOptions = self.globalHeaderOptions = {}
+        $scope.globalHeaderOptions = self.globalHeaderOptions = {};
 
         $scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
-            console.log("clicked header button for " + self.route);
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope && b.action) {
-                routeScope.$eval(b.action)
+                routeScope.$eval(b.action);
             } else if (routeScope && b.items) {
 
-                app.setSharedUiComponentState(routeScope, "cjs-action-sheet", true, true, {
+                self.app.setSharedUiComponentState(routeScope, "cjs-action-sheet", true, true, {
                     element: lastTap.element,
                     items: b.items
-                })
+                });
             }
-        }
+        };
 
     },
     setStatePartial: function(self, initialState, finalState, progress) {
         if (!self.globalHeaderOptions) return;
         var v1 = self.globalHeaderOptions.v1;
-        var v2 = self.globalHeaderOptions.v2;
         if (v1 && v1.route == initialState.route) {
             self.globalHeaderOptions.v1 = initialState;
             self.globalHeaderOptions.v2 = finalState;
@@ -47,7 +45,6 @@ Chondric.registerSharedUiComponent({
         self.route = route;
         self.data = data;
         var v1 = self.globalHeaderOptions.v1;
-        var v2 = self.globalHeaderOptions.v2;
         if (v1 && v1.route == route) {
             self.globalHeaderOptions.v1 = {
                 route: route,
@@ -67,4 +64,4 @@ Chondric.registerSharedUiComponent({
         }
 
     }
-})
+});

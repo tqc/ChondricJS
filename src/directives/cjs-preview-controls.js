@@ -4,7 +4,7 @@ Chondric.directive("cjsPreviewControls", function() {
         restrict: "AE",
         replace: true,
         templateUrl: "cjs-preview-controls.html",
-        link: function(scope, element, attrs) {
+        link: function(scope) {
             scope.previewSettings = {
                 width: 1024,
                 height: 768,
@@ -12,7 +12,7 @@ Chondric.directive("cjsPreviewControls", function() {
             };
             scope.reloadPreview = function() {
                 document.getElementById("preview").contentDocument.location.reload(true);
-            }
+            };
             scope.updatePreviewSettings = function(w, h, overlayStatusBar) {
                 scope.previewSettings = {
                     width: w,
@@ -21,5 +21,5 @@ Chondric.directive("cjsPreviewControls", function() {
                 };
             };
         }
-    }
+    };
 });

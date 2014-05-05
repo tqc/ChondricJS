@@ -16,16 +16,31 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   );
 
 
-  $templateCache.put('cjs-loading-overlay.html',
-    "<div class=\"loadingoverlay\" ng-show=\"dataLoadStatus.waitingForData\">\n" +
-    "    <div ng-show=\"!dataLoadStatus.error\" class=\"progress large\">\n" +
+  $templateCache.put('cjs-loading-overlay-compact.html',
+    "<div class=\"cjs-loading-overlay cjs-loading-overlay-compact\">\n" +
+    "    <div ng-show=\"!error\" class=\"progress small\">\n" +
     "        <div></div>\n" +
     "    </div>\n" +
-    "    <div ng-show=\"!dataLoadStatus.error\">{{dataLoadStatus.message || \"Loading\"}}</div>\n" +
-    "    <div class=\"error\" ng-show=\"dataLoadStatus.error\">{{dataLoadStatus.error}}</div>\n" +
-    "    <div>\n" +
-    "        <button ng-show=\"dataLoadStatus.retry && dataLoadStatus.error\" ng-tap=\"dataLoadStatus.retry()\">Retry</button>\n" +
-    "        <button ng-show=\"dataLoadStatus.cancel\" ng-tap=\"dataLoadStatus.cancel()\">Cancel</button>\n" +
+    "    <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
+    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "    <div class=\"buttons\">\n" +
+    "        <button ng-show=\"retry && error\" ng-tap=\"retry()\">Retry</button>\n" +
+    "        <button ng-show=\"cancel\" ng-tap=\"cancel()\">Cancel</button>\n" +
+    "    </div>\n" +
+    "</div>\n"
+  );
+
+
+  $templateCache.put('cjs-loading-overlay.html',
+    "<div class=\"cjs-loading-overlay cjs-loading-overlay-full\">\n" +
+    "    <div ng-show=\"!error\" class=\"progress large\">\n" +
+    "        <div></div>\n" +
+    "    </div>\n" +
+    "    <div class=\"message\" ng-show=\"!error\">{{message || \"Loading\"}}</div>\n" +
+    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "    <div class=\"buttons\">\n" +
+    "        <button ng-show=\"retry && error\" ng-tap=\"retry()\">Retry</button>\n" +
+    "        <button ng-show=\"cancel\" ng-tap=\"cancel()\">Cancel</button>\n" +
     "    </div>\n" +
     "</div>\n"
   );

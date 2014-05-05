@@ -3,22 +3,23 @@
 if (!window.console) {
     window.console = {
         log: function() {},
-        error: alert
+        warn: window.alert,
+        error: window.alert
     };
 }
 
-var Chondric = angular.module('chondric', [])
+var Chondric = angular.module('chondric', []);
 Chondric.allTransitions = {};
 Chondric.sharedUiComponents = {};
 Chondric.registerSharedUiComponent = function(component) {
     Chondric.sharedUiComponents[component.id] = component;
-}
+};
 
 Chondric.App =
     Chondric.initApp = function(options) {
         var app = {};
         var controllerPreload = {};
-        var appModule = app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []),
+        app.module = angular.module(options.name || "appModule", ['chondric'].concat(options.angularModules || []),
             function($controllerProvider) {
                 app.controllerProvider = $controllerProvider;
                 for (var cn in controllerPreload || {}) {
@@ -35,16 +36,9 @@ Chondric.App =
             }
         }
 
-        var allRoutes = app.allRoutes = {}
+        var allRoutes = app.allRoutes = {};
 
-        var allTransitions = app.allTransitions = Chondric.allTransitions;
-
-        // these options are defined in the
-        var initialOptions = {
-
-        }
-
-
+        app.allTransitions = Chondric.allTransitions;
 
         app.createViewTemplate = function(baseView, templateId, templateFile, viewOptions) {
 
@@ -57,7 +51,6 @@ Chondric.App =
                 viewOptions = baseView;
             }
 
-            var allControllers = [];
             var page = {};
             if (viewOptions.initAngular) {
                 viewOptions.initAngular.call(page);
@@ -74,7 +67,7 @@ Chondric.App =
                 registerController(cn, viewOptions.controllers[cn]);
             }
             if (!pageController) {
-                console.error("View " + (viewOptions.templateId || viewOptions.route) + " has no controller");
+                throw new Error("View " + (viewOptions.templateId || viewOptions.route) + " has no controller");
             }
             var route = viewOptions.route || ("/" + viewOptions.templateId + "/$p1/$p2");
             var templateUrl = viewOptions.templateId + ".html";
@@ -84,9 +77,9 @@ Chondric.App =
                 controller: pageController,
                 templateUrl: templateUrl,
                 templateId: viewOptions.templateId,
-            }
+            };
             preloadTemplate(templateUrl);
-        }
+        };
 
         function preloadTemplate(templateUrl) {
             app.module.run(function($templateCache, $http) {
@@ -106,7 +99,7 @@ Chondric.App =
             for (var cn in viewOptions.controllers || {}) {
                 if (!pageController) {
                     pageController = viewOptions.controllers[cn];
-                };
+                }
                 registerController(cn, viewOptions.controllers[cn]);
             }
 
@@ -117,14 +110,30 @@ Chondric.App =
                 controller: pageController,
                 //            templateUrl: viewOptions.templateUrl,
                 //            templateId: viewOptions.templateId,
-            }
+            };
+        };
+
+        app.sharedUiComponents = {};
+        for (var k in Chondric.sharedUiComponents) {
+            var sc = Chondric.sharedUiComponents[k];
+            app.sharedUiComponents[k] = {
+                app: app,
+                id: sc.id,
+                template: sc.template,
+                templateUrl: sc.templateUrl,
+                controller: sc.controller,
+                setState: sc.setState,
+                setStatePartial: sc.setStatePartial
+            };
         }
 
-        app.sharedUiComponents = Chondric.sharedUiComponents;
-        app.registerSharedUiComponent = Chondric.registerSharedUiComponent;
+        app.registerSharedUiComponent = function(component) {
+            app.sharedUiComponents[component.id] = component;
+        };
 
-        var appCtrl = app.controller = function($scope, $location) {
+        app.controller = function($scope, $location) {
             app.scope = $scope;
+            $scope.app = app;
             $scope.allRoutes = allRoutes;
             $scope.route = null;
             $scope.nextRoute = null;
@@ -140,11 +149,11 @@ Chondric.App =
             // these will usually get overridden on a child scope - otherwise names have to be globally unique
             $scope.showModal = function(name, lastTap) {
                 $scope[name] = lastTap;
-            }
+            };
 
             $scope.hideModal = function(name) {
                 $scope[name] = null;
-            }
+            };
 
 
             $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
@@ -161,12 +170,12 @@ Chondric.App =
                     active: active,
                     available: available,
                     data: data
-                }
+                };
                 if ($scope.route == routeScope.rk) {
                     component.setState(component, routeScope.rk, active, available, data);
                 }
 
-            }
+            };
 
 
             app.scopesForRoutes = {};
@@ -175,8 +184,7 @@ Chondric.App =
             function loadView(url) {
                 if (!url) {
                     // first run - load start page
-                    console.log("default route")
-                    return;
+                    throw new Error("loadView requires a valid route URL");
                 }
                 var matchingRoutes = [];
                 var parts = url.split("/");
@@ -190,15 +198,15 @@ Chondric.App =
                     matchingRoutes.push(r);
                 }
                 matchingRoutes.sort(function(a, b) {
-                    return a.length - b.length
-                })
+                    return a.length - b.length;
+                });
 
                 // matching routes list should be section heirarchy
 
                 var openViews = $scope.openViews;
-                for (var i = 0; i < matchingRoutes.length; i++) {
-                    var template = $scope.allRoutes[matchingRoutes[i]];
-                    var mrp = matchingRoutes[i].split("/");
+                for (var i2 = 0; i2 < matchingRoutes.length; i2++) {
+                    var template = $scope.allRoutes[matchingRoutes[i2]];
+                    var mrp = matchingRoutes[i2].split("/");
                     var ar = "";
                     var params = {};
                     for (var j = 0; j < mrp.length; j++) {
@@ -206,7 +214,6 @@ Chondric.App =
                         if (parts[j]) ar += "/" + parts[j];
                     }
                     if (template.isSection) {
-                        console.log("Get section with route " + ar);
                         var section = openViews[ar];
                         if (!section) {
                             section = openViews[ar] = {
@@ -214,11 +221,10 @@ Chondric.App =
                                 isSection: true,
                                 params: params,
                                 subsections: {}
-                            }
+                            };
                         }
                         openViews = section.subsections;
                     } else {
-                        console.log("Get page with route " + ar);
                         var page = openViews[ar];
                         if (!page) {
                             page = openViews[ar] = {
@@ -226,7 +232,7 @@ Chondric.App =
                                 templateUrl: template.templateUrl,
                                 templateId: template.templateId,
                                 params: params
-                            }
+                            };
                         }
                         return;
                     }
@@ -234,17 +240,17 @@ Chondric.App =
             }
 
             $scope.changePage = app.changePage = function(p, transition) {
+                var r;
                 if (p instanceof Array) {
-                    var r = "";
+                    r = "";
                     for (var i = 0; i < p.length; i++) {
                         r += "/" + p[i];
                     }
                 } else {
-                    var r = p;
+                    r = p;
                 }
                 if (!r || r.indexOf("/") < 0) {
-                    console.error("changePage syntax has changed - the first parameter is a route url instead of an id");
-                    return;
+                    throw new Error("changePage syntax has changed - the first parameter is a route url or an array of route url segments instead of an id");
                 }
                 if ($scope.route == r) return;
                 if ($scope.lastRoute == r) $scope.lastRoute = null;
@@ -260,9 +266,9 @@ Chondric.App =
                     $scope.route = r;
                     $scope.transition.progress = 1;
                     $scope.$apply();
-                }, 100)
+                }, 100);
 
-            }
+            };
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
@@ -276,7 +282,6 @@ Chondric.App =
                 // default handler covers left and right border swipe
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
-                        console.log("updating swipe - left border");
                         if (swipeNav[p].route) {
                             loadView(swipeNav[p].route);
                             $scope.nextRoute = swipeNav[p].route;
@@ -296,11 +301,10 @@ Chondric.App =
                     }
 
                 }
-            }
+            };
 
             $scope.endSwipe = function(swipeState, swipeNav, pageScope) {
                 if (!swipeState || !swipeNav) return;
-                console.log("ending swipe");
 
                 for (var k in app.sharedUiComponents) {
                     var component = app.sharedUiComponents[k];
@@ -310,7 +314,6 @@ Chondric.App =
 
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
-                        console.log("ending swipe - " + p);
                         if (swipeNav[p].route) {
                             if (swipeState[p] > 0.6) {
                                 // continue change to next page
@@ -341,33 +344,33 @@ Chondric.App =
                     }
                 }
 
-            }
+            };
 
 
             function viewCleanup(viewCollection, preservedRoutes) {
                 for (var k in viewCollection) {
-                    if (k.indexOf("/") != 0) continue;
+                    if (k.indexOf("/") !== 0) continue;
                     var keep = false;
                     for (var i = 0; i < preservedRoutes.length; i++) {
                         var r = preservedRoutes[i];
                         if (!r) continue;
-                        if (r.indexOf(k) == 0) {
+                        if (r.indexOf(k) === 0) {
                             keep = true;
                             break;
                         }
                     }
                     if (!keep) {
-                        for (var shik in app.componentStatesForRoutes) {
-                            if (shik.indexOf(k) == 0) delete app.componentStatesForRoutes[shik];
+                        for (var csfrk in app.componentStatesForRoutes) {
+                            if (csfrk.indexOf(k) === 0) delete app.componentStatesForRoutes[csfrk];
                         }
-                        for (var shik in app.scopesForRoutes) {
-                            if (shik.indexOf(k) == 0) delete app.scopesForRoutes[shik];
+                        for (var sfrk in app.scopesForRoutes) {
+                            if (sfrk.indexOf(k) === 0) delete app.scopesForRoutes[sfrk];
                         }
-                        delete viewCollection[k]
+                        delete viewCollection[k];
                         continue;
                     }
                     if (viewCollection[k].subsections) {
-                        viewCleanup(viewCollection[k].subsections, preservedRoutes)
+                        viewCleanup(viewCollection[k].subsections, preservedRoutes);
                     }
 
                 }
@@ -408,23 +411,16 @@ Chondric.App =
 
 
             $scope.$watch("route", function(url, oldVal) {
+                if (!url) return;
                 if (document.activeElement) document.activeElement.blur();
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
-                console.log("Route changed to " + url + " from " + oldVal);
-                if (url) {
-                    // window.history.replaceState(null, null, "#" + url);
-                    // workaround for https://github.com/angular/angular.js/issues/1417
-                    $location.path(url).replace();
-                }
+                $location.path(url).replace();
                 loadView(url);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
-            })
+            });
             if (options.appCtrl) options.appCtrl($scope);
-        } // end appCtrl
-
-
-
+        }; // end appCtrl
 
         app.ready = false;
         app.autohidesplashscreen = false;
@@ -436,94 +432,8 @@ Chondric.App =
         app.Views = {};
         app.ViewTemplates = {};
 
-        /*
-    app.createViewTemplate = function(baseView, templateId, templateFile, options) {
-
-        if (typeof templateId == "string") {
-            // old format
-            options.baseView = baseView;
-            options.templateId = templateId;
-            options.templateFile = templateFile;
-        } else {
-            options = baseView;
-        }
-
-        var templateSettings = {
-            templateId: options.templateId,
-            templateFile: options.templateFile || (options.templateId + ".html"),
-            baseView: options.baseView || Chondric.View,
-        };
-
-        if (options.initAngular || options.angularModules) {
-            options.useAngular = true;
-        }
-
-        var template = function(viewoptions) {
-            var settings = {};
-            $.extend(settings, templateSettings, viewoptions);
-            templateSettings.baseView.call(this, settings);
-            this.settings = settings;
-        };
-
-        var functions = {};
-
-        for (var k in options) {
-            var v = options[k];
-            if (k == "baseView") continue;
-            else if (k == "templateId") continue;
-            else if (k == "templateFile") continue;
-            else if (k == "controller") templateSettings[k] = v;
-            else if (typeof v == "function") functions[k] = v;
-            else templateSettings[k] = v;
-        }
-
-        $.extend(template.prototype, templateSettings.baseView.prototype, functions);
-
-        app.ViewTemplates[options.templateId] = template;
-
-    };
-*/
-        /*
-    app.createViewTemplate(
-        Chondric.View,
-        "AppLoadTemplate",
-        "index.html", {
-            getDefaultModel: function() {
-                return {};
-            },
-            updateModel: function(dataId, existingData, callback) {
-                if (!this.model) this.model = this.getDefaultModel();
-                var m = this.model;
-
-
-                callback();
-            },
-            updateView: function() {
-
-            },
-            attachSubviews: function() {
-                var page = this;
-
-
-            }
-
-        })
-
-    app.Views.appLoadPage = new app.ViewTemplates.AppLoadTemplate({
-        id: "appLoadPage"
-    });
-
-    app.activeView = app.Views.appLoadPage;
-*/
-
         app.platform = "web";
         app.isSimulator = false;
-
-        function getByProp(arr, prop, val) {
-            for (var i = 0; i < arr.length; i++) {
-                if (arr[i][prop] == val) return arr[i];
-            }
-        }
 
         var settings = {
             name: "Base App",
@@ -540,10 +450,12 @@ Chondric.App =
                 callback();
             },
             updateNotificationSettings: function(deviceId, notificationsEnabled) {
+                // jshint unused: false
                 // send details to the notification server
                 console.warn("updateNotificationSettings is not implemented");
             },
             notificationReceived: function(event) {
+                // jshint unused: false
                 console.warn("notificationReceived is not implemented");
             },
             debugMode: false
@@ -565,28 +477,18 @@ Chondric.App =
 
 
 
-        function loadScripts(scriptGroupNum, callback) {
-            console.log("starting loadscripts");
-            if (scriptGroupNum >= settings.scriptGroups.length) {
-                return callback();
-            }
-            console.log("calling require");
-            require(settings.scriptGroups[scriptGroupNum], function() {
-                loadScripts(scriptGroupNum + 1, callback)
-            });
-        }
-
         function initData(callback) {
-            console.log("getting database");
-
             app.db = settings.getDatabase();
             if (!app.db) {
                 callback();
             } else {
-                app.db.updateDatabase(function() {
-
+                if (app.db.updateDatabase) {
+                    app.db.updateDatabase(function() {
+                        callback();
+                    });
+                } else {
                     callback();
-                })
+                }
             }
         }
 
@@ -602,203 +504,6 @@ Chondric.App =
             app.ready = true;
             callback();
         }
-
-        function isScriptless(pagediv) {
-            return $(pagediv).attr("data-scriptless") != undefined;
-        }
-
-
-        this.appLoadLog = function(msg) {
-            console.log(msg);
-        };
-
-        this.getView = function(viewId) {
-            var view = app.Views[viewId];
-            if (view) return view;
-            var ind = viewId.indexOf("_");
-            var templateId = viewId.substr(0, ind) || viewId;
-
-            if (!app.ViewTemplates[templateId]) {
-                // template doesn't exist. possibly this is a scriptless page so try creating a default template
-                app.createViewTemplate({
-                    templateId: templateId
-                });
-            }
-
-            view = app.Views[viewId] = new app.ViewTemplates[templateId]({
-                id: viewId
-            });
-
-
-
-            return view;
-
-        };
-
-
-        var pageCleanupTimer = 0;
-        this.pageCleanup = function() {
-            var currentPage = app.activeView;
-            var lastPage = app.lastPage;
-            var preloads = app.activeView.preloads || [];
-            if (currentPage.next) preloads.push(currentPage.next);
-            if (currentPage.prev) preloads.push(currentPage.prev);
-
-            // remove any pages not in preload list
-
-            for (var k in app.Views) {
-                if (currentPage && currentPage.id == k) continue;
-                if (currentPage && currentPage.prev == k) continue;
-                if (currentPage && currentPage.next == k) continue;
-                if (lastPage && lastPage.id == k) continue;
-                if (preloads.indexOf(k) >= 0) continue;
-                var v = app.Views[k];
-                if (v) {
-                    v.unload();
-                }
-                delete app.Views[k];
-            }
-
-            // todo: load any pages in preload list that are not already loaded
-
-            for (var i = 0; i < preloads.length; i++) {
-                //                console.log("preload: " + preloads[i]);
-                app.getView(preloads[i]).ensureLoaded(null, function() {});
-            }
-
-            pageCleanupTimer = 0;
-        }
-
-        this.queuePageCleanup = function() {
-            if (!pageCleanupTimer) {
-                pageCleanupTimer = window.setTimeout(app.pageCleanup, 200);
-            }
-        }
-
-        this.transition = function(nextPageId, inPageClass, outPageClass) {
-            /*
-        if (!app.transitionClasses) {
-            app.transitionClasses= {};
-            for (var tn in transitions) {
-                app.transitionClasses[app.transitions[tn].inPageClass] = true;
-                app.transitionClasses[app.transitions[tn].outPageClass] = true;
-            }
-        }*/
-
-            if (app.transitioning) {
-                if (app.transitioningTo != nextPageId) {
-                    // transition changed
-                    // immediately complete existing transition, but do not call activated event
-                    app.transitioning = false;
-                    app.transitioningTo = undefined;
-
-                } else {
-                    // transition called twice - ignore
-                    return;
-                }
-            }
-
-            app.transitioning = true;
-            app.transitioningTo = nextPageId;
-            var thisPage = app.lastPage = app.activeView;
-            thisPage.ensureLoaded("active", function() {
-                var nextPage = app.getView(nextPageId);
-                thisPage.deactivating(nextPage);
-
-                //            $("."+inPageClass).removeClass(inPageClass);
-                nextPage.ensureLoaded(inPageClass, function() {
-                    window.setTimeout(function() {
-                        history.pushState({}, null, "#" + nextPageId);
-                        if (nextPage.loading) {
-                            nextPage.isActivating = true;
-                        } else {
-                            nextPage.activating(thisPage);
-                            if (nextPage.scope) {
-                                nextPage.scope.$apply();
-                            }
-                        }
-                    }, 0);
-
-                    thisPage.element.one("webkitTransitionEnd", function() {
-                        window.setTimeout(function() {
-                            app.transitioning = false;
-                            app.transitioningTo = undefined;
-                            if (!app.splashScreenHidden) app.hideSplashScreen();
-
-                            if (nextPage.loading) {
-                                nextPage.isActivated = true;
-                            } else {
-                                nextPage.activated();
-                                if (nextPage.scope) {
-                                    nextPage.scope.$apply();
-                                }
-                            }
-
-                            app.queuePageCleanup();
-                        }, 0);
-                    });
-
-
-                    thisPage.setSwipePosition(null, nextPage.element, null);
-
-                    //              $("."+outPageClass).removeClass(outPageClass);
-                    thisPage.element.addClass(outPageClass).removeClass("active");
-                    nextPage.element.addClass("active").removeClass(inPageClass);
-                    if (outPageClass == "behinddlg") nextPage.dlgbg = thisPage.id;
-
-                    app.activeView = nextPage;
-
-
-                });
-
-
-
-            });
-
-
-        };
-
-
-        this.transitions = {
-            pop: {
-                inPageClass: "behindsmall",
-                outPageClass: "behindfull"
-            },
-            dlgpop: {
-                inPageClass: "behindsmall",
-                outPageClass: "behinddlg"
-            },
-            dlgclose: {
-                inPageClass: "behinddlg",
-                outPageClass: "behindsmall"
-            },
-            close: {
-                inPageClass: "behindfull",
-                outPageClass: "behindsmall"
-            },
-            prev: {
-                inPageClass: "prev",
-                outPageClass: "next"
-            },
-            next: {
-                inPageClass: "next",
-                outPageClass: "prev"
-            },
-            crossfade: {
-                inPageClass: "behindfull",
-                outPageClass: "behindfull"
-            }
-        };
-        /*
-    app.changePage = function(pageId, transitionId) {
-        var transition = app.transitions[transitionId] || app.transitions.crossfade;
-        if (pageId == "dlgbg") pageId = app.activeView.dlgbg;
-        if (pageId == "prev") pageId = app.activeView.prev;
-        if (pageId == "next") pageId = app.activeView.next;
-        if (!pageId) return;
-        app.transition(pageId, transition.inPageClass, transition.outPageClass);
-    };
-*/
 
         var initEvents = function(callback) {
             callback();
@@ -838,7 +543,6 @@ Chondric.App =
                 }, function(error) {
                     console.error(error);
                     settings.updateNotificationSettings(null, false);
-                    // alert(error);
                 }, {
                     badge: "true",
                     sound: "true",
@@ -854,8 +558,8 @@ Chondric.App =
             $.ajax({
                 url: "../settings.json" + location.search,
                 dataType: "json",
-                error: function(data) {
-                    console.warn("error loading ../settings.json");
+                error: function() {
+                    console.warn("error loading ../settings.json - using default");
                     app.hostSettings = {};
                     callback();
                 },
@@ -865,12 +569,10 @@ Chondric.App =
                     callback();
                 }
             });
-
-            callback;
         };
 
-        app.init = function(callback) {
-            console.warn("no longer need to call app.init manually")
+        app.init = function() {
+            throw new Error("no longer need to call app.init manually");
         };
 
         var init = function(callback) {
@@ -886,7 +588,7 @@ Chondric.App =
                     // for now just check if height matches the full screen
                     var w = $(window).width();
                     var h = $(window).height();
-                    console.log(w + "," + h);
+                    console.log("Size changed: " + w + "x" + h);
                     if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
                         $(".viewport").addClass("hasstatusbar");
                     } else {
@@ -895,57 +597,49 @@ Chondric.App =
 
                     // for phone screens a multicolumn layout doesn't make sense
                     if (w < 768 && app.scope.maxColumns != 1) {
-                        console.log("setting singlecolumn")
+                        console.log("setting singlecolumn");
                         app.scope.maxColumns = 1;
                         $(".viewport").addClass("singlecolumn");
                         app.scope.$apply();
                     } else if (w >= 768 && app.scope.maxColumns != 3) {
-                        console.log("setting multicolumn")
+                        console.log("setting multicolumn");
                         app.scope.maxColumns = 3;
                         $(".viewport").removeClass("singlecolumn");
                         app.scope.$apply();
                     }
 
 
-                }
+                };
                 sizeChanged();
                 $(window).on("resize", sizeChanged);
-
                 console.log("begin internal init");
-                //  alert("running init")
-                loadScripts(0, function() {
-                    console.log("loaded scripts");
-                    initEvents(function() {
-                        loadHostSettings(function() {
+                initEvents(function() {
+                    loadHostSettings(function() {
 
-                            // create database
-                            initData(function() {
-                                console.log("loading context");
+                        // create database
+                        initData(function() {
+                            //load data
+                            settings.loadData.call(app, null, function() {
+                                // attach common events
+                                attachEvents(function() {
 
-                                var loadedctx = JSON.parse(localStorage["appcontext_" + settings.name] || "{}");
-                                //load data
-                                settings.loadData.call(app, loadedctx, function() {
-                                    // attach common events
-                                    attachEvents(function() {
-
-                                        if (window.NativeNav) {
-                                            NativeNav.handleAction = function(route, action) {
-                                                var routeScope = app.scopesForRoutes[route];
-                                                if (routeScope) {
-                                                    routeScope.$apply(action);
-                                                }
+                                    if (window.NativeNav) {
+                                        window.NativeNav.handleAction = function(route, action) {
+                                            var routeScope = app.scopesForRoutes[route];
+                                            if (routeScope) {
+                                                routeScope.$apply(action);
                                             }
+                                        };
 
-                                        }
+                                    }
 
-                                        // custom init function
-                                        settings.customInit.call(app, function() {
-                                            // hide splash screen and show page
-                                            loadFirstPage(function() {
+                                    // custom init function
+                                    settings.customInit.call(app, function() {
+                                        // hide splash screen and show page
+                                        loadFirstPage(function() {
 
-                                                complete(function() {
-                                                    if (callback) callback();
-                                                });
+                                            complete(function() {
+                                                if (callback) callback();
                                             });
                                         });
                                     });
@@ -961,31 +655,23 @@ Chondric.App =
                 app.isPhonegap = true;
                 app.platform = "cordova";
                 document.addEventListener("deviceready", function() {
-                        console.log("appframework deviceready");
-                        if (window.device) {
-                            console.log(device.platform);
-                            app.isSimulator = device.platform.indexOf("Simulator") > 0;
-                        }
-                        $(initInternal);
+                    console.log("appframework deviceready");
+                    if (window.device) {
+                        app.isSimulator = window.device.platform.indexOf("Simulator") > 0;
                     }
-
-                    , false);
+                    $(initInternal);
+                }, false);
             } else {
                 // no phonegap - web preview mode
-                app.platform = "web"
-
+                app.platform = "web";
                 $(initInternal);
             }
 
         };
 
-
         app.module.run(["$rootScope", "$compile", "$controller",
-            function($rootScope, $compile, $controller) {
-                //          app.compile = $compile;
-                //          app.$controller = $controller;
+            function($rootScope) {
                 app.rootScope = $rootScope;
-                console.log("angular app module run");
                 init();
             }
         ]);
@@ -993,7 +679,6 @@ Chondric.App =
         angular.element(document).ready(function() {
             angular.bootstrap(document, [app.module.name]);
         });
-
 
         return app;
 };

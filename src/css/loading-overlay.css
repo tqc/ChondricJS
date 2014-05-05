@@ -1,5 +1,9 @@
+/* */
+.cjs-loading-overlay-container {
+    position: relative;
+}
 /* Loading overlay */
- .loadingoverlay {
+ .cjs-loading-overlay {
     position: absolute;
     left: 0;
     right: 0;
@@ -12,14 +16,48 @@
     font-size: large;
 }
 
-.loadingoverlay .error {
+.cjs-loading-overlay-compact {
+    text-align: left;
+}
+
+.cjs-loading-overlay .error {
     color:red;
+}
+
+.cjs-loading-overlay-full .error {
     margin-top: 270px;
 }
 
-.loadingoverlay button {
+.cjs-loading-overlay-compact .error {
+display: inline;
+text-align: left;
+}
+
+
+.cjs-loading-overlay .message {
+
+}
+
+.cjs-loading-overlay-full .message {
+    
+}
+
+.cjs-loading-overlay-compact .message {
+display: inline;
+text-align: left;
+}
+
+.cjs-loading-overlay-compact .buttons {
+display: inline;
+}
+
+.cjs-loading-overlay button {
     margin-top: 30px;
     display: inline-block;
+}
+
+.cjs-loading-overlay-compact button {
+    margin: 5px;
 }
 
 /* css spinner from http://lea.verou.me/2013/11/cleanest-css-spinner-ever/ */
@@ -32,24 +70,37 @@
         -webkit-transform: rotate(1turn);
     }
 }
-.loadingoverlay .progress {
+.cjs-loading-overlay .progress {
     position: relative;
     display: block;
     width: 5em;
     height: 5em;
-    margin: 100px auto 50px auto;
     font-size: 12px;
     text-indent: 999em;
     overflow: hidden;
     -webkit-animation: spin 1s infinite steps(8);
 }
-.loadingoverlay .small.progress {
+
+.cjs-loading-overlay-full .progress {
+    margin: 100px auto 50px auto;
+}
+
+.cjs-loading-overlay-compact .progress {
+    display:inline-block;
+    vertical-align: middle;
+    margin: 5px;
+}
+
+.cjs-loading-overlay .small.progress {
     font-size: 6px;
 }
-.loadingoverlay .large.progress {
+.cjs-loading-overlay .large.progress {
     font-size: 24px;
 }
-.loadingoverlay .progress:before, .loadingoverlay .progress:after, .loadingoverlay .progress > div:before, .loadingoverlay .progress > div:after {
+.cjs-loading-overlay .progress:before, 
+.cjs-loading-overlay .progress:after, 
+.cjs-loading-overlay .progress > div:before, 
+.cjs-loading-overlay .progress > div:after {
     content:'';
     position: absolute;
     top: 0;
@@ -64,18 +115,18 @@
     -webkit-transform-origin: 50% 2.5em;
     /* container height / 2 */
 }
-.loadingoverlay .progress:before {
+.cjs-loading-overlay .progress:before {
     background: #555;
 }
-.loadingoverlay .progress:after {
+.cjs-loading-overlay .progress:after {
     -webkit-transform: rotate(-45deg);
     background: #777;
 }
-.loadingoverlay .progress > div:before {
+.cjs-loading-overlay .progress > div:before {
     -webkit-transform: rotate(-90deg);
     background: #999;
 }
-.loadingoverlay .progress > div:after {
+.cjs-loading-overlay .progress > div:after {
     -webkit-transform: rotate(-135deg);
     background: #bbb;
 }

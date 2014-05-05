@@ -7,17 +7,17 @@ Chondric.registerSharedUiComponent({
         self.defaultController = function() {};
         $scope.hideModal = function() {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            app.setSharedUiComponentState(routeScope, "cjs-shared-popup", false, true, null);
-        }
+            self.app.setSharedUiComponentState(routeScope, "cjs-shared-popup", false, true, null);
+        };
         $scope.handleAction = function(funcName, params) {
             self.popuptrigger = null;
-            var routeScope = app.scopesForRoutes[self.route];
+            var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
                 routeScope.$eval(funcName)(params);
             }
-        }
+        };
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
@@ -26,8 +26,8 @@ Chondric.registerSharedUiComponent({
         if (!active) {
             self.popuptrigger = null;
         } else {
-            self.popuptrigger = {}
+            self.popuptrigger = {};
         }
 
     }
-})
+});

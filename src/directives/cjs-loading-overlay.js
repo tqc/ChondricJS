@@ -1,36 +1,29 @@
-// add a loading overlay if the scope has dataLoadStatus.waitingForData set.
-// if dataLoadStatus.error is set, it will be displayed as an error message.
-// if dataLoadStatus.retry is a function, a button wil be displayed
-// if dataLoadStatus.cancel is set, a button will be displayed.
-Chondric.directive('cjsLoadingOverlay', function($compile) {
-    return {
-        replace: true,
-        templateUrl: "cjs-loading-overlay.html"
-    }
-});
-
-Chondric.directive('cjsShowAfterLoad', function($compile) {
+Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
     return {
         restrict: 'A',
-        scope: {
-            cjsShowAfterLoad: "="
-        },
+        scope: true,
         link: function(scope, element, attrs) {
-            var contents = element.contents();
+            var contentElement;
+            if (element.children().length == 1) {
+                contentElement = element.children().first();
+            } else {
+                contentElement = element.wrapInner("<div/>").first();
+            }
 
-            var contentElement = angular.element(element[0].outerHTML);
-            contentElement.removeAttr("cjs-show-after-load");
-            contentElement.attr("ui-toggle", "!currentTask");
 
-            var overlay = angular.element("<div>Loading ({{message}})</div>")
-            overlay.attr("ui-toggle", "currentTask");
+            // get the contents of the element. If there is a single element, use it directly. if not, wrap it.
+            var overlay;
+            if (attrs.overlayType == "compact") {
+                overlay = angular.element($templateCache.get("cjs-loading-overlay-compact.html"));
+            } else {
+                overlay = angular.element($templateCache.get("cjs-loading-overlay.html"));
+            }
 
-            var wrapper = angular.element("<div></div>");
-            wrapper.append(overlay);
-            wrapper.append(contentElement);
-            $compile(wrapper)(scope);
-            element.replaceWith(wrapper);
-            scope.$watch("cjsShowAfterLoad", function(status) {
+            element.append(overlay);
+
+            $compile(overlay)(scope);
+
+            scope.$watch(attrs.cjsLoadingOverlay, function(status) {
                 if (!status) return;
                 var currentTask = null;
                 for (var i = 0; i < status.tasks.length; i++) {
@@ -48,16 +41,46 @@ Chondric.directive('cjsShowAfterLoad', function($compile) {
                 if (!currentTask) {
                     // finished
                     scope.message = "finished";
-                } else if (currentTask.error) {
-                    scope.message = "error";
+                    contentElement.addClass("ui-show").removeClass("ui-hide");
+                    overlay.addClass("ui-hide").removeClass("ui-show");
                 } else {
+                    contentElement.addClass("ui-hide").removeClass("ui-show");
+                    overlay.addClass("ui-show").removeClass("ui-hide");
+                    scope.error = currentTask.error;
                     scope.message = currentTask.progressCurrent + " / " + currentTask.progressTotal;
                 }
 
 
 
-            }, true)
+            }, true);
 
+        }
+    };
+});
+
+Chondric.directive('cjsShowAfterLoad', function() {
+    return {
+        link: function(scope, element, attrs) {
+            scope.$watch(attrs.cjsShowAfterLoad, function(status) {
+                if (!status) return;
+                var currentTask = null;
+                for (var i = 0; i < status.tasks.length; i++) {
+                    var task = status.tasks[i];
+                    if (task.error) {
+                        currentTask = task;
+                        break;
+                    }
+                    if (task.progressCurrent < task.progressTotal && (!currentTask || task.progressTotal > currentTask.progressTotal)) {
+                        currentTask = task;
+                    }
+                }
+
+                if (!currentTask) {
+                    element.addClass("ui-show").removeClass("ui-hide");
+                } else {
+                    element.addClass("ui-hide").removeClass("ui-show");
+                }
+            }, true);
         }
     };
 });

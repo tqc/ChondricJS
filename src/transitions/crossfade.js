@@ -6,7 +6,7 @@ Chondric.allTransitions.crossfade = {
                 "display": "block",
                 "opacity": 0,
                 "z-index": 9000,
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             // move element to left with transition
@@ -14,7 +14,7 @@ Chondric.allTransitions.crossfade = {
             $(element).css({
                 "-webkit-transition": "opacity " + time + "ms ease-in-out",
                 "opacity": 0
-            })
+            });
 
             return time;
         },
@@ -24,7 +24,7 @@ Chondric.allTransitions.crossfade = {
             $(element).css({
                 "-webkit-transition": "opacity " + time + "ms ease-in-out",
                 "opacity": 1
-            })
+            });
             return time;
         },
         progress: function(element, progress) {
@@ -32,15 +32,15 @@ Chondric.allTransitions.crossfade = {
                 "display": "block",
                 "opacity": progress,
                 "z-index": 9000,
-            })
+            });
         }
     },
     transitionOut: {
         start: function(element) {
-            // just ensure the oldpage remains visible
+            // just ensure the old page remains visible while the new page fades in on top
             element.css({
                 "display": "block"
-            })
+            });
         },
         cancel: function(element, prevProgress) {
             var time = (prevProgress) * 300;
@@ -51,11 +51,10 @@ Chondric.allTransitions.crossfade = {
             var time = (1 - prevProgress) * 300;
             return time;
         },
-        progress: function(element, progress) {
-            // set element position without transition
+        progress: function(element) {
             element.css({
                 "display": "block"
-            })
+            });
         }
     },
     reset: function(element) {
@@ -65,6 +64,6 @@ Chondric.allTransitions.crossfade = {
             "opacity": "",
             "z-index": "",
             "-webkit-transition": "",
-        })
+        });
     }
 };

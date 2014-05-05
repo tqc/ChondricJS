@@ -22,17 +22,15 @@ Chondric.directive("cjsPopover", function() {
 
             function ensureOverlay(element, useOverlay) {
                 var parentPageElement = element.closest(".chondric-page");
-                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-section");
-                if (parentPageElement.length == 0) parentPageElement = element.closest(".chondric-viewport");
+                if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
+                if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
                 if (useOverlay) {
                     var overlay = $(".modal-overlay", parentPageElement);
-                    if (overlay.length == 0) {
+                    if (overlay.length === 0) {
                         overlay = angular.element('<div class="modal-overlay"></div>');
                         parentPageElement.append(overlay);
                     }
                     var hide = function() {
-                        console.log("overlay touch");
-
                         scope.$apply("hideModal('" + attrs.cjsPopover + "')");
                         overlay.off(useMouse ? "mousedown" : "touchstart", hide);
                     };
@@ -107,22 +105,22 @@ Chondric.directive("cjsPopover", function() {
                     if (horizontal) {
                         if (actualX < horizontalCutoff) {
                             menupos.left = (actualX + 13) + "px";
-                            menupos.right = "auto"
+                            menupos.right = "auto";
                             element.addClass("right").removeClass("left");
                         } else {
                             menupos.right = (sw - actualX + 13) + "px";
-                            menupos.left = "auto"
+                            menupos.left = "auto";
                             element.addClass("left").removeClass("right");
                         }
                         menupos.top = (actualY - menuheight / 2) + "px";
                     } else {
                         if (actualY < verticalCutoff) {
                             menupos.top = (actualY + 13) + "px";
-                            menupos.bottom = "auto"
+                            menupos.bottom = "auto";
                             element.addClass("down").removeClass("up");
                         } else {
                             menupos.bottom = (sh - actualY + 13) + "px";
-                            menupos.top = "auto"
+                            menupos.top = "auto";
                             element.addClass("up").removeClass("down");
                         }
                         menupos.left = (actualX - menuwidth / 2) + "px";
@@ -165,7 +163,7 @@ Chondric.directive("cjsPopover", function() {
                     element.addClass("active");
                     element.css(menupos);
                 }
-            })
+            });
         }
-    }
+    };
 });
