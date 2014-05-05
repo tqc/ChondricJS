@@ -980,7 +980,7 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
             if (element.children().length == 1) {
                 contentElement = element.children().first();
             } else {
-                contentElement = element.wrapInner("<div/>").first();
+                contentElement = element.wrapInner("<div/>").children().first();
             }
 
 
