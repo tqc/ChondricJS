@@ -23,22 +23,10 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
 
             $compile(overlay)(scope);
 
-            scope.$watch(attrs.cjsLoadingOverlay, function(status) {
-                if (!status) return;
-                var currentTask = null;
-                for (var i = 0; i < status.tasks.length; i++) {
-                    var task = status.tasks[i];
-                    if (task.error) {
-                        currentTask = task;
-                        break;
-                    }
-                    if (task.progressCurrent < task.progressTotal && (!currentTask || task.progressTotal > currentTask.progressTotal)) {
-                        currentTask = task;
-                    }
-                }
-
-                scope.currentTask = currentTask;
-                if (!currentTask) {
+            scope.loadStatus.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), function(taskGroup) {
+                scope.taskGroup = taskGroup;
+                scope.currentTask = taskGroup.currentTask;
+                if (taskGroup.completed) {
                     // finished                    
                     scope.message = "finished";
                     contentElement.addClass("ui-show").removeClass("ui-hide");
@@ -46,13 +34,11 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
                 } else {
                     contentElement.addClass("ui-hide").removeClass("ui-show");
                     overlay.addClass("ui-show").removeClass("ui-hide");
-                    scope.title = currentTask.title;
-                    scope.error = currentTask.error;
-                    scope.message = currentTask.progressCurrent + " / " + currentTask.progressTotal;
+                    scope.title = taskGroup.title;
+                    scope.error = taskGroup.error;
+                    scope.message = taskGroup.message;
                 }
-
-            }, true);
-
+            });
         }
     };
 });
@@ -60,26 +46,132 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
 Chondric.directive('cjsShowAfterLoad', function() {
     return {
         link: function(scope, element, attrs) {
-            scope.$watch(attrs.cjsShowAfterLoad, function(status) {
-                if (!status) return;
-                var currentTask = null;
-                for (var i = 0; i < status.tasks.length; i++) {
-                    var task = status.tasks[i];
-                    if (task.error) {
-                        currentTask = task;
-                        break;
-                    }
-                    if (task.progressCurrent < task.progressTotal && (!currentTask || task.progressTotal > currentTask.progressTotal)) {
-                        currentTask = task;
-                    }
-                }
 
-                if (!currentTask) {
+            scope.loadStatus.onUpdate(scope.$eval(attrs.cjsShowAfterLoad), function(taskGroup) {
+                if (taskGroup.completed) {
                     element.addClass("ui-show").removeClass("ui-hide");
                 } else {
                     element.addClass("ui-hide").removeClass("ui-show");
                 }
-            }, true);
+            });
         }
     };
+});
+
+
+Chondric.factory('loadStatus', function() {
+    // simple UI to track loading status
+    var service = {};
+    service.init = function($scope, tasks) {
+        var existing = $scope.loadStatus;
+        if (existing) {
+            $.extend(service, existing);
+            service.allTasks = [].concat(existing.allTasks);
+
+        } else {
+            service.allTasks = [];
+        }
+        $scope.loadStatus = service;
+
+        service.registerTask = function(key, taskOptions) {
+            var task = {
+                key: key,
+                title: "Untitled Task",
+                progressCurrent: 0,
+                progressTotal: 1,
+                active: false,
+                message: "Message Here...",
+                error: null,
+                start: function() {
+                    task.active = true;
+                },
+                finish: function() {
+                    task.progressCurrent = task.progressTotal;
+                    task.completed = true;
+                    task.active = false;
+                },
+                fail: function(message) {
+                    task.active = false;
+                    task.error = message;
+                },
+                progress: function(progress, total) {
+                    task.active = true;
+                    task.progressCurrent = progress;
+                    if (total !== undefined) task.progressTotal = total;
+                }
+            };
+            $.extend(task, taskOptions);
+            service[key] = task;
+            service.allTasks.push(task);
+        };
+
+        service.onUpdate = function(tasksOrKeys, fn) {
+            // if no task array specified, include all tasks in the current scope
+            tasksOrKeys = tasksOrKeys || service.allTasks;
+            var watchedKeys = [];
+            for (var i = 0; i < tasksOrKeys.length; i++) {
+                var t = tasksOrKeys[i];
+                if (typeof t == "string") watchedKeys.push(t);
+                else if (t.key) watchedKeys.push(t.key);
+            }
+            if (watchedKeys.length === 0) return fn({
+                tasks: [],
+                completed: true
+            });
+
+            $scope.$watch("[loadStatus." + watchedKeys.join(",loadStatus.") + "]", function(tasks) {
+                // check all tasks, see if there are any outstanding
+                if (!tasks) return;
+
+                var result = {
+                    tasks: tasks
+                };
+
+                result.currentTask = undefined;
+                for (var i = 0; i < tasks.length; i++) {
+                    var task = tasks[i];
+                    if (task.error) {
+                        result.currentTask = task;
+                        break;
+                    }
+
+                    if (task.active) {
+                        result.currentTask = task;
+                        break;
+                    }
+                    if (task.progressCurrent < task.progressTotal && (!result.currentTask || task.progressTotal > result.currentTask.progressTotal)) {
+                        result.currentTask = task;
+                        break;
+                    }
+                }
+                if (!result.currentTask) {
+                    // finished                    
+                    result.message = "finished";
+                    result.completed = true;
+                } else {
+                    result.completed = false;
+                    result.title = result.currentTask.title;
+                    result.error = result.currentTask.error;
+                    result.message = result.currentTask.message || (result.currentTask.progressCurrent + " / " + result.currentTask.progressTotal);
+                }
+
+                fn(result);
+
+            }, true);
+
+        };
+
+        service.after = function(tasksOrKeys, fn) {
+            service.onUpdate(tasksOrKeys, function(taskGroup) {
+                if (taskGroup.completed) return fn();
+            });
+        };
+
+        if (tasks) {
+            for (var tk in tasks) {
+                service.registerTask(tk, tasks[tk]);
+            }
+        }
+    };
+    return service;
 });

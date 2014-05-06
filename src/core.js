@@ -703,7 +703,7 @@ Chondric.App =
 };
 
 Chondric.factory('sharedUi', function() {
-    // service to update standard features of calculator page
+    // A simplified interface for the shared ui components
     var service = {};
     service.init = function($scope, componentAliases) {
         var app = $scope.app;
@@ -746,10 +746,6 @@ Chondric.factory('sharedUi', function() {
         for (var alias in componentAliases) {
             service.addComponent(alias, componentAliases[alias]);
         }
-
-        //        if (page.scopePreload) {
-        //            delete page.scopePreload;
-        //      }
 
     };
     return service;
