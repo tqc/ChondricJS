@@ -132,6 +132,7 @@ Chondric.App =
 
         app.registerSharedUiComponent = function(component) {
             app.sharedUiComponents[component.id] = component;
+            component.app = app;
         };
 
         app.controller = function($scope, $location) {
