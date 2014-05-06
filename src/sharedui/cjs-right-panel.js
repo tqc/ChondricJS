@@ -8,7 +8,7 @@ Chondric.registerSharedUiComponent({
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            self.app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
+            self.app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
         };
         $scope.runOnMainScope = function(funcName, params) {
             var routeScope = self.app.scopesForRoutes[self.route];

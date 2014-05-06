@@ -157,26 +157,38 @@ Chondric.App =
                 $scope[name] = null;
             };
 
-
-            $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
+            $scope.getSharedUiComponentState = app.getSharedUiComponentState = function(routeScope, componentId) {
                 app.scopesForRoutes[routeScope.rk] = routeScope;
+
                 var component = app.sharedUiComponents[componentId];
                 if (!component) {
                     throw new Error(
                         "Shared UI Component " + componentId + " not found"
                     );
                 }
+
                 var csfr = app.componentStatesForRoutes[routeScope.rk] = app.componentStatesForRoutes[routeScope.rk] || {};
-                var cs = csfr[componentId] || {
-                    route: routeScope.rk
+                var cs = csfr[componentId] = csfr[componentId] || {
+                    route: routeScope.rk,
+                    active: false,
+                    available: false,
+                    data: {}
                 };
+
+                return cs;
+
+            };
+
+            $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
+                var cs = app.getSharedUiComponentState(routeScope, componentId);
                 // if parameters are undefined, the previous value will be used
                 if (active === true || active === false) cs.active = active;
                 if (available === true || available === false) cs.available = available;
                 if (data !== undefined) cs.data = data;
-                csfr[componentId] = cs;
+
                 if ($scope.route == routeScope.rk) {
-                    component.setState(component, routeScope.rk, active, available, data);
+                    var component = app.sharedUiComponents[componentId];
+                    component.setState(component, routeScope.rk, cs.active, cs.available, cs.data);
                 }
 
             };
@@ -394,13 +406,13 @@ Chondric.App =
                         route: transition.from,
                         active: false,
                         available: false,
-                        data: null
+                        data: {}
                     };
                     var toState = toStates[k] || {
                         route: transition.to,
                         active: false,
                         available: false,
-                        data: null
+                        data: {}
                     };
                     if (component.setStatePartial) {
                         component.setStatePartial(component, fromState, toState, transition.progress);
@@ -688,3 +700,56 @@ Chondric.App =
 
         return app;
 };
+
+Chondric.factory('sharedUi', function() {
+    // service to update standard features of calculator page
+    var service = {};
+    service.init = function($scope, componentAliases) {
+        var app = $scope.app;
+        $scope.sharedUi = service;
+
+        function addComponent(alias, componentKey) {
+            service[alias] = {
+                setState: function(active, available, data) {
+                    app.setSharedUiComponentState($scope, componentKey, active, available, data);
+                },
+                enable: function(data) {
+                    app.setSharedUiComponentState($scope, componentKey, undefined, true, data);
+                },
+                disable: function() {
+                    app.setSharedUiComponentState($scope, componentKey, false, false, undefined);
+                },
+                show: function(data) {
+                    app.setSharedUiComponentState($scope, componentKey, true, true, data);
+                },
+                hide: function(disable) {
+                    app.setSharedUiComponentState($scope, componentKey, false, !disable, undefined);
+                },
+                replaceData: function(data) {
+                    app.setSharedUiComponentState($scope, componentKey, undefined, undefined, data);
+                },
+                extendData: function(update) {
+                    var state = app.getSharedUiComponentState($scope, componentKey);
+                    var newData = $.extend(state.data || {}, update);
+                    app.setSharedUiComponentState($scope, componentKey, state.active, state.available, newData);
+                },
+                updateState: function(fn) {
+                    var state = app.getSharedUiComponentState($scope, componentKey);
+                    fn(state);
+                    app.setSharedUiComponentState($scope, componentKey, state.active, state.available, state.data);
+                },
+
+            };
+        }
+
+        for (var alias in componentAliases) {
+            addComponent(alias, componentAliases[alias]);
+        }
+
+        //        if (page.scopePreload) {
+        //            delete page.scopePreload;
+        //      }
+
+    };
+    return service;
+});
