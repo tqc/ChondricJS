@@ -705,51 +705,53 @@ Chondric.App =
 
 Chondric.factory('sharedUi', function() {
     // A simplified interface for the shared ui components
-    var service = {};
-    service.init = function($scope, componentAliases) {
-        var app = $scope.app;
-        $scope.sharedUi = service;
 
-        service.addComponent = function(alias, componentKey) {
-            service[alias] = {
-                setState: function(active, available, data) {
-                    app.setSharedUiComponentState($scope, componentKey, active, available, data);
-                },
-                enable: function(data) {
-                    app.setSharedUiComponentState($scope, componentKey, undefined, true, data);
-                },
-                disable: function() {
-                    app.setSharedUiComponentState($scope, componentKey, false, false, undefined);
-                },
-                show: function(data) {
-                    app.setSharedUiComponentState($scope, componentKey, true, true, data);
-                },
-                hide: function(disable) {
-                    app.setSharedUiComponentState($scope, componentKey, false, !disable, undefined);
-                },
-                replaceData: function(data) {
-                    app.setSharedUiComponentState($scope, componentKey, undefined, undefined, data);
-                },
-                extendData: function(update) {
-                    var state = app.getSharedUiComponentState($scope, componentKey);
-                    var newData = $.extend(state.data || {}, update);
-                    app.setSharedUiComponentState($scope, componentKey, state.active, state.available, newData);
-                },
-                updateState: function(fn) {
-                    var state = app.getSharedUiComponentState($scope, componentKey);
-                    fn(state);
-                    app.setSharedUiComponentState($scope, componentKey, state.active, state.available, state.data);
-                },
+    return {
+        init: function($scope, componentAliases) {
+            var service = {};
+            var app = $scope.app;
+            service.route = $scope.rk;
+            $scope.sharedUi = service;
+            service.addComponent = function(alias, componentKey) {
+                service[alias] = {
+                    setState: function(active, available, data) {
+                        app.setSharedUiComponentState($scope, componentKey, active, available, data);
+                    },
+                    enable: function(data) {
+                        app.setSharedUiComponentState($scope, componentKey, undefined, true, data);
+                    },
+                    disable: function() {
+                        app.setSharedUiComponentState($scope, componentKey, false, false, undefined);
+                    },
+                    show: function(data) {
+                        app.setSharedUiComponentState($scope, componentKey, true, true, data);
+                    },
+                    hide: function(disable) {
+                        app.setSharedUiComponentState($scope, componentKey, false, !disable, undefined);
+                    },
+                    replaceData: function(data) {
+                        app.setSharedUiComponentState($scope, componentKey, undefined, undefined, data);
+                    },
+                    extendData: function(update) {
+                        var state = app.getSharedUiComponentState($scope, componentKey);
+                        var newData = $.extend(state.data || {}, update);
+                        app.setSharedUiComponentState($scope, componentKey, state.active, state.available, newData);
+                    },
+                    updateState: function(fn) {
+                        var state = app.getSharedUiComponentState($scope, componentKey);
+                        fn(state);
+                        app.setSharedUiComponentState($scope, componentKey, state.active, state.available, state.data);
+                    },
 
+                };
             };
-        };
 
-        for (var alias in componentAliases) {
-            service.addComponent(alias, componentAliases[alias]);
+            for (var alias in componentAliases) {
+                service.addComponent(alias, componentAliases[alias]);
+            }
+            return service;
         }
-
     };
-    return service;
 });
 angular.module('chondric').run(['$templateCache', function($templateCache) {
   'use strict';
@@ -1103,119 +1105,121 @@ Chondric.directive('cjsShowAfterLoad', function() {
 
 Chondric.factory('loadStatus', function() {
     // simple UI to track loading status
-    var service = {};
-    service.init = function($scope, tasks) {
-        var existing = $scope.loadStatus;
-        if (existing) {
-            $.extend(service, existing);
-            service.allTasks = [].concat(existing.allTasks);
+    return {
+        init: function($scope, tasks) {
+            var service = {};
+            var existing = $scope.loadStatus;
+            if (existing) {
+                $.extend(service, existing);
+                service.allTasks = [].concat(existing.allTasks);
 
-        } else {
-            service.allTasks = [];
-        }
-        $scope.loadStatus = service;
-
-        service.registerTask = function(key, taskOptions) {
-            var task = {
-                key: key,
-                title: "Untitled Task",
-                progressCurrent: 0,
-                progressTotal: 1,
-                active: false,
-                message: "Message Here...",
-                error: null,
-                start: function() {
-                    task.active = true;
-                },
-                finish: function() {
-                    task.progressCurrent = task.progressTotal;
-                    task.completed = true;
-                    task.active = false;
-                },
-                fail: function(message) {
-                    task.active = false;
-                    task.error = message;
-                },
-                progress: function(progress, total) {
-                    task.active = true;
-                    task.progressCurrent = progress;
-                    if (total !== undefined) task.progressTotal = total;
-                }
-            };
-            $.extend(task, taskOptions);
-            service[key] = task;
-            service.allTasks.push(task);
-        };
-
-        service.onUpdate = function(tasksOrKeys, fn) {
-            // if no task array specified, include all tasks in the current scope
-            tasksOrKeys = tasksOrKeys || service.allTasks;
-            var watchedKeys = [];
-            for (var i = 0; i < tasksOrKeys.length; i++) {
-                var t = tasksOrKeys[i];
-                if (typeof t == "string") watchedKeys.push(t);
-                else if (t.key) watchedKeys.push(t.key);
+            } else {
+                service.allTasks = [];
             }
-            if (watchedKeys.length === 0) return fn({
-                tasks: [],
-                completed: true
-            });
+            $scope.loadStatus = service;
 
-            $scope.$watch("[loadStatus." + watchedKeys.join(",loadStatus.") + "]", function(tasks) {
-                // check all tasks, see if there are any outstanding
-                if (!tasks) return;
-
-                var result = {
-                    tasks: tasks
+            service.registerTask = function(key, taskOptions) {
+                var task = {
+                    key: key,
+                    title: "Untitled Task",
+                    progressCurrent: 0,
+                    progressTotal: 1,
+                    active: false,
+                    message: "Message Here...",
+                    error: null,
+                    start: function() {
+                        task.active = true;
+                    },
+                    finish: function() {
+                        task.progressCurrent = task.progressTotal;
+                        task.completed = true;
+                        task.active = false;
+                    },
+                    fail: function(message) {
+                        task.active = false;
+                        task.error = message;
+                    },
+                    progress: function(progress, total) {
+                        task.active = true;
+                        task.progressCurrent = progress;
+                        if (total !== undefined) task.progressTotal = total;
+                    }
                 };
+                $.extend(task, taskOptions);
+                service[key] = task;
+                service.allTasks.push(task);
+            };
 
-                result.currentTask = undefined;
-                for (var i = 0; i < tasks.length; i++) {
-                    var task = tasks[i];
-                    if (task.error) {
-                        result.currentTask = task;
-                        break;
-                    }
-
-                    if (task.active) {
-                        result.currentTask = task;
-                        break;
-                    }
-                    if (task.progressCurrent < task.progressTotal && (!result.currentTask || task.progressTotal > result.currentTask.progressTotal)) {
-                        result.currentTask = task;
-                        break;
-                    }
+            service.onUpdate = function(tasksOrKeys, fn) {
+                // if no task array specified, include all tasks in the current scope
+                tasksOrKeys = tasksOrKeys || service.allTasks;
+                var watchedKeys = [];
+                for (var i = 0; i < tasksOrKeys.length; i++) {
+                    var t = tasksOrKeys[i];
+                    if (typeof t == "string") watchedKeys.push(t);
+                    else if (t.key) watchedKeys.push(t.key);
                 }
-                if (!result.currentTask) {
-                    // finished                    
-                    result.message = "finished";
-                    result.completed = true;
-                } else {
-                    result.completed = false;
-                    result.title = result.currentTask.title;
-                    result.error = result.currentTask.error;
-                    result.message = result.currentTask.message || (result.currentTask.progressCurrent + " / " + result.currentTask.progressTotal);
+                if (watchedKeys.length === 0) return fn({
+                    tasks: [],
+                    completed: true
+                });
+
+                $scope.$watch("[loadStatus." + watchedKeys.join(",loadStatus.") + "]", function(tasks) {
+                    // check all tasks, see if there are any outstanding
+                    if (!tasks) return;
+
+                    var result = {
+                        tasks: tasks
+                    };
+
+                    result.currentTask = undefined;
+                    for (var i = 0; i < tasks.length; i++) {
+                        var task = tasks[i];
+                        if (task.error) {
+                            result.currentTask = task;
+                            break;
+                        }
+
+                        if (task.active) {
+                            result.currentTask = task;
+                            break;
+                        }
+                        if (task.progressCurrent < task.progressTotal && (!result.currentTask || task.progressTotal > result.currentTask.progressTotal)) {
+                            result.currentTask = task;
+                            break;
+                        }
+                    }
+                    if (!result.currentTask) {
+                        // finished                    
+                        result.message = "finished";
+                        result.completed = true;
+                    } else {
+                        result.completed = false;
+                        result.title = result.currentTask.title;
+                        result.error = result.currentTask.error;
+                        result.message = result.currentTask.message || (result.currentTask.progressCurrent + " / " + result.currentTask.progressTotal);
+                    }
+
+                    fn(result);
+
+                }, true);
+
+            };
+
+            service.after = function(tasksOrKeys, fn) {
+                service.onUpdate(tasksOrKeys, function(taskGroup) {
+                    if (taskGroup.completed) return fn();
+                });
+            };
+
+            if (tasks) {
+                for (var tk in tasks) {
+                    service.registerTask(tk, tasks[tk]);
                 }
-
-                fn(result);
-
-            }, true);
-
-        };
-
-        service.after = function(tasksOrKeys, fn) {
-            service.onUpdate(tasksOrKeys, function(taskGroup) {
-                if (taskGroup.completed) return fn();
-            });
-        };
-
-        if (tasks) {
-            for (var tk in tasks) {
-                service.registerTask(tk, tasks[tk]);
             }
+            return service;
         }
     };
-    return service;
 });
 Chondric.directive("cjsPopover", function() {
     return {
@@ -1981,7 +1985,13 @@ Chondric.directive('chondricViewport', function($compile) {
             //            console.log("viewport directive");
             var rk = scope.$eval("rk");
             var rv = scope.$eval("rv");
-            if (rv) scope.pageParams = rv.params || {};
+            if (rv) {
+                scope.pageParams = rv.params || {};
+                // add route parameters directly to the scope
+                for (var k in rv.params) {
+                    scope[k] = rv.params[k];
+                }
+            }
             if (rk) scope.pageRoute = rk;
 
             if (!rk && attrs["chondric-viewport"] == "1") return;

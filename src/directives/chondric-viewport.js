@@ -5,7 +5,13 @@ Chondric.directive('chondricViewport', function($compile) {
             //            console.log("viewport directive");
             var rk = scope.$eval("rk");
             var rv = scope.$eval("rv");
-            if (rv) scope.pageParams = rv.params || {};
+            if (rv) {
+                scope.pageParams = rv.params || {};
+                // add route parameters directly to the scope
+                for (var k in rv.params) {
+                    scope[k] = rv.params[k];
+                }
+            }
             if (rk) scope.pageRoute = rk;
 
             if (!rk && attrs["chondric-viewport"] == "1") return;
