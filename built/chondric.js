@@ -709,7 +709,7 @@ Chondric.factory('sharedUi', function() {
         var app = $scope.app;
         $scope.sharedUi = service;
 
-        function addComponent(alias, componentKey) {
+        service.addComponent = function(alias, componentKey) {
             service[alias] = {
                 setState: function(active, available, data) {
                     app.setSharedUiComponentState($scope, componentKey, active, available, data);
@@ -741,10 +741,10 @@ Chondric.factory('sharedUi', function() {
                 },
 
             };
-        }
+        };
 
         for (var alias in componentAliases) {
-            addComponent(alias, componentAliases[alias]);
+            service.addComponent(alias, componentAliases[alias]);
         }
 
         //        if (page.scopePreload) {
