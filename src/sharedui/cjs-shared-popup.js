@@ -8,6 +8,10 @@ Chondric.registerSharedUiComponent({
 
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
+            if (self.data.closeCallback) {
+                routeScope.$eval(self.data.closeCallback)(self.data);
+            }
+
             // need to reset this so the popup doesnt reopen if the page is reactivated.
             self.app.setSharedUiComponentState(routeScope, "cjs-shared-popup", false, true, self.data);
         };

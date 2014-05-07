@@ -806,12 +806,14 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
     "<div class=\"navbar\" ng-style=\"{top: (-60 + (((globalHeaderOptions.v1.active && 60 || 0) * (1 - globalHeaderOptions.transitionState)) + ((globalHeaderOptions.v2.active && 60 || 0) * (globalHeaderOptions.transitionState))))+'px' }\">\n" +
     "    <div class=\"v1\" ng-style=\"{opacity:(1-globalHeaderOptions.transitionState), 'z-index': ((globalHeaderOptions.transitionState > 0.5) ? 1: 2)  }\">\n" +
     "        <button class=\"left\" ng-repeat=\"b in globalHeaderOptions.v1.data.leftButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)\">{{b.title}}</button>\n" +
-    "        <h1>{{globalHeaderOptions.v1.data.title}}</h1>\n" +
+    "        <h1 ng-show=\"!globalHeaderOptions.v1.data.titleEditable\">{{globalHeaderOptions.v1.data.title}}</h1>\n" +
+    "        <input class=\"h1\" ng-show=\"globalHeaderOptions.v1.data.titleEditable\" type=\"text\" ng-model=\"globalHeaderOptions.v1.data.title\" ng-change=\"titleChanged()\" />\n" +
     "        <button class=\"right\" ng-repeat=\"b in globalHeaderOptions.v1.data.rightButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)\">{{b.title}}</button>\n" +
     "    </div>\n" +
     "    <div class=\"v2\" ng-style=\"{opacity:(globalHeaderOptions.transitionState), 'z-index': ((globalHeaderOptions.transitionState > 0.5) ? 2: 1)}\">\n" +
     "        <button class=\"left\" ng-repeat=\"b in globalHeaderOptions.v2.data.leftButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)\">{{b.title}}</button>\n" +
-    "        <h1>{{globalHeaderOptions.v2.data.title}}</h1>\n" +
+    "        <h1 ng-show=\"!globalHeaderOptions.v2.data.titleEditable\">{{globalHeaderOptions.v2.data.title}}</h1>\n" +
+    "        <input class=\"h1\" ng-show=\"globalHeaderOptions.v2.data.titleEditable\" type=\"text\" ng-model=\"globalHeaderOptions.v2.data.title\" ng-change=\"titleChanged()\" />\n" +
     "        <button class=\"right\" ng-repeat=\"b in globalHeaderOptions.v2.data.rightButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)\">{{b.title}}</button>\n" +
     "    </div>\n" +
     "</div>\n"
@@ -1705,7 +1707,9 @@ Chondric.directive("cjsSidepanel", function() {
             });
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
-                if (document.activeElement) document.activeElement.blur();
+                if (document.activeElement && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
+                    document.activeElement.blur();
+                }
                 var transition = "coverRight";
                 var progress = 0;
                 var oldprogress = 0;
@@ -2083,8 +2087,10 @@ Chondric.registerSharedUiComponent({
         self.route = route;
 
         if (window.NativeNav) {
-            var rect = data.element[0].getBoundingClientRect();
-            window.NativeNav.showPopupMenu(route, rect.left, rect.top, rect.width, rect.height, data.items);
+            if (active && data.element && data.element.length > 0) {
+                var rect = data.element[0].getBoundingClientRect();
+                window.NativeNav.showPopupMenu(route, rect.left, rect.top, rect.width, rect.height, data.items);
+            }
         } else {
             if (!active) {
                 self.popuptrigger = null;
@@ -2101,6 +2107,7 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-navigation-bar.html",
     controller: function($scope) {
         var self = $scope.componentDefinition;
+        self.scope = $scope;
         $scope.globalHeaderOptions = self.globalHeaderOptions = {};
 
         $scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
@@ -2116,6 +2123,12 @@ Chondric.registerSharedUiComponent({
             }
         };
 
+        $scope.titleChanged = function() {
+            var routeScope = self.app.scopesForRoutes[self.route];
+            if (routeScope && self.data.titleChanged) {
+                routeScope.$eval(self.data.titleChanged)(self.data.title);
+            }
+        };
     },
     setStatePartial: function(self, initialState, finalState, progress) {
         if (!self.globalHeaderOptions) return;
@@ -2173,6 +2186,10 @@ Chondric.registerSharedUiComponent({
 
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
+            if (self.data.closeCallback) {
+                routeScope.$eval(self.data.closeCallback)(self.data);
+            }
+
             // need to reset this so the popup doesnt reopen if the page is reactivated.
             self.app.setSharedUiComponentState(routeScope, "cjs-shared-popup", false, true, self.data);
         };
@@ -2212,6 +2229,10 @@ Chondric.registerSharedUiComponent({
         self.defaultController = function() {};
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
+            if (self.data.closeCallback) {
+                routeScope.$eval(self.data.closeCallback)(self.data);
+            }
+
             // need to reset this so the popup doesnt reopen if the page is reactivated.
             self.app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
         };
@@ -2294,6 +2315,10 @@ Chondric.registerSharedUiComponent({
         self.defaultController = function() {};
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
+            if (self.data.closeCallback) {
+                routeScope.$eval(self.data.closeCallback)(self.data);
+            }
+
             // need to reset this so the popup doesnt reopen if the page is reactivated.
             self.app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
         };

@@ -22,8 +22,10 @@ Chondric.registerSharedUiComponent({
         self.route = route;
 
         if (window.NativeNav) {
-            var rect = data.element[0].getBoundingClientRect();
-            window.NativeNav.showPopupMenu(route, rect.left, rect.top, rect.width, rect.height, data.items);
+            if (active && data.element && data.element.length > 0) {
+                var rect = data.element[0].getBoundingClientRect();
+                window.NativeNav.showPopupMenu(route, rect.left, rect.top, rect.width, rect.height, data.items);
+            }
         } else {
             if (!active) {
                 self.popuptrigger = null;

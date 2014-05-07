@@ -51,12 +51,14 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
     "<div class=\"navbar\" ng-style=\"{top: (-60 + (((globalHeaderOptions.v1.active && 60 || 0) * (1 - globalHeaderOptions.transitionState)) + ((globalHeaderOptions.v2.active && 60 || 0) * (globalHeaderOptions.transitionState))))+'px' }\">\n" +
     "    <div class=\"v1\" ng-style=\"{opacity:(1-globalHeaderOptions.transitionState), 'z-index': ((globalHeaderOptions.transitionState > 0.5) ? 1: 2)  }\">\n" +
     "        <button class=\"left\" ng-repeat=\"b in globalHeaderOptions.v1.data.leftButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)\">{{b.title}}</button>\n" +
-    "        <h1>{{globalHeaderOptions.v1.data.title}}</h1>\n" +
+    "        <h1 ng-show=\"!globalHeaderOptions.v1.data.titleEditable\">{{globalHeaderOptions.v1.data.title}}</h1>\n" +
+    "        <input class=\"h1\" ng-show=\"globalHeaderOptions.v1.data.titleEditable\" type=\"text\" ng-model=\"globalHeaderOptions.v1.data.title\" ng-change=\"titleChanged()\" />\n" +
     "        <button class=\"right\" ng-repeat=\"b in globalHeaderOptions.v1.data.rightButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)\">{{b.title}}</button>\n" +
     "    </div>\n" +
     "    <div class=\"v2\" ng-style=\"{opacity:(globalHeaderOptions.transitionState), 'z-index': ((globalHeaderOptions.transitionState > 0.5) ? 2: 1)}\">\n" +
     "        <button class=\"left\" ng-repeat=\"b in globalHeaderOptions.v2.data.leftButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)\">{{b.title}}</button>\n" +
-    "        <h1>{{globalHeaderOptions.v2.data.title}}</h1>\n" +
+    "        <h1 ng-show=\"!globalHeaderOptions.v2.data.titleEditable\">{{globalHeaderOptions.v2.data.title}}</h1>\n" +
+    "        <input class=\"h1\" ng-show=\"globalHeaderOptions.v2.data.titleEditable\" type=\"text\" ng-model=\"globalHeaderOptions.v2.data.title\" ng-change=\"titleChanged()\" />\n" +
     "        <button class=\"right\" ng-repeat=\"b in globalHeaderOptions.v2.data.rightButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v2, b, lastTap)\">{{b.title}}</button>\n" +
     "    </div>\n" +
     "</div>\n"

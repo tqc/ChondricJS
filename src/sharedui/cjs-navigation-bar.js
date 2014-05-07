@@ -3,6 +3,7 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-navigation-bar.html",
     controller: function($scope) {
         var self = $scope.componentDefinition;
+        self.scope = $scope;
         $scope.globalHeaderOptions = self.globalHeaderOptions = {};
 
         $scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
@@ -18,6 +19,12 @@ Chondric.registerSharedUiComponent({
             }
         };
 
+        $scope.titleChanged = function() {
+            var routeScope = self.app.scopesForRoutes[self.route];
+            if (routeScope && self.data.titleChanged) {
+                routeScope.$eval(self.data.titleChanged)(self.data.title);
+            }
+        };
     },
     setStatePartial: function(self, initialState, finalState, progress) {
         if (!self.globalHeaderOptions) return;
