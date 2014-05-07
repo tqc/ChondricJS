@@ -38,7 +38,7 @@ exports.update = function(apphostdir, appdef) {
         }
 
         if (targetExists && !previouslyGenerated) {
-            console.log(relativePath + " was created manually - not updating");
+            console.log("Skipping manually created file " + relativePath);
             return;
         }
 
@@ -52,7 +52,7 @@ exports.update = function(apphostdir, appdef) {
             if (filehash != previouslyGenerated) {
                 if (resulthash != previouslyGenerated) {
                     // only report this if the template or appdef has caused a change
-                    console.log(relativePath + " was changed - not updating");
+                    console.log("Skipping modified file " + relativePath);
                 }
                 return;
             }
@@ -64,9 +64,9 @@ exports.update = function(apphostdir, appdef) {
         }
 
         if (targetExists) {
-            console.log(relativePath + " found - updating");
+            console.log("Applying updated template to " + relativePath);
         } else {
-            console.log(relativePath + " not found - creating");
+            console.log("Creating new file " + relativePath);
         }
 
         fs.writeFileSync(targetPath, result);
