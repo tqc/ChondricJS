@@ -42,7 +42,7 @@ Chondric.directive("cjsPopover", function() {
             }
 
             scope.$watch(attrs.cjsPopover, function(val) {
-                if (document.activeElement) document.activeElement.blur();
+                if (document.activeElement && useOverlay) document.activeElement.blur();
                 var overlay = ensureOverlay(element, useOverlay);
 
                 if (!val) {
