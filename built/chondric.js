@@ -12,9 +12,23 @@ if (!window.console) {
 var Chondric = angular.module('chondric', []);
 Chondric.allTransitions = {};
 Chondric.sharedUiComponents = {};
-Chondric.registerSharedUiComponent = function(component) {
-    Chondric.sharedUiComponents[component.id] = component;
+Chondric.registerSharedUiComponent = function(componentOptions, componentCollection) {
+
+    componentCollection = componentCollection || Chondric.sharedUiComponents;
+
+    var component = {};
+    if (componentOptions.baseComponentId) {
+        $.extend(component, componentCollection[componentOptions.baseComponentId]);
+        component["controller-" + componentOptions.baseComponentId] = component.controller;
+        component.baseController = function(baseComponentId, $scope) {
+            component["controller-" + componentOptions.baseComponentId]($scope);
+        };
+    }
+    $.extend(component, componentOptions);
+
+    componentCollection[component.id] = component;
 };
+
 
 Chondric.App =
     Chondric.initApp = function(options) {
@@ -117,22 +131,14 @@ Chondric.App =
         app.sharedUiComponents = {};
         for (var k in Chondric.sharedUiComponents) {
             var sc = Chondric.sharedUiComponents[k];
-            app.sharedUiComponents[k] = {
-                app: app,
-                id: sc.id,
-                template: sc.template,
-                templateUrl: sc.templateUrl,
-                controller: sc.controller,
-                setState: sc.setState,
-                setStatePartial: sc.setStatePartial,
-                updateSwipe: sc.updateSwipe,
-                endSwipe: sc.endSwipe
-            };
+            var ac = app.sharedUiComponents[k] = {};
+            $.extend(ac, sc);
+            ac.app = app;
         }
 
         app.registerSharedUiComponent = function(component) {
-            app.sharedUiComponents[component.id] = component;
             component.app = app;
+            Chondric.registerSharedUiComponent(component, app.sharedUiComponents);
         };
 
         app.controller = function($scope, $location) {
@@ -2229,6 +2235,8 @@ Chondric.registerSharedUiComponent({
 Chondric.registerSharedUiComponent({
     id: "cjs-right-panel",
     templateUrl: "cjs-right-panel.html",
+    handledSwipeState: "rightBorder",
+    transition: "coverRight",
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;
@@ -2240,7 +2248,7 @@ Chondric.registerSharedUiComponent({
             }
 
             // need to reset this so the popup doesnt reopen if the page is reactivated.
-            self.app.setSharedUiComponentState(routeScope, "cjs-right-panel", false, true, self.data);
+            self.app.setSharedUiComponentState(routeScope, self.id, false, true, self.data);
         };
         $scope.runOnMainScope = function(funcName, params) {
             var routeScope = self.app.scopesForRoutes[self.route];
@@ -2257,6 +2265,12 @@ Chondric.registerSharedUiComponent({
         };
 
     },
+    setPanelPosition: function(self, progress) {
+        self.popuptrigger = {
+            progress: progress,
+            transition: self.transition
+        };
+    },
     setState: function(self, route, active, available, data) {
         self.data = data;
         self.route = route;
@@ -2264,15 +2278,9 @@ Chondric.registerSharedUiComponent({
         self.available = available;
 
         if (!active) {
-            self.popuptrigger = {
-                progress: 0,
-                transition: "coverRight"
-            };
+            self.setPanelPosition(self, 0);
         } else {
-            self.popuptrigger = {
-                progress: 1,
-                transition: "coverRight"
-            };
+            self.setPanelPosition(self, 1);
         }
 
     },
@@ -2280,31 +2288,21 @@ Chondric.registerSharedUiComponent({
         if (!self.available) return;
         if (self.active) return;
 
-        if (swipeState.rightBorder) {
-            self.popuptrigger = {
-                progress: swipeState.rightBorder,
-                transition: "coverRight"
-            };
+        if (swipeState[self.handledSwipeState]) {
+            self.setPanelPosition(self, swipeState[self.handledSwipeState]);
             self.scope.$apply();
         }
-
     },
     endSwipe: function(self, swipeState) {
         if (!self.available) return;
         if (self.active) return;
 
-        if (swipeState.rightBorder) {
-            if (swipeState.rightBorder < 0.1) {
-                self.popuptrigger = {
-                    progress: 0,
-                    transition: "coverRight"
-                };
+        if (swipeState[self.handledSwipeState]) {
+            if (swipeState[self.handledSwipeState] < 0.1) {
+                self.setPanelPosition(self, 0);
                 self.scope.$apply();
             } else {
-                self.popuptrigger = {
-                    progress: 1,
-                    transition: "coverRight"
-                };
+                self.setPanelPosition(self, 1);
                 self.scope.$apply();
             }
         }
@@ -2314,88 +2312,20 @@ Chondric.registerSharedUiComponent({
 });
 Chondric.registerSharedUiComponent({
     id: "cjs-left-panel",
+    baseComponentId: "cjs-right-panel",
     templateUrl: "cjs-left-panel.html",
+    handledSwipeState: "leftBorder",
+    transition: "coverLeft",
     controller: function($scope) {
         var self = $scope.componentDefinition;
-        self.scope = $scope;
-        self.defaultController = function() {};
-        $scope.hideModal = function() {
-            var routeScope = self.app.scopesForRoutes[self.route];
-            if (self.data.closeCallback) {
-                routeScope.$eval(self.data.closeCallback)(self.data);
-            }
-
-            // need to reset this so the popup doesnt reopen if the page is reactivated.
-            self.app.setSharedUiComponentState(routeScope, "cjs-left-panel", false, true, self.data);
-        };
-        $scope.runOnMainScope = function(funcName, params) {
-            var routeScope = self.app.scopesForRoutes[self.route];
-            if (routeScope) {
-                routeScope.$eval(funcName).apply(undefined, params);
-            }
-        };
-        $scope.runOnMainScopeAndClose = function(funcName, params) {
-            $scope.hideModal();
-            var routeScope = self.app.scopesForRoutes[self.route];
-            if (routeScope) {
-                routeScope.$eval(funcName).apply(undefined, params);
-            }
+        self.baseController("cjs-right-panel", $scope);
+    },
+    setPanelPosition: function(self, progress) {
+        self.popuptrigger = {
+            progress: progress,
+            transition: "coverLeft"
         };
     },
-    setState: function(self, route, active, available, data) {
-        self.data = data;
-        self.route = route;
-        self.active = active;
-        self.available = available;
-
-        if (!active) {
-            self.popuptrigger = {
-                progress: 0,
-                transition: "coverLeft"
-            };
-        } else {
-            self.popuptrigger = {
-                progress: 1,
-                transition: "coverLeft"
-            };
-        }
-
-    },
-    updateSwipe: function(self, swipeState) {
-        if (!self.available) return;
-        if (self.active) return;
-
-        if (swipeState.leftBorder) {
-            self.popuptrigger = {
-                progress: swipeState.leftBorder,
-                transition: "coverLeft"
-            };
-            self.scope.$apply();
-        }
-
-    },
-    endSwipe: function(self, swipeState) {
-        if (!self.available) return;
-        if (self.active) return;
-
-        if (swipeState.leftBorder) {
-            if (swipeState.leftBorder < 0.1) {
-                self.popuptrigger = {
-                    progress: 0,
-                    transition: "coverLeft"
-                };
-                self.scope.$apply();
-            } else {
-                self.popuptrigger = {
-                    progress: 1,
-                    transition: "coverLeft"
-                };
-                self.scope.$apply();
-            }
-        }
-
-
-    }
 });
 Chondric.allTransitions.crossfade = {
     transitionIn: {

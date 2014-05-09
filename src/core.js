@@ -11,9 +11,23 @@ if (!window.console) {
 var Chondric = angular.module('chondric', []);
 Chondric.allTransitions = {};
 Chondric.sharedUiComponents = {};
-Chondric.registerSharedUiComponent = function(component) {
-    Chondric.sharedUiComponents[component.id] = component;
+Chondric.registerSharedUiComponent = function(componentOptions, componentCollection) {
+
+    componentCollection = componentCollection || Chondric.sharedUiComponents;
+
+    var component = {};
+    if (componentOptions.baseComponentId) {
+        $.extend(component, componentCollection[componentOptions.baseComponentId]);
+        component["controller-" + componentOptions.baseComponentId] = component.controller;
+        component.baseController = function(baseComponentId, $scope) {
+            component["controller-" + componentOptions.baseComponentId]($scope);
+        };
+    }
+    $.extend(component, componentOptions);
+
+    componentCollection[component.id] = component;
 };
+
 
 Chondric.App =
     Chondric.initApp = function(options) {
@@ -116,22 +130,14 @@ Chondric.App =
         app.sharedUiComponents = {};
         for (var k in Chondric.sharedUiComponents) {
             var sc = Chondric.sharedUiComponents[k];
-            app.sharedUiComponents[k] = {
-                app: app,
-                id: sc.id,
-                template: sc.template,
-                templateUrl: sc.templateUrl,
-                controller: sc.controller,
-                setState: sc.setState,
-                setStatePartial: sc.setStatePartial,
-                updateSwipe: sc.updateSwipe,
-                endSwipe: sc.endSwipe
-            };
+            var ac = app.sharedUiComponents[k] = {};
+            $.extend(ac, sc);
+            ac.app = app;
         }
 
         app.registerSharedUiComponent = function(component) {
-            app.sharedUiComponents[component.id] = component;
             component.app = app;
+            Chondric.registerSharedUiComponent(component, app.sharedUiComponents);
         };
 
         app.controller = function($scope, $location) {
