@@ -772,7 +772,8 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('cjs-left-panel.html',
     "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
-    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
+    "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
     "</div>"
   );
 
@@ -843,14 +844,18 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
   $templateCache.put('cjs-right-panel.html',
     "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
-    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
+    "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
+    "\n" +
     "</div>"
   );
 
 
   $templateCache.put('cjs-shared-popup.html',
     "<div cjs-popup=\"componentDefinition.popuptrigger\">\n" +
-    "<div ng-include=\"componentDefinition.data.templateUrl\"></div>\n" +
+    "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
+    "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
+    "\n" +
     "</div>"
   );
 
@@ -1282,10 +1287,8 @@ Chondric.directive("cjsPopover", function() {
                     }
                     element.removeClass("active");
                     window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
-
                 } else {
-                    window.document.addEventListener('mousedown', clickOutsidePopup, true);
-
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                     menuheight = element.height() || menuheight;
                     menuwidth = element.width() || menuwidth;
 
@@ -1418,6 +1421,13 @@ Chondric.directive("cjsPopup", function() {
                 useMouse = false;
             }
 
+            function clickOutsidePopup(e) {
+                if (element[0] != e.target && !element[0].contains(e.target)) {
+                    scope.$apply("hideModal('" + attrs.cjsPopup + "')");
+                }
+            }
+
+
             element.addClass("modal");
             element.addClass("popup");
             var parentPageElement = element.closest(".chondric-page");
@@ -1429,15 +1439,15 @@ Chondric.directive("cjsPopup", function() {
                 parentPageElement.append(overlay);
             }
 
-            overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                scope.$apply("hideModal('" + attrs.cjsPopup + "')");
-            });
             scope.$watch(attrs.cjsPopup, function(val) {
                 if (document.activeElement) document.activeElement.blur();
                 if (!val) {
                     overlay.removeClass("active");
                     element.removeClass("active");
+                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 } else {
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+
                     overlay.addClass("active");
                     element.addClass("active");
                 }
@@ -1686,6 +1696,12 @@ Chondric.directive("cjsSidepanel", function() {
                 useMouse = false;
             }
 
+            function clickOutsidePopup(e) {
+                if (element[0] != e.target && !element[0].contains(e.target)) {
+                    scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
+                }
+            }
+
             element.addClass("modal");
             element.addClass("sidepanel");
 
@@ -1714,9 +1730,6 @@ Chondric.directive("cjsSidepanel", function() {
             }
 
 
-            overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
-            });
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
                 if (document.activeElement && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
@@ -1748,6 +1761,8 @@ Chondric.directive("cjsSidepanel", function() {
 
                 if (progress == 1) {
                     overlay.addClass("active");
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+
                     if (!oldprogress) {
                         // ensure initial position was set
                         panelTransitions[transition].init(element, parentPageElement, overlay);
@@ -1762,9 +1777,11 @@ Chondric.directive("cjsSidepanel", function() {
                         panelTransitions[transition].reset(element, parentPageElement, overlay);
                     }, time);
                     overlay.removeClass("active");
+                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 } else {
                     panelTransitions[transition].progress(element, parentPageElement, overlay, progress);
                     overlay.addClass("active");
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 }
 
             });
@@ -2015,18 +2032,11 @@ Chondric.directive('chondricViewport', function($compile) {
             var template = "";
             if (!rv) {
                 // first level
-                scope.handleSharedPopupButtonClick = function(b) {
-                    var options = scope.globalPopupMenu;
-                    scope.hideModal("globalPopupMenu");
-                    if (b.action) {
-                        options.scope.$eval(b.action);
-                    }
-                };
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
                 template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
                 template += "</div>";
-                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component>";
+                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component testattr='{{componentId}}'>";
                 template += "</div>";
 
                 //                template += "</div>"
@@ -2058,6 +2068,8 @@ Chondric.directive('cjsSharedComponent', function($compile) {
         scope: true,
         link: function(scope, element) {
             var cd = scope.componentDefinition;
+            // no need to create html elements when using the native implementation
+            if (cd.isNative && cd.isNative()) return;
             element.addClass("sharedcomponent-" + cd.id);
             var template = "";
             template += "<div ng-controller=\"componentDefinition.controller\" >";
@@ -2075,9 +2087,60 @@ Chondric.directive('cjsSharedComponent', function($compile) {
         }
     };
 });
+Chondric.directive("cjsJsonTemplate", function($compile) {
+
+    var templates = {
+        container: function(template) {
+            var html = "";
+            for (var i = 0; i < template.children.length; i++) {
+                html += templates[template.children[i].type](template.children[i]);
+            }
+            return html;
+        },
+        body: function(template) {
+            var html = "";
+            for (var i = 0; i < template.children.length; i++) {
+                html += templates[template.children[i].type](template.children[i]);
+            }
+            return "<div class='body'>" + html + "</div>";
+        },
+        h2: function(template) {
+            return "<h2>{{data." + template.data + "}}</h2>";
+        },
+        p: function(template) {
+            return "<p>{{data." + template.data + "}}</p>";
+        }
+    };
+
+
+    return {
+
+        //        restrict: "E",
+        template: "Testing a template...",
+        scope: {
+            template: "=cjsJsonTemplate"
+        },
+        link: function(scope, element, attrs) {
+
+            var template = scope.template;
+            var html = templates[template.type](template);
+            var newElement = angular.element(html);
+            $compile(newElement)(scope);
+            element.html("");
+            element.append(newElement);
+
+            scope.$parent.$watch(attrs.data, function(val) {
+                scope.data = val;
+            });
+        }
+    };
+});
 Chondric.registerSharedUiComponent({
     id: "cjs-action-sheet",
     templateUrl: "cjs-action-sheet.html",
+    isNative: function() {
+        return window.NativeNav;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         $scope.hideModal = function() {
@@ -2117,6 +2180,9 @@ Chondric.registerSharedUiComponent({
 Chondric.registerSharedUiComponent({
     id: "cjs-navigation-bar",
     templateUrl: "cjs-navigation-bar.html",
+    isNative: function() {
+        return false;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;
@@ -2191,6 +2257,9 @@ Chondric.registerSharedUiComponent({
 Chondric.registerSharedUiComponent({
     id: "cjs-shared-popup",
     templateUrl: "cjs-shared-popup.html",
+    isNative: function() {
+        return false;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;
@@ -2237,9 +2306,13 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-right-panel.html",
     handledSwipeState: "rightBorder",
     transition: "coverRight",
+    isNative: function() {
+        return false;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;
+        $scope.componentId = self.id;
         self.defaultController = function() {};
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
@@ -2287,7 +2360,6 @@ Chondric.registerSharedUiComponent({
     updateSwipe: function(self, swipeState) {
         if (!self.available) return;
         if (self.active) return;
-
         if (swipeState[self.handledSwipeState]) {
             self.setPanelPosition(self, swipeState[self.handledSwipeState]);
             self.scope.$apply();
@@ -2319,13 +2391,17 @@ Chondric.registerSharedUiComponent({
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.baseController("cjs-right-panel", $scope);
-    },
-    setPanelPosition: function(self, progress) {
-        self.popuptrigger = {
-            progress: progress,
-            transition: "coverLeft"
+
+        $scope.hideModal = function() {
+            var routeScope = self.app.scopesForRoutes[self.route];
+            if (self.data.closeCallback) {
+                routeScope.$eval(self.data.closeCallback)(self.data);
+            }
+
+            // need to reset this so the popup doesnt reopen if the page is reactivated.
+            self.app.setSharedUiComponentState(routeScope, self.id, false, true, self.data);
         };
-    },
+    }
 });
 Chondric.allTransitions.crossfade = {
     transitionIn: {

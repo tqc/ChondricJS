@@ -266,6 +266,7 @@ exports.hostApp = function(options) {
             srcDir + "/directives/cjs-swipe.js",
             srcDir + "/directives/cjs-preview-controls.js",
             srcDir + "/directives/chondric-viewport.js",
+            srcDir + "/directives/cjs-json-template.js",
             srcDir + "/sharedui/cjs-action-sheet.js",
             srcDir + "/sharedui/cjs-navigation-bar.js",
             srcDir + "/sharedui/cjs-shared-popup.js",

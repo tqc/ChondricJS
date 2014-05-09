@@ -12,6 +12,13 @@ Chondric.directive("cjsPopup", function() {
                 useMouse = false;
             }
 
+            function clickOutsidePopup(e) {
+                if (element[0] != e.target && !element[0].contains(e.target)) {
+                    scope.$apply("hideModal('" + attrs.cjsPopup + "')");
+                }
+            }
+
+
             element.addClass("modal");
             element.addClass("popup");
             var parentPageElement = element.closest(".chondric-page");
@@ -23,15 +30,15 @@ Chondric.directive("cjsPopup", function() {
                 parentPageElement.append(overlay);
             }
 
-            overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                scope.$apply("hideModal('" + attrs.cjsPopup + "')");
-            });
             scope.$watch(attrs.cjsPopup, function(val) {
                 if (document.activeElement) document.activeElement.blur();
                 if (!val) {
                     overlay.removeClass("active");
                     element.removeClass("active");
+                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 } else {
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+
                     overlay.addClass("active");
                     element.addClass("active");
                 }

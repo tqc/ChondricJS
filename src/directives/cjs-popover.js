@@ -51,10 +51,8 @@ Chondric.directive("cjsPopover", function() {
                     }
                     element.removeClass("active");
                     window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
-
                 } else {
-                    window.document.addEventListener('mousedown', clickOutsidePopup, true);
-
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                     menuheight = element.height() || menuheight;
                     menuwidth = element.width() || menuwidth;
 

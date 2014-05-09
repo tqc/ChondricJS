@@ -19,18 +19,11 @@ Chondric.directive('chondricViewport', function($compile) {
             var template = "";
             if (!rv) {
                 // first level
-                scope.handleSharedPopupButtonClick = function(b) {
-                    var options = scope.globalPopupMenu;
-                    scope.hideModal("globalPopupMenu");
-                    if (b.action) {
-                        options.scope.$eval(b.action);
-                    }
-                };
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
                 template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
                 template += "</div>";
-                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component>";
+                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component testattr='{{componentId}}'>";
                 template += "</div>";
 
                 //                template += "</div>"
@@ -62,6 +55,8 @@ Chondric.directive('cjsSharedComponent', function($compile) {
         scope: true,
         link: function(scope, element) {
             var cd = scope.componentDefinition;
+            // no need to create html elements when using the native implementation
+            if (cd.isNative && cd.isNative()) return;
             element.addClass("sharedcomponent-" + cd.id);
             var template = "";
             template += "<div ng-controller=\"componentDefinition.controller\" >";

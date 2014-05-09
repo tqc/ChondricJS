@@ -3,9 +3,13 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-right-panel.html",
     handledSwipeState: "rightBorder",
     transition: "coverRight",
+    isNative: function() {
+        return false;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;
+        $scope.componentId = self.id;
         self.defaultController = function() {};
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
@@ -53,7 +57,6 @@ Chondric.registerSharedUiComponent({
     updateSwipe: function(self, swipeState) {
         if (!self.available) return;
         if (self.active) return;
-
         if (swipeState[self.handledSwipeState]) {
             self.setPanelPosition(self, swipeState[self.handledSwipeState]);
             self.scope.$apply();

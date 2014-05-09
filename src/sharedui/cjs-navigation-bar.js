@@ -1,6 +1,9 @@
 Chondric.registerSharedUiComponent({
     id: "cjs-navigation-bar",
     templateUrl: "cjs-navigation-bar.html",
+    isNative: function() {
+        return false;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;

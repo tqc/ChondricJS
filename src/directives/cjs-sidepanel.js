@@ -239,6 +239,12 @@ Chondric.directive("cjsSidepanel", function() {
                 useMouse = false;
             }
 
+            function clickOutsidePopup(e) {
+                if (element[0] != e.target && !element[0].contains(e.target)) {
+                    scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
+                }
+            }
+
             element.addClass("modal");
             element.addClass("sidepanel");
 
@@ -267,9 +273,6 @@ Chondric.directive("cjsSidepanel", function() {
             }
 
 
-            overlay.on(useMouse ? "mousedown" : "touchstart", function() {
-                scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
-            });
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
                 if (document.activeElement && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
@@ -301,6 +304,8 @@ Chondric.directive("cjsSidepanel", function() {
 
                 if (progress == 1) {
                     overlay.addClass("active");
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+
                     if (!oldprogress) {
                         // ensure initial position was set
                         panelTransitions[transition].init(element, parentPageElement, overlay);
@@ -315,9 +320,11 @@ Chondric.directive("cjsSidepanel", function() {
                         panelTransitions[transition].reset(element, parentPageElement, overlay);
                     }, time);
                     overlay.removeClass("active");
+                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 } else {
                     panelTransitions[transition].progress(element, parentPageElement, overlay, progress);
                     overlay.addClass("active");
+                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 }
 
             });

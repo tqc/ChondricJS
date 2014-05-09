@@ -1,6 +1,9 @@
 Chondric.registerSharedUiComponent({
     id: "cjs-shared-popup",
     templateUrl: "cjs-shared-popup.html",
+    isNative: function() {
+        return false;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;

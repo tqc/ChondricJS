@@ -1,6 +1,9 @@
 Chondric.registerSharedUiComponent({
     id: "cjs-action-sheet",
     templateUrl: "cjs-action-sheet.html",
+    isNative: function() {
+        return window.NativeNav;
+    },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         $scope.hideModal = function() {
