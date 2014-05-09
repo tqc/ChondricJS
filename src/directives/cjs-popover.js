@@ -20,6 +20,13 @@ Chondric.directive("cjsPopover", function() {
             element.addClass("modal");
             element.addClass("popover");
 
+            function clickOutsidePopup(e) {
+                if (element[0] != e.target && !element[0].contains(e.target)) {
+                    scope.$apply("hideModal('" + attrs.cjsPopover + "')");
+                }
+            }
+
+
             function ensureOverlay(element, useOverlay) {
                 var parentPageElement = element.closest(".chondric-page");
                 if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
@@ -30,11 +37,6 @@ Chondric.directive("cjsPopover", function() {
                         overlay = angular.element('<div class="modal-overlay"></div>');
                         parentPageElement.append(overlay);
                     }
-                    var hide = function() {
-                        scope.$apply("hideModal('" + attrs.cjsPopover + "')");
-                        overlay.off(useMouse ? "mousedown" : "touchstart", hide);
-                    };
-                    overlay.on(useMouse ? "mousedown" : "touchstart", hide);
                     return overlay;
                 }
             }
@@ -48,12 +50,16 @@ Chondric.directive("cjsPopover", function() {
                         overlay.removeClass("active");
                     }
                     element.removeClass("active");
+                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+
                 } else {
+                    window.document.addEventListener('mousedown', clickOutsidePopup, true);
+
                     menuheight = element.height() || menuheight;
                     menuwidth = element.width() || menuwidth;
 
                     var menupos = {};
-                    // TODO: should get actual size of the element, but it is display:none at this point.
+                    // TODO: should get actual size of the element, but it is display: none at this point.
 
                     var sw = element[0].offsetParent.offsetWidth;
                     var sh = element[0].offsetParent.offsetHeight;
