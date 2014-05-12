@@ -48,6 +48,8 @@ Chondric.registerSharedUiComponent({
             self.route = finalState.route;
             self.data = finalState.data;
         }
+
+
     },
     setState: function(self, route, active, available, data) {
         if (!self.globalHeaderOptions) return;
@@ -72,6 +74,7 @@ Chondric.registerSharedUiComponent({
             };
             self.globalHeaderOptions.transitionState = 1;
         }
+
 
     }
 });

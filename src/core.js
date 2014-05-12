@@ -192,6 +192,16 @@ Chondric.App =
                 if (active === true || active === false) cs.active = active;
                 if (available === true || available === false) cs.available = available;
                 if (data !== undefined) cs.data = data;
+                var uc = routeScope.usedComponents;
+                var uci = uc.asArray.indexOf("uses-" + componentId);
+                if (available && uci < 0) {
+                    uc.asArray.push("uses-" + componentId);
+                    uc.asString = uc.asArray.join(" ");
+                } else if (!available && uci >= 0) {
+                    uc.asArray.splice(uci, 1);
+                    uc.asString = uc.asArray.join(" ");
+                }
+
 
                 if ($scope.route == routeScope.rk) {
                     var component = app.sharedUiComponents[componentId];
@@ -615,9 +625,9 @@ Chondric.App =
                     var h = $(window).height();
                     console.log("Size changed: " + w + "x" + h);
                     if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
-                        $(".viewport").addClass("hasstatusbar");
+                        $(".chondric-viewport").addClass("hasstatusbar");
                     } else {
-                        $(".viewport").removeClass("hasstatusbar");
+                        $(".chondric-viewport").removeClass("hasstatusbar");
                     }
 
                     // for phone screens a multicolumn layout doesn't make sense

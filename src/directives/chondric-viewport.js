@@ -35,8 +35,12 @@ Chondric.directive('chondricViewport', function($compile) {
                 template += "</div>";
 
             } else if (rv.templateUrl) {
-                template = "<div  ng-controller=\"rv.controller\" cjs-swipe> <div ng-include src=\"rv.templateUrl\"></div>";
+                template = "<div  ng-controller=\"rv.controller\" cjs-swipe class=\"{{usedComponents.asString}}\"> <div ng-include src=\"rv.templateUrl\"></div>";
                 template += '</div>';
+                scope.usedComponents = {
+                    asArray: [],
+                    asString: ""
+                };
 
             } else {
                 template = "<span>Template not set</span>";

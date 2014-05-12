@@ -193,6 +193,16 @@ Chondric.App =
                 if (active === true || active === false) cs.active = active;
                 if (available === true || available === false) cs.available = available;
                 if (data !== undefined) cs.data = data;
+                var uc = routeScope.usedComponents;
+                var uci = uc.asArray.indexOf("uses-" + componentId);
+                if (available && uci < 0) {
+                    uc.asArray.push("uses-" + componentId);
+                    uc.asString = uc.asArray.join(" ");
+                } else if (!available && uci >= 0) {
+                    uc.asArray.splice(uci, 1);
+                    uc.asString = uc.asArray.join(" ");
+                }
+
 
                 if ($scope.route == routeScope.rk) {
                     var component = app.sharedUiComponents[componentId];
@@ -616,9 +626,9 @@ Chondric.App =
                     var h = $(window).height();
                     console.log("Size changed: " + w + "x" + h);
                     if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
-                        $(".viewport").addClass("hasstatusbar");
+                        $(".chondric-viewport").addClass("hasstatusbar");
                     } else {
-                        $(".viewport").removeClass("hasstatusbar");
+                        $(".chondric-viewport").removeClass("hasstatusbar");
                     }
 
                     // for phone screens a multicolumn layout doesn't make sense
@@ -810,7 +820,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-navigation-bar.html',
-    "<div class=\"navbar\" ng-style=\"{top: (-60 + (((globalHeaderOptions.v1.active && 60 || 0) * (1 - globalHeaderOptions.transitionState)) + ((globalHeaderOptions.v2.active && 60 || 0) * (globalHeaderOptions.transitionState))))+'px' }\">\n" +
+    "<div class=\"navbar\" ng-style=\"{'-webkit-transform': 'translate(0, '+(-60 + (((globalHeaderOptions.v1.active && 60 || 0) * (1 - globalHeaderOptions.transitionState)) + ((globalHeaderOptions.v2.active && 60 || 0) * (globalHeaderOptions.transitionState))))+'px)' }\">\n" +
     "    <div class=\"v1\" ng-style=\"{opacity:(1-globalHeaderOptions.transitionState), 'z-index': ((globalHeaderOptions.transitionState > 0.5) ? 1: 2)  }\">\n" +
     "        <button class=\"left\" ng-repeat=\"b in globalHeaderOptions.v1.data.leftButtons\" ng-tap=\"handleSharedHeaderButtonClick(globalHeaderOptions.v1, b, lastTap)\">{{b.title}}</button>\n" +
     "        <h1 ng-show=\"!globalHeaderOptions.v1.data.titleEditable\">{{globalHeaderOptions.v1.data.title}}</h1>\n" +
@@ -2054,8 +2064,12 @@ Chondric.directive('chondricViewport', function($compile) {
                 template += "</div>";
 
             } else if (rv.templateUrl) {
-                template = "<div  ng-controller=\"rv.controller\" cjs-swipe> <div ng-include src=\"rv.templateUrl\"></div>";
+                template = "<div  ng-controller=\"rv.controller\" cjs-swipe class=\"{{usedComponents.asString}}\"> <div ng-include src=\"rv.templateUrl\"></div>";
                 template += '</div>';
+                scope.usedComponents = {
+                    asArray: [],
+                    asString: ""
+                };
 
             } else {
                 template = "<span>Template not set</span>";
@@ -2233,6 +2247,8 @@ Chondric.registerSharedUiComponent({
             self.route = finalState.route;
             self.data = finalState.data;
         }
+
+
     },
     setState: function(self, route, active, available, data) {
         if (!self.globalHeaderOptions) return;
@@ -2257,6 +2273,7 @@ Chondric.registerSharedUiComponent({
             };
             self.globalHeaderOptions.transitionState = 1;
         }
+
 
     }
 });

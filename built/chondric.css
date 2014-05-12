@@ -85,27 +85,6 @@ input, textarea, [contenteditable=true] {
 .clear {
     clear: both;
 }
-*[data-role="viewTemplate"] {
-    display: none;
-}
-*[data-role="viewEmpty"] {
-    display: none;
-}
-ul.emptylist>li[data-role="viewEmpty"] {
-    display: block;
-}
-.ui-dialog {
-    background: transparent;
-}
-.ui-dialog-contain {
-    width: 60%;
-    max-width: none;
-    margin: 10% auto 15px auto;
-    padding: 0;
-    position: relative;
-    height: 60%;
-    max-height: none;
-}
 .sidebar {
     position: absolute;
     width: 400px;
@@ -272,14 +251,17 @@ button.icon-only {
     top:0;
     left: 0;
     right:0;
+    background-color: #f7f7f8;
     background-color: rgba(248, 248, 248, 0.9);
     height: 44px;
     z-index: 10;
-    background-color: #f7f7f8;
     border-bottom: 1px solid #c4c4c4;
     font-size: 17px;
 }
 
+.hasstatusbar .navbar {
+    top:20px;
+}
 .navbar>.v1,.navbar>.v2 {
      position: absolute;
     top:0;
@@ -288,9 +270,6 @@ button.icon-only {
     bottom: 0;
 }
 
-.hasstatusbar .navbar {
-    top:20px;
-}
 .navbar.nobg {
     background-color: transparent;
 }
@@ -428,12 +407,25 @@ background-color: transparent;
     left:0;
     right:0;
     bottom:0;
-    padding: 45px 0 80px 0;
     z-index: 1;
 }
+
 .hasstatusbar .body {
+    padding-top:20px;
+}
+
+.uses-cjs-navigation-bar .body {
     padding-top:60px;
 }
+
+.hasstatusbar .uses-cjs-navigation-bar  .body {
+    padding-top:80px;
+}
+
+.hastoolbar .body {
+padding-bottom: 80px;
+}
+
 .body.hidden {
     display: none;
 }
