@@ -1,4 +1,4 @@
-/*! chondric-tools 0.4.1 */
+/*! chondric-tools 0.5.0 */
 // ie doesn't like console.log
 
 if (!window.console) {
@@ -861,6 +861,8 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 }]);
 
+/* jshint devel: true, browser: true */
+
 Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 
     this.sqlerror = function(t, err) {
@@ -1152,10 +1154,11 @@ Chondric.factory('loadStatus', function() {
                         task.active = false;
                         task.error = message;
                     },
-                    progress: function(progress, total) {
+                    progress: function(progress, total, message) {
                         task.active = true;
                         task.progressCurrent = progress;
                         if (total !== undefined) task.progressTotal = total;
+                        if (message !== undefined) task.message = message;
                     }
                 };
                 $.extend(task, taskOptions);
@@ -1455,6 +1458,9 @@ Chondric.directive("cjsPopup", function() {
         }
     };
 });
+// todo: remopve this once transitions are fully implemented
+/* jshint unused: false */
+
 Chondric.directive("cjsSidepanel", function() {
 
     var panelTransitions = {
@@ -2657,6 +2663,9 @@ Chondric.allTransitions.slideright = {
         });
     }
 };
+/* jshint devel: true, browser: true, unused: false */
+/* global Chondric: true */
+
 Chondric.Syncable = function(options) {
     var syncable = this;
 
