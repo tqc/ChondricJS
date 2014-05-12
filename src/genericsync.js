@@ -1,3 +1,6 @@
+/* jshint devel: true, browser: true, unused: false */
+/* global Chondric: true */
+
 Chondric.Syncable = function(options) {
     var syncable = this;
 

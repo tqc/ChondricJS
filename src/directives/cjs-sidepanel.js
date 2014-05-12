@@ -1,3 +1,6 @@
+// todo: remopve this once transitions are fully implemented
+/* jshint unused: false */
+
 Chondric.directive("cjsSidepanel", function() {
 
     var panelTransitions = {

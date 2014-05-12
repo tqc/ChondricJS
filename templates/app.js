@@ -1,3 +1,7 @@
+/* jshint browser: true, strict:false, unused:false */
+/* global Chondric: true */
+/* global app: true */
+
 var app = new Chondric.App({
     name: "__APPTITLE__",
     mightBePhoneGap: true,

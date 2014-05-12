@@ -1,3 +1,5 @@
+/* jshint devel: true, browser: true */
+
 Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 
     this.sqlerror = function(t, err) {

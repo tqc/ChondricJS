@@ -1,7 +1,7 @@
 {
   "browser": true,
   "esnext": true,
-  "globals": {"Chondric": true, "angular":true, "$":true},
+  "globals": {"Chondric": true, "angular":true, "$":true, "console": true},
   "globalstrict": false,
   "quotmark": false,
   "smarttabs": true,

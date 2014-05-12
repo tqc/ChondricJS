@@ -1,3 +1,4 @@
+/* jshint unused: false */
 "use strict";
 var chondric = require("chondric-tools");
 

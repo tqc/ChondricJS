@@ -125,11 +125,14 @@ exports.update = function(apphostdir, appdef) {
         updateFile(apphostdir, appdef.appHost + ".js", "apphost.js", standardSubstitution);
         updateFile(apphostdir, "package.json", "package.json", standardSubstitution);
         updateFile(apphostdir, ".env", "template.env", noSubstitution);
-        updateFile(apphostdir, ".gitignore", "template.gitignore", noSubstitution);
-        updateFile(apphostdir, ".bowerrc", "bowerrc.json", standardSubstitution);
-        updateFile(apphostdir, "bower.json", "bower.json", standardSubstitution);
         updateFile(apphostdir, ".jshintrc", "template.node.jshintrc", standardSubstitution);
     }
+
+
+    updateFile(apphostdir, ".gitignore", "template.gitignore", noSubstitution);
+    updateFile(apphostdir, ".jshintignore", "template.jshintignore", standardSubstitution);
+    updateFile(apphostdir, ".bowerrc", "bowerrc.json", standardSubstitution);
+    updateFile(apphostdir, "bower.json", "bower.json", standardSubstitution);
 
 
 

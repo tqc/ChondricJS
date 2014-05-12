@@ -1,9 +1,13 @@
+/* jshint devel: true, browser: true */
+/* global Chondric: true */
+/* global app: true */
+/* exported ExampleDb */
 function ExampleDb() {
-
+    "use strict";
     var db;
-    if (app.isPhonegap) {
+    if (app.isPhonegap && window.sqlitePlugin) {
         console.log("using native db");
-        db = sqlitePlugin.openDatabase("ExampleDb", "", "Example local database", 1000000);
+        db = window.sqlitePlugin.openDatabase("ExampleDb", "", "Example local database", 1000000);
 
     } else {
         console.log("Using web db");
