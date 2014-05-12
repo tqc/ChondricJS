@@ -95,10 +95,11 @@ Chondric.factory('loadStatus', function() {
                         task.active = false;
                         task.error = message;
                     },
-                    progress: function(progress, total) {
+                    progress: function(progress, total, message) {
                         task.active = true;
                         task.progressCurrent = progress;
                         if (total !== undefined) task.progressTotal = total;
+                        if (message !== undefined) task.message = message;
                     }
                 };
                 $.extend(task, taskOptions);
