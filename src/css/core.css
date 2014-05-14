@@ -259,8 +259,9 @@ button.icon-only {
 }
 
 .hasstatusbar .navbar {
-    top:20px;
+    padding-top:20px;
 }
+
 .navbar>.v1,.navbar>.v2 {
      position: absolute;
     top:0;
@@ -268,6 +269,11 @@ button.icon-only {
     right:0;
     bottom: 0;
 }
+
+.hasstatusbar .navbar>.v1,.hasstatusbar .navbar>.v2 {
+    top:20px;
+}
+
 
 .navbar.nobg {
     background-color: transparent;
@@ -294,7 +300,7 @@ button.icon-only {
 }
 .navbar h1 {
     position: absolute;
-    top:0;
+    bottom:0;
     left: 33%;
     right:33%;
     margin: 0;
@@ -413,11 +419,14 @@ background-color: transparent;
     padding-top:20px;
 }
 
-.uses-cjs-navigation-bar .body {
+.uses-cjs-navigation-bar .body,
+.navbar ~ .body
+ {
     padding-top:60px;
-}
+ }
 
-.hasstatusbar .uses-cjs-navigation-bar  .body {
+.hasstatusbar .uses-cjs-navigation-bar  .body,
+.hasstatusbar .navbar ~ .body {
     padding-top:80px;
 }
 
