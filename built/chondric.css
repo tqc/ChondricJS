@@ -431,8 +431,9 @@ background-color: transparent;
     padding-top:80px;
 }
 
-.hastoolbar .body {
-padding-bottom: 80px;
+.uses-cjs-tab-footer .body,
+.tabbar ~ .body {
+    padding-bottom:80px;
 }
 
 .body.hidden {
