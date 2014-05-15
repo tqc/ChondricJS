@@ -364,6 +364,7 @@ background-color: transparent;
     text-align: center;
     z-index: 10;
     background-color: #f7f7f8;
+    background-color: rgba(248, 248, 248, 0.9);
     border-top: 1px solid #c4c4c4;
     padding-top: 10px;
 }
@@ -809,6 +810,21 @@ display: inline;
     background-repeat: no-repeat;
     display: block;
     line-height: 40px;
+}
+
+.icon-custom::before {
+    display: none !important;
+}
+
+ .icon-top.icon-custom .maskedicon {
+        background-color: currentColor;
+        -webkit-mask-position: center;
+    -webkit-mask-size: 32px;
+    -webkit-mask-repeat: no-repeat;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: block;
+    height: 40px;
 }
 
 /* Standard icons */

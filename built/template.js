@@ -102,7 +102,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   $templateCache.put('cjs-tab-footer.html',
     "<div class=\"tabbar\" ng-show=\"componentDefinition.active\">\n" +
     "\n" +
-    "    <button ng-repeat=\"tab in componentDefinition.data.buttons\"  ng-tap=\"setTab(tab.value)\" ng-class=\"{selected: tab.value == componentDefinition.data.selectedTab}\" class=\"icon-top icon-default\">{{tab.title}}</button>\n" +
+    "    <button ng-repeat=\"tab in componentDefinition.data.buttons\"  ng-tap=\"setTab(tab.value)\" ng-class=\"{selected: tab.value == componentDefinition.data.selectedTab}\" class=\"icon-top icon-custom\"><div class=\"maskedicon\" ng-style=\"{'-webkit-mask-image': 'url('+tab.icon+')'}\"></div> {{tab.title}}</button>\n" +
     "\n" +
     "    \n" +
     "</div>"

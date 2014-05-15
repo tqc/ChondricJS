@@ -873,7 +873,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   $templateCache.put('cjs-tab-footer.html',
     "<div class=\"tabbar\" ng-show=\"componentDefinition.active\">\n" +
     "\n" +
-    "    <button ng-repeat=\"tab in componentDefinition.data.buttons\"  ng-tap=\"setTab(tab.value)\" ng-class=\"{selected: tab.value == componentDefinition.data.selectedTab}\" class=\"icon-top icon-default\">{{tab.title}}</button>\n" +
+    "    <button ng-repeat=\"tab in componentDefinition.data.buttons\"  ng-tap=\"setTab(tab.value)\" ng-class=\"{selected: tab.value == componentDefinition.data.selectedTab}\" class=\"icon-top icon-custom\"><div class=\"maskedicon\" ng-style=\"{'-webkit-mask-image': 'url('+tab.icon+')'}\"></div> {{tab.title}}</button>\n" +
     "\n" +
     "    \n" +
     "</div>"
@@ -2286,6 +2286,35 @@ Chondric.registerSharedUiComponent({
 
 
     }
+});
+Chondric.registerSharedUiComponent({
+    id: "cjs-tab-footer",
+    templateUrl: "cjs-tab-footer.html",
+    isNative: function() {
+        return false;
+    },
+    controller: function($scope) {
+        var self = $scope.componentDefinition;
+        self.scope = $scope;
+        $scope.componentId = self.id;
+
+        $scope.setTab = function(val) {
+            self.data.selectedTab = val;
+            var routeScope = self.app.scopesForRoutes[self.route];
+            if (routeScope) {
+                routeScope.$eval(self.data.setTab || "setTab")(val);
+            }
+        };
+
+    },
+    setState: function(self, route, active, available, data) {
+        self.data = data;
+        self.route = route;
+        self.active = active;
+        self.available = available;
+
+    },
+
 });
 Chondric.registerSharedUiComponent({
     id: "cjs-shared-popup",

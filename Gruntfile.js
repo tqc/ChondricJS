@@ -16,6 +16,7 @@ module.exports = function(grunt) {
         "src/directives/cjs-json-template.js",
         "src/sharedui/cjs-action-sheet.js",
         "src/sharedui/cjs-navigation-bar.js",
+        "src/sharedui/cjs-tab-footer.js",
         "src/sharedui/cjs-shared-popup.js",
         "src/sharedui/cjs-right-panel.js",
         "src/sharedui/cjs-left-panel.js",
