@@ -275,6 +275,7 @@ exports.hostApp = function(options) {
             srcDir + "/sharedui/cjs-shared-popup.js",
             srcDir + "/sharedui/cjs-right-panel.js",
             srcDir + "/sharedui/cjs-left-panel.js",
+            srcDir + "/sharedui/cjs-tab-footer.js",
             srcDir + "/transitions/crossfade.js",
             srcDir + "/transitions/sidepanel.js",
             srcDir + "/transitions/slide.js"
