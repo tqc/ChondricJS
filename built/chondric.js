@@ -244,7 +244,7 @@ Chondric.App =
                     var ar = "";
                     var params = {};
                     for (var j = 0; j < mrp.length; j++) {
-                        if (mrp[j][0] == "$") params[mrp[j].substr(1)] = decodeURIComponent(parts[j]);
+                        if (mrp[j][0] == "$" && parts[j]) params[mrp[j].substr(1)] = decodeURIComponent(parts[j]);
                         if (parts[j]) ar += "/" + parts[j];
                     }
                     if (template.isSection) {
@@ -351,7 +351,7 @@ Chondric.App =
                 for (var p in swipeState) {
                     if (swipeState[p] && swipeNav[p]) {
                         if (swipeNav[p].route) {
-                            if (swipeState[p] > 0.6) {
+                            if (swipeState[p] > 0.4) {
                                 // continue change to next page
                                 loadView(swipeNav[p].route);
                                 $scope.transition.progress = 1;
