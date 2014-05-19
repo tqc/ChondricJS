@@ -873,7 +873,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   $templateCache.put('cjs-tab-footer.html',
     "<div class=\"tabbar\" ng-show=\"componentDefinition.active\">\n" +
     "\n" +
-    "    <button ng-repeat=\"tab in componentDefinition.data.buttons\"  ng-tap=\"setTab(tab.value)\" ng-class=\"{selected: tab.value == componentDefinition.data.selectedTab}\" class=\"icon-top icon-custom\"><div class=\"maskedicon\" ng-style=\"{'-webkit-mask-image': 'url('+tab.icon+')'}\"></div> {{tab.title}}</button>\n" +
+    "    <button ng-repeat=\"tab in componentDefinition.data.buttons track by tab.value\"  ng-tap=\"setTab(tab.value)\" ng-class=\"{selected: tab.value == componentDefinition.selectedTab}\" class=\"icon-top icon-custom\"><div class=\"maskedicon\" ng-style=\"{'-webkit-mask-image': 'url('+tab.icon+')'}\"></div> {{tab.title}}</button>\n" +
     "\n" +
     "    \n" +
     "</div>"
@@ -2299,7 +2299,7 @@ Chondric.registerSharedUiComponent({
         $scope.componentId = self.id;
 
         $scope.setTab = function(val) {
-            self.data.selectedTab = val;
+            self.selectedTab = val;
             var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
                 routeScope.$eval(self.data.setTab || "setTab")(val);
@@ -2312,7 +2312,7 @@ Chondric.registerSharedUiComponent({
         self.route = route;
         self.active = active;
         self.available = available;
-
+        self.selectedTab = data.selectedTab;
     },
 
 });

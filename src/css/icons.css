@@ -46,7 +46,7 @@
  .icon-top.icon-custom .maskedicon {
         background-color: currentColor;
         -webkit-mask-position: center;
-    -webkit-mask-size: 32px;
+    -webkit-mask-size: contain;
     -webkit-mask-repeat: no-repeat;
     background-position: center;
     background-repeat: no-repeat;

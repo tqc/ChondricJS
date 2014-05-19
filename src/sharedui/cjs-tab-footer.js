@@ -10,7 +10,7 @@ Chondric.registerSharedUiComponent({
         $scope.componentId = self.id;
 
         $scope.setTab = function(val) {
-            self.data.selectedTab = val;
+            self.selectedTab = val;
             var routeScope = self.app.scopesForRoutes[self.route];
             if (routeScope) {
                 routeScope.$eval(self.data.setTab || "setTab")(val);
@@ -23,7 +23,7 @@ Chondric.registerSharedUiComponent({
         self.route = route;
         self.active = active;
         self.available = available;
-
+        self.selectedTab = data.selectedTab;
     },
 
 });

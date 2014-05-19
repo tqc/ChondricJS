@@ -212,7 +212,7 @@ body.debugmode::after {
     text-align: center;
     display: inline-block;
     border-radius: 5px;
-    line-height: 27px;
+    line-height: 2em;
     padding: 0 10px;
     height: 29px;
     white-space: nowrap;
@@ -819,7 +819,7 @@ display: inline;
  .icon-top.icon-custom .maskedicon {
         background-color: currentColor;
         -webkit-mask-position: center;
-    -webkit-mask-size: 32px;
+    -webkit-mask-size: contain;
     -webkit-mask-repeat: no-repeat;
     background-position: center;
     background-repeat: no-repeat;
