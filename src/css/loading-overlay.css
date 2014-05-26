@@ -16,6 +16,17 @@
     font-size: large;
 }
 
+
+.cjs-loading-overlay.ui-show {
+    -webkit-transition: z-index 0.5s ease, opacity:0.3s ease;
+    z-index: 1000;
+}
+
+.cjs-loading-overlay.ui-hide {
+    -webkit-transition: z-index 0.5s ease, opacity:0.3s ease;
+    z-index: -1;
+}
+
 .cjs-loading-overlay-compact {
     text-align: left;
 }
