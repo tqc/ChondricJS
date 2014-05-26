@@ -71,6 +71,10 @@ display: inline;
     margin: 5px;
 }
 
+
+/* simple */
+
+
 /* css spinner from http://lea.verou.me/2013/11/cleanest-css-spinner-ever/ */
 
 /**
@@ -101,6 +105,11 @@ display: inline;
     vertical-align: middle;
     margin: 5px;
 }
+
+.cjs-loading-overlay-simple .progress {
+    margin: 100px auto 50px auto;
+}
+
 
 .cjs-loading-overlay .small.progress {
     font-size: 6px;

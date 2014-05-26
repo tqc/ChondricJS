@@ -32,6 +32,16 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('cjs-loading-overlay-simple.html',
+    "<div class=\"cjs-loading-overlay cjs-loading-overlay-simple\">\n" +
+    "    <div ng-show=\"!error\" class=\"progress small\">\n" +
+    "        <div></div>\n" +
+    "    </div>\n" +
+    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "</div>\n"
+  );
+
+
   $templateCache.put('cjs-loading-overlay.html',
     "<div class=\"cjs-loading-overlay cjs-loading-overlay-full\">\n" +
     "    <div ng-show=\"!error\" class=\"progress large\">\n" +

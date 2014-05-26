@@ -803,6 +803,16 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
   );
 
 
+  $templateCache.put('cjs-loading-overlay-simple.html',
+    "<div class=\"cjs-loading-overlay cjs-loading-overlay-simple\">\n" +
+    "    <div ng-show=\"!error\" class=\"progress small\">\n" +
+    "        <div></div>\n" +
+    "    </div>\n" +
+    "    <div class=\"error\" ng-show=\"error\">{{error}}</div>\n" +
+    "</div>\n"
+  );
+
+
   $templateCache.put('cjs-loading-overlay.html',
     "<div class=\"cjs-loading-overlay cjs-loading-overlay-full\">\n" +
     "    <div ng-show=\"!error\" class=\"progress large\">\n" +
@@ -1094,12 +1104,14 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
             var overlay;
             if (attrs.overlayType == "compact") {
                 overlay = angular.element($templateCache.get("cjs-loading-overlay-compact.html"));
+            } else if (attrs.overlayType == "simple") {
+                overlay = angular.element($templateCache.get("cjs-loading-overlay-simple.html"));
             } else {
                 overlay = angular.element($templateCache.get("cjs-loading-overlay.html"));
             }
 
             element.append(overlay);
-
+            element.addClass("cjs-loading-overlay-container");
             $compile(overlay)(scope);
 
             scope.loadStatus.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), function(taskGroup) {
@@ -1108,10 +1120,15 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
                 if (taskGroup.completed) {
                     // finished                    
                     scope.message = "finished";
-                    contentElement.addClass("ui-show").removeClass("ui-hide");
+                    if (attrs.showUnloaded === undefined)
+                        contentElement.addClass("ui-show").removeClass("ui-hide");
+                    contentElement.addClass("cjs-loaded").removeClass("cjs-unloaded");
                     overlay.addClass("ui-hide").removeClass("ui-show");
                 } else {
-                    contentElement.addClass("ui-hide").removeClass("ui-show");
+                    if (attrs.showUnloaded === undefined)
+                        contentElement.addClass("ui-hide").removeClass("ui-show");
+                    contentElement.addClass("cjs-unloaded").removeClass("cjs-loaded");
+                    contentElement.addClass("cjs-unloaded")
                     overlay.addClass("ui-show").removeClass("ui-hide");
                     scope.title = taskGroup.title;
                     scope.error = taskGroup.error;
