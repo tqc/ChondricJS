@@ -638,6 +638,12 @@ right: 0;
 top: 0;
 bottom: 0;
 }
+
+/* tests */
+
+.body #mocha {
+    margin: 0;
+}
 /* */
 .cjs-loading-overlay-container {
     position: relative;

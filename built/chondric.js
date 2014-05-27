@@ -651,6 +651,16 @@ Chondric.App =
                 console.log("begin internal init");
                 initEvents(function() {
                     loadHostSettings(function() {
+                        // if in debug mode and there are tests specified, load them
+                        if (app.hostSettings.debug && app.hostSettings.tests && app.hostSettings.tests.length) {
+                            $("head").append('<script src="bower_components/mocha/mocha.js"></script>')
+                            $("head").append('<script>mocha.setup("' + (app.hostSettings.mochaInterface || "bdd") + '")</script>')
+                            $("head").append('<link rel="stylesheet" href="bower_components/mocha/mocha.css" />')
+                            $("head").append('<script src="bower_components/chai/chai.js"></script>')
+                            for (var i = 0; i < app.hostSettings.tests.length; i++) {
+                                $("head").append('<script src="' + app.hostSettings.tests[i] + '"></script>')
+                            }
+                        }
 
                         // create database
                         initData(function() {
@@ -668,6 +678,8 @@ Chondric.App =
                                         };
 
                                     }
+
+
 
                                     // custom init function
                                     settings.customInit.call(app, function() {
