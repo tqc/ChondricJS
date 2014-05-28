@@ -1193,6 +1193,8 @@ Chondric.factory('loadStatus', function() {
                     error: null,
                     start: function() {
                         task.active = true;
+                        task.error = null;
+                        task.progressCurrent = 0;
                     },
                     finish: function() {
                         task.progressCurrent = task.progressTotal;
@@ -1604,7 +1606,10 @@ Chondric.directive("cjsSidepanel", function() {
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
-                    "-webkit-transform": ""
+                    "-webkit-transform": "",
+                    // keep position because there isn't a reasonable default
+                    "right": 0,
+                    "left": "auto"
                 });
             }
         },
@@ -1716,7 +1721,10 @@ Chondric.directive("cjsSidepanel", function() {
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
-                    "-webkit-transform": ""
+                    "-webkit-transform": "",
+                    // keep position because there isn't a reasonable default
+                    "left": 0,
+                    "right": "auto"
                 });
             }
         },

@@ -95,7 +95,10 @@ Chondric.directive("cjsSidepanel", function() {
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
-                    "-webkit-transform": ""
+                    "-webkit-transform": "",
+                    // keep position because there isn't a reasonable default
+                    "right": 0,
+                    "left": "auto"
                 });
             }
         },
@@ -207,7 +210,10 @@ Chondric.directive("cjsSidepanel", function() {
                 panel.css({
                     "display": "",
                     "-webkit-transition": "",
-                    "-webkit-transform": ""
+                    "-webkit-transform": "",
+                    // keep position because there isn't a reasonable default
+                    "left": 0,
+                    "right": "auto"
                 });
             }
         },
