@@ -92,6 +92,8 @@ Chondric.factory('loadStatus', function() {
                     error: null,
                     start: function() {
                         task.active = true;
+                        task.error = null;
+                        task.progressCurrent = 0;
                     },
                     finish: function() {
                         task.progressCurrent = task.progressTotal;
