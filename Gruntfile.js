@@ -36,6 +36,8 @@ module.exports = function(grunt) {
         "src/css/transitions/slideright.css",
     ];
 
+    grunt.util.linefeed = '\n';
+
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
