@@ -15,6 +15,7 @@ Chondric.registerSharedUiComponent({
         $scope.handleSharedPopupButtonClick = function(b) {
             self.popuptrigger = null;
             var routeScope = self.app.scopesForRoutes[self.route];
+            self.app.setSharedUiComponentState(routeScope, "cjs-action-sheet", false, true, null);
             if (routeScope && b.action) {
                 routeScope.$eval(b.action);
             }
