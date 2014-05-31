@@ -676,7 +676,44 @@ Chondric.App =
                                                 routeScope.$apply(action);
                                             }
                                         };
+                                    }
 
+                                    if (window.Keyboard) {
+                                        window.Keyboard.onshowing = function() {
+                                            $("body").addClass("haskeyboard");
+                                            var t0 = new Date().getTime();
+
+                                            window.setTimeout(function() {
+                                                var sel = window.getSelection();
+                                                if (sel && sel.type == "Caret") {
+                                                    var fn = sel.focusNode;
+                                                    if (fn.nodeName == "#text") fn = fn.parentElement;
+                                                    var scrollContainer = $(fn).closest(".body")[0];
+                                                    var scr = scrollContainer.getBoundingClientRect();
+                                                    var fnr = fn.getBoundingClientRect();
+                                                    var startTop = scrollContainer.scrollTop;
+                                                    var targetTop = scrollContainer.scrollTop + fnr.top - scr.top - 100;
+
+
+                                                    var step = function() {
+                                                        var t = new Date().getTime();
+                                                        var dt = t - t0;
+                                                        if (dt > 300) {
+                                                            scrollContainer.scrollTop = targetTop;
+                                                        } else {
+                                                            scrollContainer.scrollTop = Math.round(startTop + ((targetTop - startTop) * dt / 300));
+                                                            window.requestAnimationFrame(step);
+                                                        }
+                                                    };
+                                                    window.requestAnimationFrame(step);
+
+                                                }
+
+                                            }, 0);
+                                        };
+                                        window.Keyboard.onhiding = function() {
+                                            $("body").removeClass("haskeyboard");
+                                        };
                                     }
 
 

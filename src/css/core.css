@@ -414,6 +414,7 @@ background-color: transparent;
     right:0;
     bottom:0;
     z-index: 1;
+    -webkit-transition: padding-bottom 0.3s ease;
 }
 
 .hasstatusbar .body {
@@ -434,6 +435,10 @@ background-color: transparent;
 .uses-cjs-tab-footer .body,
 .tabbar ~ .body {
     padding-bottom:80px;
+}
+
+.haskeyboard .body {
+    padding-bottom: 400px;
 }
 
 .body.hidden {
