@@ -437,10 +437,6 @@ background-color: transparent;
     padding-bottom:80px;
 }
 
-.haskeyboard .body {
-    padding-bottom: 400px;
-}
-
 .body.hidden {
     display: none;
 }

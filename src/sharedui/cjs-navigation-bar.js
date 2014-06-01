@@ -2,7 +2,7 @@ Chondric.registerSharedUiComponent({
     id: "cjs-navigation-bar",
     templateUrl: "cjs-navigation-bar.html",
     isNative: function() {
-        return false;
+        return (window.NativeNav && true) || false;
     },
     controller: function($scope) {
         var self = $scope.componentDefinition;
@@ -29,6 +29,7 @@ Chondric.registerSharedUiComponent({
             }
         };
     },
+    /*
     setStatePartial: function(self, initialState, finalState, progress) {
         if (!self.globalHeaderOptions) return;
         var v1 = self.globalHeaderOptions.v1;
@@ -51,30 +52,35 @@ Chondric.registerSharedUiComponent({
 
 
     },
+    */
     setState: function(self, route, active, available, data) {
         if (!self.globalHeaderOptions) return;
 
         self.route = route;
         self.data = data;
-        var v1 = self.globalHeaderOptions.v1;
-        if (v1 && v1.route == route) {
-            self.globalHeaderOptions.v1 = {
-                route: route,
-                active: active,
-                available: available,
-                data: data
-            };
-            self.globalHeaderOptions.transitionState = 0;
-        } else {
-            self.globalHeaderOptions.v2 = {
-                route: route,
-                active: active,
-                available: available,
-                data: data
-            };
-            self.globalHeaderOptions.transitionState = 1;
-        }
 
+        if (window.NativeNav) {
+            window.NativeNav.showNavbar(route, active, data.leftButtons, data.title, data.rightButtons, data.titleChanged);
+        } else {
+            var v1 = self.globalHeaderOptions.v1;
+            if (v1 && v1.route == route) {
+                self.globalHeaderOptions.v1 = {
+                    route: route,
+                    active: active,
+                    available: available,
+                    data: data
+                };
+                self.globalHeaderOptions.transitionState = 0;
+            } else {
+                self.globalHeaderOptions.v2 = {
+                    route: route,
+                    active: active,
+                    available: available,
+                    data: data
+                };
+                self.globalHeaderOptions.transitionState = 1;
+            }
+        }
 
     }
 });

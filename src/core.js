@@ -680,6 +680,13 @@ Chondric.App =
                                     if (window.Keyboard) {
                                         window.Keyboard.onshowing = function() {
                                             $("body").addClass("haskeyboard");
+                                        };
+                                        window.Keyboard.onhiding = function() {
+                                            $("body").removeClass("haskeyboard");
+                                        };
+                                        /*
+                                        window.Keyboard.onshowing = function() {
+                                            $("body").addClass("haskeyboard");
                                             var t0 = new Date().getTime();
 
                                             window.setTimeout(function() {
@@ -713,6 +720,10 @@ Chondric.App =
                                         window.Keyboard.onhiding = function() {
                                             $("body").removeClass("haskeyboard");
                                         };
+                                        window.Keyboard.onshow = function() {
+
+                                        };
+*/
                                     }
 
 
