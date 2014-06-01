@@ -262,6 +262,11 @@ button.icon-only {
     padding-top:20px;
 }
 
+.hasstatusbar .popup .navbar {
+    padding-top:0px;
+}
+
+
 .navbar>.v1,.navbar>.v2 {
      position: absolute;
     top:0;
@@ -431,6 +436,12 @@ background-color: transparent;
 .hasstatusbar .navbar ~ .body {
     padding-top:80px;
 }
+
+.hasstatusbar .uses-cjs-navigation-bar .popup .body,
+.hasstatusbar .popup .navbar ~ .body {
+    padding-top:60px;
+}
+
 
 .uses-cjs-tab-footer .body,
 .tabbar ~ .body {

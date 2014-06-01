@@ -3,6 +3,7 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-shared-popup.html",
     isNative: function() {
         return false;
+        //return (window.NativeNav && true) || false;
     },
     controller: function($scope) {
         var self = $scope.componentDefinition;
@@ -37,11 +38,31 @@ Chondric.registerSharedUiComponent({
         self.data = data;
         self.route = route;
 
-        if (!active) {
-            self.popuptrigger = null;
+        if (window.NativeNav) {
+            if (active && !self.popuptrigger) {
+                window.NativeNav.startNativeTransition("popup", function() {
+                    if (screen.width < 600) {
+                        document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    } else {
+                        document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    }
+                    self.popuptrigger = {};
+                    self.nativeTransition = true;
+                    self.app.scopesForRoutes[self.route].$apply();
+                });
+            } else if (!active && self.popuptrigger) {
+                window.NativeNav.startNativeTransition("closepopup", function() {
+                    document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    self.popuptrigger = null;
+                    self.app.scopesForRoutes[self.route].$apply();
+                });
+            }
         } else {
-            self.popuptrigger = {};
+            if (!active) {
+                self.popuptrigger = null;
+            } else {
+                self.popuptrigger = {};
+            }
         }
-
     }
 });

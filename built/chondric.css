@@ -263,6 +263,11 @@ button.icon-only {
     padding-top:20px;
 }
 
+.hasstatusbar .popup .navbar {
+    padding-top:0px;
+}
+
+
 .navbar>.v1,.navbar>.v2 {
      position: absolute;
     top:0;
@@ -432,6 +437,12 @@ background-color: transparent;
 .hasstatusbar .navbar ~ .body {
     padding-top:80px;
 }
+
+.hasstatusbar .uses-cjs-navigation-bar .popup .body,
+.hasstatusbar .popup .navbar ~ .body {
+    padding-top:60px;
+}
+
 
 .uses-cjs-tab-footer .body,
 .tabbar ~ .body {
@@ -1013,6 +1024,28 @@ left:5px;
     position: absolute;
     -webkit-transform: translate(0, 0);
 }
+
+.nativetransition.popup {
+    position: absolute;
+    top:0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin-left: 0;
+    margin-top: 0;
+    width:auto;
+    height: auto;
+    z-index: 1100;
+    -webkit-transition: none;
+    -webkit-transform: none;
+    display: none;
+}
+
+.nativetransition.popup.active {
+    display: block;
+    -webkit-transform: none;
+}
+
 
 @media (max-width: 630px) {
  .popup {

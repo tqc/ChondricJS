@@ -34,10 +34,9 @@ Chondric.directive('ngTap', function() {
 
             scope.lastTap = {
                 element: element,
-                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetX : e.offsetX,
-                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetY : e.offsetY
+                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientX : e.clientX,
+                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientY : e.clientY
             };
-            scope.$apply(attrs.ngTap, element);
 
 
             if (!useMouse) {
@@ -54,7 +53,9 @@ Chondric.directive('ngTap', function() {
             element.removeClass('active');
             element.addClass('deactivated');
 
-
+            window.setTimeout(function() {
+                scope.$apply(attrs.ngTap, element);
+            }, 0);
         };
 
         function start() {

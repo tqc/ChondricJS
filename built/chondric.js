@@ -932,7 +932,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-shared-popup.html',
-    "<div cjs-popup=\"componentDefinition.popuptrigger\">\n" +
+    "<div cjs-popup=\"componentDefinition.popuptrigger\" ng-class=\"{nativetransition: componentDefinition.nativeTransition}\">\n" +
     "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
     "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
     "\n" +
@@ -1082,10 +1082,9 @@ Chondric.directive('ngTap', function() {
 
             scope.lastTap = {
                 element: element,
-                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetX : e.offsetX,
-                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches.offsetY : e.offsetY
+                x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientX : e.clientX,
+                y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientY : e.clientY
             };
-            scope.$apply(attrs.ngTap, element);
 
 
             if (!useMouse) {
@@ -1102,7 +1101,9 @@ Chondric.directive('ngTap', function() {
             element.removeClass('active');
             element.addClass('deactivated');
 
-
+            window.setTimeout(function() {
+                scope.$apply(attrs.ngTap, element);
+            }, 0);
         };
 
         function start() {
@@ -1532,6 +1533,7 @@ Chondric.directive("cjsPopup", function() {
 
             element.addClass("modal");
             element.addClass("popup");
+
             var parentPageElement = element.closest(".chondric-page");
             if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
             if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
@@ -1543,15 +1545,25 @@ Chondric.directive("cjsPopup", function() {
 
             scope.$watch(attrs.cjsPopup, function(val) {
                 if (document.activeElement) document.activeElement.blur();
-                if (!val) {
-                    overlay.removeClass("active");
-                    element.removeClass("active");
-                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
-                } else {
-                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                if (element.hasClass("nativetransition")) {
+                    if (!val) {
+                        element.removeClass("active");
+                    } else {
+                        element.addClass("active");
+                    }
 
-                    overlay.addClass("active");
-                    element.addClass("active");
+                } else {
+                    if (!val) {
+                        overlay.removeClass("active");
+                        element.removeClass("active");
+                        window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    } else {
+                        window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+
+                        overlay.addClass("active");
+                        element.addClass("active");
+                    }
+
                 }
             });
         }
@@ -2413,6 +2425,7 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-shared-popup.html",
     isNative: function() {
         return false;
+        //return (window.NativeNav && true) || false;
     },
     controller: function($scope) {
         var self = $scope.componentDefinition;
@@ -2447,12 +2460,32 @@ Chondric.registerSharedUiComponent({
         self.data = data;
         self.route = route;
 
-        if (!active) {
-            self.popuptrigger = null;
+        if (window.NativeNav) {
+            if (active && !self.popuptrigger) {
+                window.NativeNav.startNativeTransition("popup", function() {
+                    if (screen.width < 600) {
+                        document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    } else {
+                        document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    }
+                    self.popuptrigger = {};
+                    self.nativeTransition = true;
+                    self.app.scopesForRoutes[self.route].$apply();
+                });
+            } else if (!active && self.popuptrigger) {
+                window.NativeNav.startNativeTransition("closepopup", function() {
+                    document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    self.popuptrigger = null;
+                    self.app.scopesForRoutes[self.route].$apply();
+                });
+            }
         } else {
-            self.popuptrigger = {};
+            if (!active) {
+                self.popuptrigger = null;
+            } else {
+                self.popuptrigger = {};
+            }
         }
-
     }
 });
 Chondric.registerSharedUiComponent({
