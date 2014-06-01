@@ -261,11 +261,12 @@ button.icon-only {
 .hasstatusbar .navbar {
     padding-top:20px;
 }
+@media (min-width: 600px) {
 
 .hasstatusbar .popup .navbar {
     padding-top:0px;
 }
-
+}
 
 .navbar>.v1,.navbar>.v2 {
      position: absolute;
@@ -437,9 +438,11 @@ background-color: transparent;
     padding-top:80px;
 }
 
+@media (min-width: 600px) {
 .hasstatusbar .uses-cjs-navigation-bar .popup .body,
 .hasstatusbar .popup .navbar ~ .body {
     padding-top:60px;
+}
 }
 
 
