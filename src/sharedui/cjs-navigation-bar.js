@@ -1,16 +1,104 @@
 Chondric.registerSharedUiComponent({
-    id: "cjs-navigation-bar",
-    templateUrl: "cjs-navigation-bar.html",
-    isNative: function() {
-        return (window.NativeNav && true) || false;
+    id: "cjs-multistate-component",
+    updateTransitionSettings: function(self, thisState, otherState, position, isActivating) {
+        // set fields for individual components
+        // position will be 0 for active, -1 or +1 for inactive depending on transition direction
+        thisState.isActivating = isActivating;
+        thisState.text = "Active? " + isActivating;
+    },
+    updateCurrentState: function(self, state, active, available, data) {
+
+    },
+    chooseState: function(self, route, active, available, data) {
+        for (var i = 0; i < self.states.length; i++) {
+            if (self.states[i].route == route) return self.states[i];
+        }
+        for (var i = 0; i < self.states.length; i++) {
+            if (self.states[i] != self.activeState) return self.states[i];
+        }
     },
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;
+        self.states = [{
+            route: null,
+            available: false,
+            active: false,
+            data: null
+        }, {
+            route: null,
+            available: false,
+            active: false,
+            data: null
+        }];
+        self.activeState = null;
+    },
+    setState: function(self, route, active, available, data, direction) {
+        if (!self.initialTransitionTimeout && !active && !available && (!data || !Object.keys(data).length)) {
+            self.initialTransitionTimeout = window.setTimeout(function() {
+                self.setState(self, route, active, available, data, direction);
+            }, 100);
+            return;
+        }
+        window.clearTimeout(self.initialTransitionTimeout);
+        var state = self.chooseState(self, route, active, available, data);
+        state.route = route;
+        state.active = active;
+        state.available = available;
+        state.data = data;
+
+        if (state == self.activeState) {
+            // in place update - no animation
+        } else {
+            var otherState = self.states[((self.states.indexOf(state)) + 1) % self.states.length];
+            self.updateTransitionSettings(self, state, otherState, 0, true);
+            self.updateTransitionSettings(self, otherState, state, direction > 0 ? 1 : -1, false);
+            self.activeState = state;
+        }
+    }
+});
+
+Chondric.registerSharedUiComponent({
+    id: "cjs-navigation-bar",
+    templateUrl: "cjs-navigation-bar.html",
+    baseComponentId: "cjs-multistate-component",
+    isNative: function() {
+        return (window.NativeNav && true) || false;
+    },
+    updateTransitionSettings: function(self, thisState, otherState, position, isActivating) {
+        // set fields for individual components
+        // position will be 0 for active, -1 or +1 for inactive depending on transition direction
+        thisState.isActivating = isActivating;
+        thisState.text = "Active? " + isActivating;
+        if (isActivating) {
+            if (thisState.available) {
+                if (!otherState.available) {
+                    thisState.translateY = -80 * (Math.abs(position));
+                } else {
+                    thisState.translateY = 0;
+                }
+            } else {
+                thisState.translateY = -80;
+            }
+            thisState.opacity = 1;
+        } else {
+            thisState.opacity = 0;
+        }
+    },
+    updateCurrentState: function(self, state, active, available, data) {
+        if (window.NativeNav) {
+            window.NativeNav.showNavbar(state.route, active, data.leftButtons, data.title, data.rightButtons, data.titleChanged);
+        }
+    },
+    controller: function($scope) {
+        var self = $scope.componentDefinition;
+        self.baseController("cjs-multistate-component", $scope);
+
+        self.scope = $scope;
         $scope.globalHeaderOptions = self.globalHeaderOptions = {};
 
-        $scope.handleSharedHeaderButtonClick = function(headerOptions, b, lastTap) {
-            var routeScope = self.app.scopesForRoutes[self.route];
+        $scope.handleSharedHeaderButtonClick = function(state, b, lastTap) {
+            var routeScope = self.app.scopesForRoutes[state.route];
             if (routeScope && b.action) {
                 routeScope.$eval(b.action);
             } else if (routeScope && b.items) {
@@ -22,10 +110,10 @@ Chondric.registerSharedUiComponent({
             }
         };
 
-        $scope.titleChanged = function() {
-            var routeScope = self.app.scopesForRoutes[self.route];
-            if (routeScope && self.data.titleChanged) {
-                routeScope.$eval(self.data.titleChanged)(self.data.title);
+        $scope.titleChanged = function(state) {
+            var routeScope = self.app.scopesForRoutes[state.route];
+            if (routeScope && state.data.titleChanged) {
+                routeScope.$eval(state.data.titleChanged)(state.data.title);
             }
         };
     },
@@ -53,7 +141,8 @@ Chondric.registerSharedUiComponent({
 
     },
     */
-    setState: function(self, route, active, available, data) {
+    /*
+    setState2: function(self, route, active, available, data) {
         if (!self.globalHeaderOptions) return;
 
         self.route = route;
@@ -82,5 +171,5 @@ Chondric.registerSharedUiComponent({
             }
         }
 
-    }
+    }*/
 });
