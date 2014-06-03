@@ -1054,9 +1054,16 @@ Chondric.directive('ngTap', function() {
         var active = false;
         var touching = false;
 
+        var startX = 0;
+        var startY = 0;
+
         // detect move and cancel tap if drag started
         var move = function(e) {
-            cancel(e);
+            var x = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.clientX;
+            var y = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.clientY;
+            if (Math.abs(x - startX) > 10 || Math.abs(y - startY) > 10) {
+                cancel(e);
+            }
         };
 
         // called if the mouse moves too much or leaves the element
@@ -1106,7 +1113,10 @@ Chondric.directive('ngTap', function() {
             }, 0);
         };
 
-        function start() {
+        function start(e) {
+
+            startX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.clientX;
+            startY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.clientY;
 
             if (!useMouse) {
                 element.bind('touchmove', move);
@@ -1124,16 +1134,16 @@ Chondric.directive('ngTap', function() {
         }
 
         // called on mousedown or touchstart. Multiple calls are ignored.
-        var mouseStart = function() {
+        var mouseStart = function(e) {
             if (active || touching) return;
             touching = false;
-            start();
+            start(e);
         };
 
-        var touchStart = function() {
+        var touchStart = function(e) {
             if (active) return;
             touching = true;
-            start();
+            start(e);
         };
 
         var useMouse = true;
