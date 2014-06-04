@@ -10,20 +10,16 @@
     pointer-events:none;
     visibility: hidden;
     z-index: 1000;
-    -webkit-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
 }
-
 .modal-overlay.active {
     visibility: visible;
     pointer-events: all;
     opacity: 0.4;
 }
-
 .nofade.active ~ .modal-overlay {
     background-color: transparent;
 }
-
-
 /* popover */
  .popover {
     position: absolute;
@@ -34,7 +30,7 @@
     z-index: 1100;
     opacity: 0;
     pointer-events: none;
-    -webkit-transition: opacity 0.1s ease-in-out;
+    transition: opacity 0.1s ease-in-out;
 }
 .popover.active {
     position: absolute;
@@ -53,72 +49,58 @@
 .popover button:last-child {
     border: none;
 }
-
 .poparrow {
-width: 26px;
-height: 12px;
-position: absolute;
-left: 0px;
-top: 0;
-z-index: 100;
-overflow: hidden;
+    width: 26px;
+    height: 12px;
+    position: absolute;
+    left: 0px;
+    top: 0;
+    z-index: 100;
+    overflow: hidden;
 }
-
 .up .poparrow {
-bottom: -12px;
-top:auto;
+    bottom: -12px;
+    top:auto;
 }
-
 .down .poparrow {
-top:-12px;
-bottom: auto;
+    top:-12px;
+    bottom: auto;
 }
-
 .left .poparrow {
-right: -12px;
-left:auto;
-width: 12px;
-height: 26px;
+    right: -12px;
+    left:auto;
+    width: 12px;
+    height: 26px;
 }
-
 .right .poparrow {
-left:-12px;
-right: auto;
-width: 12px;
-height: 26px;
+    left:-12px;
+    right: auto;
+    width: 12px;
+    height: 26px;
 }
-
-
 .poparrow:after {
-content: ' ';
-background: #fff;
-width: 26px;
-height: 26px;
-position: absolute;
-left: 0;
-top: 0;
-border-radius: 3px;
--webkit-transform: rotate(45deg);
+    content:' ';
+    background: #fff;
+    width: 26px;
+    height: 26px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 3px;
+    transform: rotate(45deg);
 }
-
 .popover.up .poparrow:after {
-top:-19px;
+    top:-19px;
 }
-
 .popover.down .poparrow:after {
-top:5px;
+    top:5px;
 }
-
 .popover.left .poparrow:after {
-left:-19px;
+    left:-19px;
 }
-
 .popover.right .poparrow:after {
-left:5px;
+    left:5px;
 }
-
-
-
 /* popup */
  .popup {
     position: absolute;
@@ -130,15 +112,14 @@ left:5px;
     margin-left: -315px;
     margin-top: -315px;
     z-index: 1100;
-    -webkit-transition: -webkit-transform 0.3s ease-in-out;
-    -webkit-transform: translate(0, 150%);
+    transition: transform 0.3s ease-in-out;
+    transform: translate(0, 150%);
 }
 .popup.active {
     display: block;
     position: absolute;
-    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
 }
-
 .nativetransition.popup {
     position: absolute;
     top:0;
@@ -150,131 +131,109 @@ left:5px;
     width:auto;
     height: auto;
     z-index: 1100;
-    -webkit-transition: none;
-    -webkit-transform: none;
+    transition: none;
+    transform: none;
     display: none;
 }
-
 .nativetransition.popup.active {
     display: block;
-    -webkit-transform: none;
+    transform: none;
 }
-
-
 @media (max-width: 630px) {
- .popup {
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    margin-left: 0;
-    margin-top: 0;
-    -webkit-transform: translate(0, 101%);
+    .popup {
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        margin-left: 0;
+        margin-top: 0;
+        transform: translate(0, 101%);
+    }
 }
-
-}
-
-
 /* sidepanel */
-
  .sidepanel {
     position: absolute;
     display: none;
     top:0;
     bottom: 0;
     width: 260px;
-    z-index: 1100;    
+    z-index: 1100;
     left: 0px;
-right: auto;
+    right: auto;
 }
-
 .sidepanel.right {
     right: 0px;
-left: auto;
+    left: auto;
 }
-
 .sidepanel.left {
     left: 0px;
-right: auto;
+    right: auto;
 }
-
-
 /*
 
 .sidepanel.active {
     display: block;
-    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
 }
 */
-
-.sidepanel .navbar {
+ .sidepanel .navbar {
     background: #000;
     border-bottom: 1px solid #333;
     color: white;
 }
-
-
-.sidepanel .navbar h1{
-background-color: transparent;
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-margin: 0;
-text-align: center;
-font-size: 17px;
-line-height: 44px;
-font-weight: 500;
-z-index: -1;
-text-overflow: ellipsis;
+.sidepanel .navbar h1 {
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    text-align: center;
+    font-size: 17px;
+    line-height: 44px;
+    font-weight: 500;
+    z-index: -1;
+    text-overflow: ellipsis;
 }
-
 .sidepanel .body {
     background-color: #222;
-    color: white;   
+    color: white;
 }
-
 .sidepanel .body h2 {
-color: white;
+    color: white;
 }
-
 .sidepanel .body button {
 }
-
 .sidepanel .body button.menuitem {
-color: rgb(111, 111, 116);
-display: block;
-width: 260px;
-border: none;
-text-align: left;
-border-radius: 0;
-margin: 0;
-padding: 5px 15px;
-height: auto;
-border-bottom: 1px solid #aaa;
-border-top: 1px solid #aaa;
+    color: rgb(111, 111, 116);
+    display: block;
+    width: 260px;
+    border: none;
+    text-align: left;
+    border-radius: 0;
+    margin: 0;
+    padding: 5px 15px;
+    height: auto;
+    border-bottom: 1px solid #aaa;
+    border-top: 1px solid #aaa;
 }
-
 .sidepanel .body button.menuitem+button.menuitem {
     border-top: none;
 }
-
 .sidepanel .body button.menuitem.selected {
     color: #007aff;
     background-color: transparent;
 }
-
 .sidepanel .body button.menutile {
-width: 100%;
-margin: 5px 0;
-box-sizing: border-box;
-border: none;
-float: left;
-height: 50px;
-font-size: 8pt;
-color: rgb(111, 111, 116);
+    width: 100%;
+    margin: 5px 0;
+    box-sizing: border-box;
+    border: none;
+    float: left;
+    height: 50px;
+    font-size: 8pt;
+    color: rgb(111, 111, 116);
 }
-
 .sidepanel .body button.half {
     width: 50%;
 }
@@ -284,40 +243,36 @@ color: rgb(111, 111, 116);
 .sidepanel .body button.quarter {
     width: 25%;
 }
-
-
-
 .sidepanel .body button.menutile.selected {
     background-color: transparent;
     color: #007aff;
 }
-
 /*
 .chondric-page.haspushpanel .body,
 .chondric-page.haspushpanel .navbar,
 .chondric-page.haspushpanel .tabbar
 {
-    -webkit-transition: -webkit-transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out;
 }
 
 .chondric-page.pushedleft .body,
 .chondric-page.pushedleft .navbar,
 .chondric-page.pushedleft .tabbar
 {
-    -webkit-transform: translate(-261px, 0);
+    transform: translate(-261px, 0);
 }
 
 .chondric-page.pushedright .body,
 .chondric-page.pushedright .navbar,
 .chondric-page.pushedright .tabbar
 {
-    -webkit-transform: translate(261px, 0);
+    transform: translate(261px, 0);
 }
 
 .chondric-page.haspushpanel .sidepanel .body,
 .chondric-page.haspushpanel .sidepanel .navbar,
 .chondric-page.haspushpanel .sidepanel .tabbar
 {
-    -webkit-transform: translate(0, 0);
+    transform: translate(0, 0);
 }
 */

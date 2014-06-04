@@ -18,12 +18,12 @@
 
 
 .cjs-loading-overlay.ui-show {
-    -webkit-transition: z-index 0.5s ease, opacity:0.3s ease;
+    transition: z-index 0.5s ease, opacity:0.3s ease;
     z-index: 1000;
 }
 
 .cjs-loading-overlay.ui-hide {
-    -webkit-transition: z-index 0.5s ease, opacity:0.3s ease;
+    transition: z-index 0.5s ease, opacity:0.3s ease;
     z-index: -1;
 }
 
@@ -82,7 +82,7 @@ display: inline;
  */
  @-webkit-keyframes spin {
     to {
-        -webkit-transform: rotate(1turn);
+        transform: rotate(1turn);
     }
 }
 .cjs-loading-overlay .progress {
@@ -132,21 +132,21 @@ display: inline;
     background: #eee;
     box-shadow: 0 3.5em #eee;
     /* container height - part height */
-    -webkit-transform-origin: 50% 2.5em;
+    transform-origin: 50% 2.5em;
     /* container height / 2 */
 }
 .cjs-loading-overlay .progress:before {
     background: #555;
 }
 .cjs-loading-overlay .progress:after {
-    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
     background: #777;
 }
 .cjs-loading-overlay .progress > div:before {
-    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
     background: #999;
 }
 .cjs-loading-overlay .progress > div:after {
-    -webkit-transform: rotate(-135deg);
+    transform: rotate(-135deg);
     background: #bbb;
 }

@@ -280,7 +280,7 @@ exports.hostApp = function(options) {
             srcDir + "/transitions/sidepanel.js",
             srcDir + "/transitions/slide.js"
         ];
-
+        var autoprefixer = require('autoprefixer');
         app.use(function(req, res, next) {
 
             function sendMappedFile(filename) {
@@ -288,9 +288,23 @@ exports.hostApp = function(options) {
                     if (err) {
                         console.log(err);
                     }
-                    if (filename.indexOf(".css") > 0) res.type("text/css");
-                    else if (filename.indexOf(".js") > 0) res.type("application/javascript");
-                    return res.send(d);
+                    if (filename.indexOf(".css") > 0) {
+                        console.log("sending mapped css " + filename);
+                        res.type("text/css");
+                        try {
+                            var css = autoprefixer.process(d).css;
+                            return res.send(css);
+                        } catch (e) {
+                            console.log("Error processing " + filename)
+                            console.log(e);
+                            return res.send(d);
+                        }
+                    } else if (filename.indexOf(".js") > 0) {
+                        res.type("application/javascript");
+                        return res.send(d);
+                    } else {
+                        return res.send(d);
+                    }
                 });
             }
 

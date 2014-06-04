@@ -49,6 +49,15 @@ module.exports = function(grunt) {
                 options: {}
             }
         },
+        autoprefixer: {
+            options: {
+                // Task-specific options go here.
+            },
+            your_target: {
+                // Target-specific file lists and/or options go here.
+                src: 'built/chondric.css'
+            },
+        },
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n'
@@ -86,7 +95,7 @@ module.exports = function(grunt) {
         cssmin: {
             combine: {
                 files: {
-                    'built/chondric.min.css': cssfiles
+                    'built/chondric.min.css': "built/chondric.css"
                 }
             }
         }
@@ -97,7 +106,9 @@ module.exports = function(grunt) {
     //    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-angular-templates');
+    grunt.loadNpmTasks('grunt-autoprefixer');
+
     // Default task(s).
-    grunt.registerTask('default', ['ngtemplates', 'uglify:min', "concat", "cssmin"]);
+    grunt.registerTask('default', ['ngtemplates', 'uglify:min', "concat", "autoprefixer", "cssmin"]);
 
 };
