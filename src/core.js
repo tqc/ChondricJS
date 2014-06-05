@@ -289,40 +289,62 @@ Chondric.App =
                 }
                 if ($scope.route == r) return;
                 if ($scope.lastRoute == r) $scope.lastRoute = null;
-                $scope.transition.type = transition || "crossfade";
-                $scope.noTransition = true;
-                loadView(r);
-                $scope.nextRoute = r;
-                $scope.transition.progress = 0;
-                $scope.transition.from = $scope.route;
-                $scope.transition.to = $scope.nextRoute;
 
+                var fromRoute = $scope.route;
+                var toRoute = r;
 
-                if ($scope.transition.from)
-                    app.scrollPosForRoutes[$scope.transition.from] = $scope.transition.fromScroll = {
+                if (fromRoute) {
+                    app.scrollPosForRoutes[fromRoute] = {
                         x: window.scrollX,
                         y: window.scrollY
                     };
-                if (originElement) {
-                    // todo: find parent element if necessary and set appropriate origin rect                   
-                    $scope.transition.fromRect = app.transitionOriginForRoutes[$scope.transition.from] = null;
+
+                    if (originElement) {
+                        // todo: find parent element if necessary and set appropriate origin rect                   
+                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute] = null;
+                    } else {
+                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute] = null;
+                    }
+                }
+
+
+                if (settings.transitionType == "none") {
+                    loadView(r);
+                    window.setTimeout(function() {
+                        $scope.route = r;
+                        $scope.$apply();
+                    }, 10);
+
+                } else if (settings.transitionType == "native") {
+
                 } else {
-                    $scope.transition.fromRect = app.transitionOriginForRoutes[$scope.transition.from] = null;
+
+                    $scope.transition.type = transition || "crossfade";
+                    $scope.noTransition = true;
+                    loadView(r);
+                    $scope.nextRoute = r;
+                    $scope.transition.progress = 0;
+                    $scope.transition.from = $scope.route;
+                    $scope.transition.to = $scope.nextRoute;
+
+
+                    if (fromRoute) {
+                        $scope.transition.fromScroll = app.scrollPosForRoutes[fromRoute];
+                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute];
+                    }
+                    $scope.transition.toRect = app.transitionOriginForRoutes[$scope.transition.to]
+
+                    $scope.transition.toScroll = app.scrollPosForRoutes[$scope.transition.to] || {
+                        x: 0,
+                        y: 0
+                    }
+                    window.setTimeout(function() {
+                        $scope.noTransition = false;
+                        $scope.route = r;
+                        $scope.transition.progress = 1;
+                        $scope.$apply();
+                    }, 100);
                 }
-                $scope.transition.toRect = app.transitionOriginForRoutes[$scope.transition.to]
-
-
-                $scope.transition.toScroll = app.scrollPosForRoutes[$scope.transition.to] || {
-                    x: 0,
-                    y: 0
-                }
-                window.setTimeout(function() {
-                    $scope.noTransition = false;
-                    $scope.route = r;
-                    $scope.transition.progress = 1;
-                    $scope.$apply();
-                }, 100);
-
             };
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
@@ -475,6 +497,14 @@ Chondric.App =
                 $location.path(url).replace();
                 loadView(url);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
+                window.setTimeout(function() {
+                    var sp = app.scrollPosForRoutes[url];
+                    if (sp) {
+                        window.scrollTo(sp.x, sp.y);
+                    } else {
+                        window.scrollTo(0, 0);
+                    }
+                }, 10);
             });
             if (options.appCtrl) options.appCtrl($scope);
         }; // end appCtrl
