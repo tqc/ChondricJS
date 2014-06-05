@@ -5,7 +5,7 @@ Chondric.allTransitions.crossfade = {
             element.css({
                 "display": "block",
                 "opacity": 0,
-                "z-index": 9,
+                "z-index": 9
             });
         },
         cancel: function(element, prevProgress) {
@@ -31,7 +31,7 @@ Chondric.allTransitions.crossfade = {
             element.css({
                 "display": "block",
                 "opacity": progress,
-                "z-index": 9,
+                "z-index": 9
             });
         }
     },
@@ -63,7 +63,7 @@ Chondric.allTransitions.crossfade = {
             "display": "",
             "opacity": "",
             "z-index": "",
-            "-webkit-transition": "",
+            "-webkit-transition": ""
         });
     }
 };

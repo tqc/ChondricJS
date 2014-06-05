@@ -90,7 +90,7 @@ Chondric.App =
                 isSection: false,
                 controller: pageController,
                 templateUrl: templateUrl,
-                templateId: viewOptions.templateId,
+                templateId: viewOptions.templateId
             };
             preloadTemplate(templateUrl);
         };
@@ -121,7 +121,7 @@ Chondric.App =
 
             allRoutes[route] = {
                 isSection: true,
-                controller: pageController,
+                controller: pageController
                 //            templateUrl: viewOptions.templateUrl,
                 //            templateId: viewOptions.templateId,
             };
@@ -816,7 +816,7 @@ Chondric.factory('sharedUi', function() {
                         var state = app.getSharedUiComponentState($scope, componentKey);
                         fn(state);
                         app.setSharedUiComponentState($scope, componentKey, state.active, state.available, state.data);
-                    },
+                    }
 
                 };
             };
@@ -827,4 +827,49 @@ Chondric.factory('sharedUi', function() {
             return service;
         }
     };
+});
+
+
+
+Chondric.directive('ngStylePrefixer', function() {
+
+    var style = document.body.style;
+    var transitionStyle = "transition"
+    if (style.transition === undefined && style.webkitTransition !== undefined) transitionStyle = "-webkit-transition";
+    else if (style.transition === undefined && style.mozTransition !== undefined) transitionStyle = "-moz-transition";
+
+    var transformStyle = "transform"
+    if (style.transform === undefined && style.webkitTransform !== undefined) transformStyle = "-webkit-transform";
+    else if (style.transform === undefined && style.mozTransform !== undefined) transformStyle = "-moz-transform";
+
+    return {
+        restrict: "AC",
+        link: function(scope, element, attr) {
+            scope.$watch(attr.ngStylePrefixer, function ngStyleWatchAction(newStyles, oldStyles) {
+                if (oldStyles && (newStyles !== oldStyles)) {
+                    for (var k in oldStyles) {
+                        element.css(k, '');
+                    };
+                }
+
+                if (newStyles) {
+                    var convertedStyles = {}
+
+                    for (var k in newStyles) {
+                        var v = newStyles[k];
+                        if (k == "transform") {
+                            k = transformStyle;
+                        }
+                        if (k == "transition") {
+                            if (v) v = v.replace("transform", transformStyle);
+                        }
+
+                        convertedStyles[k] = v;
+                    }
+                    element.css(convertedStyles);
+
+                }
+            }, true);
+        }
+    }
 });

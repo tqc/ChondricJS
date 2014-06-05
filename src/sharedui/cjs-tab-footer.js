@@ -24,6 +24,6 @@ Chondric.registerSharedUiComponent({
         self.active = active;
         self.available = available;
         self.selectedTab = data.selectedTab;
-    },
+    }
 
 });

@@ -59,7 +59,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-navigation-bar.html',
-    "<div class=\"navbar\" ng-repeat=\"state in componentDefinition.states track by $index\" ng-style=\"{zIndex:(state.isActivating? 1200 : 1100), '-webkit-transform': 'translate(0, '+(state.translateY)+'px)', opacity: state.opacity, '-webkit-transition': 'opacity 0.3s ease, -webkit-transform 0.3s ease'}\">\n" +
+    "<div class=\"navbar\" ng-repeat=\"state in componentDefinition.states track by $index\" ng-style-prefixer=\"{zIndex:(state.isActivating? 1200 : 1100), 'top': (state.translateY)+'px', opacity: state.opacity, 'transition': 'opacity 0.3s ease, top 0.3s ease'}\">\n" +
     "  <button class=\"left\" ng-repeat=\"b in state.data.leftButtons\" ng-tap=\"handleSharedHeaderButtonClick(state, b, lastTap)\">{{b.title}}</button>\n" +
     "        <h1 ng-show=\"!state.data.titleEditable\">{{state.data.title}}</h1>\n" +
     "        <input class=\"h1\" ng-show=\"state.data.titleEditable\" type=\"text\" ng-model=\"state.data.title\" ng-change=\"titleChanged(state)\" />\n" +

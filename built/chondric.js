@@ -91,7 +91,7 @@ Chondric.App =
                 isSection: false,
                 controller: pageController,
                 templateUrl: templateUrl,
-                templateId: viewOptions.templateId,
+                templateId: viewOptions.templateId
             };
             preloadTemplate(templateUrl);
         };
@@ -122,7 +122,7 @@ Chondric.App =
 
             allRoutes[route] = {
                 isSection: true,
-                controller: pageController,
+                controller: pageController
                 //            templateUrl: viewOptions.templateUrl,
                 //            templateId: viewOptions.templateId,
             };
@@ -817,7 +817,7 @@ Chondric.factory('sharedUi', function() {
                         var state = app.getSharedUiComponentState($scope, componentKey);
                         fn(state);
                         app.setSharedUiComponentState($scope, componentKey, state.active, state.available, state.data);
-                    },
+                    }
 
                 };
             };
@@ -828,6 +828,51 @@ Chondric.factory('sharedUi', function() {
             return service;
         }
     };
+});
+
+
+
+Chondric.directive('ngStylePrefixer', function() {
+
+    var style = document.body.style;
+    var transitionStyle = "transition"
+    if (style.transition === undefined && style.webkitTransition !== undefined) transitionStyle = "-webkit-transition";
+    else if (style.transition === undefined && style.mozTransition !== undefined) transitionStyle = "-moz-transition";
+
+    var transformStyle = "transform"
+    if (style.transform === undefined && style.webkitTransform !== undefined) transformStyle = "-webkit-transform";
+    else if (style.transform === undefined && style.mozTransform !== undefined) transformStyle = "-moz-transform";
+
+    return {
+        restrict: "AC",
+        link: function(scope, element, attr) {
+            scope.$watch(attr.ngStylePrefixer, function ngStyleWatchAction(newStyles, oldStyles) {
+                if (oldStyles && (newStyles !== oldStyles)) {
+                    for (var k in oldStyles) {
+                        element.css(k, '');
+                    };
+                }
+
+                if (newStyles) {
+                    var convertedStyles = {}
+
+                    for (var k in newStyles) {
+                        var v = newStyles[k];
+                        if (k == "transform") {
+                            k = transformStyle;
+                        }
+                        if (k == "transition") {
+                            if (v) v = v.replace("transform", transformStyle);
+                        }
+
+                        convertedStyles[k] = v;
+                    }
+                    element.css(convertedStyles);
+
+                }
+            }, true);
+        }
+    }
 });
 angular.module('chondric').run(['$templateCache', function($templateCache) {
   'use strict';
@@ -890,7 +935,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-navigation-bar.html',
-    "<div class=\"navbar\" ng-repeat=\"state in componentDefinition.states track by $index\" ng-style=\"{zIndex:(state.isActivating? 1200 : 1100), '-webkit-transform': 'translate(0, '+(state.translateY)+'px)', opacity: state.opacity, '-webkit-transition': 'opacity 0.3s ease, -webkit-transform 0.3s ease'}\">\n" +
+    "<div class=\"navbar\" ng-repeat=\"state in componentDefinition.states track by $index\" ng-style-prefixer=\"{zIndex:(state.isActivating? 1200 : 1100), 'top': (state.translateY)+'px', opacity: state.opacity, 'transition': 'opacity 0.3s ease, top 0.3s ease'}\">\n" +
     "  <button class=\"left\" ng-repeat=\"b in state.data.leftButtons\" ng-tap=\"handleSharedHeaderButtonClick(state, b, lastTap)\">{{b.title}}</button>\n" +
     "        <h1 ng-show=\"!state.data.titleEditable\">{{state.data.title}}</h1>\n" +
     "        <input class=\"h1\" ng-show=\"state.data.titleEditable\" type=\"text\" ng-model=\"state.data.title\" ng-change=\"titleChanged(state)\" />\n" +
@@ -2426,7 +2471,7 @@ Chondric.registerSharedUiComponent({
                 routeScope.$eval(state.data.titleChanged)(state.data.title);
             }
         };
-    },
+    }
     /*
     setStatePartial: function(self, initialState, finalState, progress) {
         if (!self.globalHeaderOptions) return;
@@ -2509,7 +2554,7 @@ Chondric.registerSharedUiComponent({
         self.active = active;
         self.available = available;
         self.selectedTab = data.selectedTab;
-    },
+    }
 
 });
 Chondric.registerSharedUiComponent({
@@ -2689,7 +2734,7 @@ Chondric.allTransitions.crossfade = {
             element.css({
                 "display": "block",
                 "opacity": 0,
-                "z-index": 9,
+                "z-index": 9
             });
         },
         cancel: function(element, prevProgress) {
@@ -2715,7 +2760,7 @@ Chondric.allTransitions.crossfade = {
             element.css({
                 "display": "block",
                 "opacity": progress,
-                "z-index": 9,
+                "z-index": 9
             });
         }
     },
@@ -2747,7 +2792,7 @@ Chondric.allTransitions.crossfade = {
             "display": "",
             "opacity": "",
             "z-index": "",
-            "-webkit-transition": "",
+            "-webkit-transition": ""
         });
     }
 };

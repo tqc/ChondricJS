@@ -116,7 +116,7 @@ Chondric.registerSharedUiComponent({
                 routeScope.$eval(state.data.titleChanged)(state.data.title);
             }
         };
-    },
+    }
     /*
     setStatePartial: function(self, initialState, finalState, progress) {
         if (!self.globalHeaderOptions) return;

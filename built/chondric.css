@@ -1053,15 +1053,24 @@ display: inline;
     transition: transform 0.3s ease-in-out;
     -webkit-transform: translate(0, 150%);
     -ms-transform: translate(0, 150%);
-    transform: translate(0, 150%);
+    transform: translate(0, 150%);   
 }
 .popup.active {
     display: block;
-    position: absolute;
-    -webkit-transform: translate(0, 0);
-    -ms-transform: translate(0, 0);
+    position: absolute;    
+    -webkit-transform: translate(0, 0);    
+    -ms-transform: translate(0, 0);    
     transform: translate(0, 0);
 }
+
+.noflexbox .popup {
+    visibility: hidden;    
+}
+
+.noflexbox .popup.active {
+    visibility: visible;
+}
+
 .nativetransition.popup {
     position: absolute;
     top:0;

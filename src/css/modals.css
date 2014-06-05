@@ -113,13 +113,22 @@
     margin-top: -315px;
     z-index: 1100;
     transition: transform 0.3s ease-in-out;
-    transform: translate(0, 150%);
+    transform: translate(0, 150%);   
 }
 .popup.active {
     display: block;
-    position: absolute;
+    position: absolute;    
     transform: translate(0, 0);
 }
+
+.noflexbox .popup {
+    visibility: hidden;    
+}
+
+.noflexbox .popup.active {
+    visibility: visible;
+}
+
 .nativetransition.popup {
     position: absolute;
     top:0;
