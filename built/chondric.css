@@ -4,34 +4,55 @@ body {
     color: #000;
     font-size: 14px;
     line-height: 1.4;
-    background-color: #888;
+    background-color:#efeff4;
+
     -webkit-tap-highlight-color:transparent;
 }
+
 .chondric-viewport {
+    z-index: 1;
+}
+
+.cjs-scrolling-page .chondric-viewport {
     position: absolute;
     top:0;
     left:0;
     bottom:0;
     right: 0;
     overflow:hidden;
-    z-index: 1;
 }
+
+.cjs-scrolling-window .chondric-viewport {
+ position: static;
+}
+
 .chondric-section {
 }
+
+
 .chondric-page {
+    display: none;
+}
+
+.cjs-scrolling-page .chondric-page {
     position: absolute;
     top:0;
     left:0;
     bottom:0;
     right: 0;
     overflow: hidden;
-    display: none;
 }
+
+.cjs-scrolling-window .chondric-page {
+}
+
+
 .chondric-page.active {
     display: block;
     opacity: 1;
     z-index: 10;
 }
+
 .chondric-page.prev {
     pointer-events:none;
 }
@@ -51,38 +72,6 @@ body {
     transition: none !important;
 }
 /* Old styles */
- .page.behindfull {
-    display:block;
-    visibility: hidden;
-    -webkit-transform: scale(1, 1);
-    -ms-transform: scale(1, 1);
-    transform: scale(1, 1);
-    opacity:0;
-    z-index: 1;
-    -webkit-transition: -webkit-transform 0.2s linear, opacity 0.9s ease-in-out, z-index 0.9s linear, visibility 0.9s linear;
-    transition: transform 0.2s linear, opacity 0.9s ease-in-out, z-index 0.9s linear, visibility 0.9s linear;
-}
-.page.behinddlg {
-    display: block;
-    -webkit-transform: scale(1, 1);
-    -ms-transform: scale(1, 1);
-    transform: scale(1, 1);
-    opacity:1;
-    z-index: 1;
-    -webkit-transition: -webkit-transform 0.2s linear, opacity 0.9s ease-in-out, z-index 0.9s 0.9s linear;
-    transition: transform 0.2s linear, opacity 0.9s ease-in-out, z-index 0.9s 0.9s linear;
-}
-.page.behindsmall {
-    display:block;
-    visibility: hidden;
-    -webkit-transform: scale(0.1, 0.1);
-    -ms-transform: scale(0.1, 0.1);
-    transform: scale(0.1, 0.1);
-    opacity:0;
-    z-index: 1;
-    -webkit-transition: -webkit-transform 0.2s linear, opacity 0.9s ease-in-out, z-index 0.9s linear, visibility 0.9s linear;
-    transition: transform 0.2s linear, opacity 0.9s ease-in-out, z-index 0.9s linear, visibility 0.9s linear;
-}
 
 .chondric-viewport {
 -webkit-user-select:none;
@@ -191,7 +180,7 @@ body.debugmode .debugonly {
 body.debugmode::after {
     content:"Debug mode - do not release";
     display:block !important;
-    position:absolute;
+    position:fixed;
     bottom: 0;
     left:0;
     right: 0;
@@ -286,6 +275,15 @@ button.icon-only {
     border-bottom: 1px solid #c4c4c4;
     font-size: 17px;
 }
+
+ .cjs-scrolling-window .navbar {
+position: fixed;
+ }
+
+ .sidepanel .navbar {
+position: absolute;
+ }
+
 
 .hasstatusbar .navbar {
     padding-top:20px;
@@ -402,6 +400,16 @@ background-color: transparent;
     border-top: 1px solid #c4c4c4;
     padding-top: 10px;
 }
+
+ .cjs-scrolling-window .tabbar {
+position: fixed;
+ }
+
+ .cjs-scrolling-window.haskeyboard .tabbar {
+visibility: hidden;
+ }
+
+
 .tabbar button {
     background: transparent;
     border: none;
@@ -439,8 +447,23 @@ background-color: transparent;
     bottom:0;
     top:0;
 }
+
 .body {
     background-color:#efeff4;
+    z-index: 1;
+}
+
+.cjs-scrolling-window .body {
+        position: static;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+min-height: 100vh;
+}
+
+.cjs-scrolling-page .body,
+.sidepanel .body
+ {
     overflow:auto;
     -webkit-overflow-scrolling: touch;
     position: absolute;
@@ -448,10 +471,17 @@ background-color: transparent;
     left:0;
     right:0;
     bottom:0;
-    z-index: 1;
     -webkit-transition: padding-bottom 0.3s ease;
     transition: padding-bottom 0.3s ease;
 }
+
+
+.cjs-scrolling-window .popup .body {
+min-height: 0;
+}
+
+
+
 
 .hasstatusbar .body {
     padding-top:20px;
@@ -954,6 +984,10 @@ display: inline;
 .nofade.active ~ .modal-overlay {
     background-color: transparent;
 }
+ .cjs-scrolling-window .modal-overlay {
+position: fixed;
+ }
+
 /* popover */
  .popover {
     position: absolute;
@@ -1049,12 +1083,18 @@ display: inline;
     margin-left: -315px;
     margin-top: -315px;
     z-index: 1100;
-    -webkit-transition: -webkit-transform 0.3s ease-in-out;
-    transition: transform 0.3s ease-in-out;
+    -webkit-transition: -webkit-transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
     -webkit-transform: translate(0, 150%);
     -ms-transform: translate(0, 150%);
     transform: translate(0, 150%);   
 }
+
+ .cjs-scrolling-window .popup {
+position: fixed;
+visibility: hidden;
+ }
+
 .popup.active {
     display: block;
     position: absolute;    
@@ -1062,6 +1102,11 @@ display: inline;
     -ms-transform: translate(0, 0);    
     transform: translate(0, 0);
 }
+
+ .cjs-scrolling-window .popup.active {
+visibility: visible;
+ }
+
 
 .noflexbox .popup {
     visibility: hidden;    
@@ -1071,7 +1116,7 @@ display: inline;
     visibility: visible;
 }
 
-.nativetransition.popup {
+.cjs-transitions-native .popup {
     position: absolute;
     top:0;
     left: 0;
@@ -1089,12 +1134,18 @@ display: inline;
     transform: none;
     display: none;
 }
-.nativetransition.popup.active {
+.cjs-transitions-native .popup.active {
     display: block;
     -webkit-transform: none;
     -ms-transform: none;
     transform: none;
 }
+
+
+.cjs-transitions-native.cjs-shared-popup-active .chondric-page {
+    display: none !important;
+}
+
 @media (max-width: 630px) {
     .popup {
         width: 100%;
@@ -1115,10 +1166,15 @@ display: inline;
     top:0;
     bottom: 0;
     width: 260px;
-    z-index: 1100;
+    z-index: 1201;
     left: 0px;
     right: auto;
 }
+
+ .cjs-scrolling-window .sidepanel {
+position: fixed;
+ }
+
 .sidepanel.right {
     right: 0px;
     left: auto;

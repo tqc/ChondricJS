@@ -144,7 +144,7 @@ visibility: visible;
     visibility: visible;
 }
 
-.nativetransition.popup {
+.cjs-transitions-native .popup {
     position: absolute;
     top:0;
     left: 0;
@@ -159,10 +159,16 @@ visibility: visible;
     transform: none;
     display: none;
 }
-.nativetransition.popup.active {
+.cjs-transitions-native .popup.active {
     display: block;
     transform: none;
 }
+
+
+.cjs-transitions-native.cjs-shared-popup-active .chondric-page {
+    display: none !important;
+}
+
 @media (max-width: 630px) {
     .popup {
         width: 100%;

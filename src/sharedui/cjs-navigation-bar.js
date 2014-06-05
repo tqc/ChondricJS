@@ -41,14 +41,18 @@ Chondric.registerSharedUiComponent({
             return;
         }
         window.clearTimeout(self.initialTransitionTimeout);
+
         var state = self.chooseState(self, route, active, available, data);
         state.route = route;
         state.active = active;
         state.available = available;
         state.data = data;
 
-        if (state == self.activeState) {
+        if (self.isNative && self.isNative() && self.setNativeState) {
+            self.setNativeState(self, route, active, available, data, direction);
+        } else if (state == self.activeState) {
             // in place update - no animation
+            self.updateCurrentState(self, state, active, available, data);
         } else {
             var otherState = self.states[((self.states.indexOf(state)) + 1) % self.states.length];
             self.updateTransitionSettings(self, state, otherState, 0, true);
@@ -85,9 +89,10 @@ Chondric.registerSharedUiComponent({
             thisState.opacity = 0;
         }
     },
-    updateCurrentState: function(self, state, active, available, data) {
+    updateCurrentState: function(self, state, active, available, data) {},
+    setNativeState: function(self, route, active, available, data) {
         if (window.NativeNav) {
-            window.NativeNav.showNavbar(state.route, active, data.leftButtons, data.title, data.rightButtons, data.titleChanged);
+            window.NativeNav.showNavbar(route, active, data.leftButtons, data.title, data.rightButtons, data.titleChanged);
         }
     },
     controller: function($scope) {

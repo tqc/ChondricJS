@@ -290,40 +290,62 @@ Chondric.App =
                 }
                 if ($scope.route == r) return;
                 if ($scope.lastRoute == r) $scope.lastRoute = null;
-                $scope.transition.type = transition || "crossfade";
-                $scope.noTransition = true;
-                loadView(r);
-                $scope.nextRoute = r;
-                $scope.transition.progress = 0;
-                $scope.transition.from = $scope.route;
-                $scope.transition.to = $scope.nextRoute;
 
+                var fromRoute = $scope.route;
+                var toRoute = r;
 
-                if ($scope.transition.from)
-                    app.scrollPosForRoutes[$scope.transition.from] = $scope.transition.fromScroll = {
+                if (fromRoute) {
+                    app.scrollPosForRoutes[fromRoute] = {
                         x: window.scrollX,
                         y: window.scrollY
                     };
-                if (originElement) {
-                    // todo: find parent element if necessary and set appropriate origin rect                   
-                    $scope.transition.fromRect = app.transitionOriginForRoutes[$scope.transition.from] = null;
+
+                    if (originElement) {
+                        // todo: find parent element if necessary and set appropriate origin rect                   
+                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute] = null;
+                    } else {
+                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute] = null;
+                    }
+                }
+
+
+                if (settings.transitionType == "none") {
+                    loadView(r);
+                    window.setTimeout(function() {
+                        $scope.route = r;
+                        $scope.$apply();
+                    }, 10);
+
+                } else if (settings.transitionType == "native") {
+
                 } else {
-                    $scope.transition.fromRect = app.transitionOriginForRoutes[$scope.transition.from] = null;
+
+                    $scope.transition.type = transition || "crossfade";
+                    $scope.noTransition = true;
+                    loadView(r);
+                    $scope.nextRoute = r;
+                    $scope.transition.progress = 0;
+                    $scope.transition.from = $scope.route;
+                    $scope.transition.to = $scope.nextRoute;
+
+
+                    if (fromRoute) {
+                        $scope.transition.fromScroll = app.scrollPosForRoutes[fromRoute];
+                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute];
+                    }
+                    $scope.transition.toRect = app.transitionOriginForRoutes[$scope.transition.to]
+
+                    $scope.transition.toScroll = app.scrollPosForRoutes[$scope.transition.to] || {
+                        x: 0,
+                        y: 0
+                    }
+                    window.setTimeout(function() {
+                        $scope.noTransition = false;
+                        $scope.route = r;
+                        $scope.transition.progress = 1;
+                        $scope.$apply();
+                    }, 100);
                 }
-                $scope.transition.toRect = app.transitionOriginForRoutes[$scope.transition.to]
-
-
-                $scope.transition.toScroll = app.scrollPosForRoutes[$scope.transition.to] || {
-                    x: 0,
-                    y: 0
-                }
-                window.setTimeout(function() {
-                    $scope.noTransition = false;
-                    $scope.route = r;
-                    $scope.transition.progress = 1;
-                    $scope.$apply();
-                }, 100);
-
             };
 
             $scope.updateSwipe = function(swipeState, swipeNav, pageScope) {
@@ -476,6 +498,14 @@ Chondric.App =
                 $location.path(url).replace();
                 loadView(url);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
+                window.setTimeout(function() {
+                    var sp = app.scrollPosForRoutes[url];
+                    if (sp) {
+                        window.scrollTo(sp.x, sp.y);
+                    } else {
+                        window.scrollTo(0, 0);
+                    }
+                }, 10);
             });
             if (options.appCtrl) options.appCtrl($scope);
         }; // end appCtrl
@@ -496,6 +526,7 @@ Chondric.App =
         var settings = {
             name: "Base App",
             mightBePhoneGap: true,
+            enableTransitions: true,
             loadPageFromHash: true,
             scriptGroups: [],
             angularModules: [],
@@ -646,7 +677,7 @@ Chondric.App =
                     // for now just check if height matches the full screen
                     var w = $(window).width();
                     var h = $(window).height();
-                    console.log("Size changed: " + w + "x" + h);
+                    //                    console.log("Size changed: " + w + "x" + h);
                     if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
                         $(".chondric-viewport").addClass("hasstatusbar");
                     } else {
@@ -691,13 +722,23 @@ Chondric.App =
                                 // attach common events
                                 attachEvents(function() {
 
+                                    app.transitionType = settings.enableTransitions ? "html" : "none";
+
                                     if (window.NativeNav) {
+                                        if (settings.enableTransitions) app.transitionType = "native";
                                         window.NativeNav.handleAction = function(route, action) {
                                             var routeScope = app.scopesForRoutes[route];
                                             if (routeScope) {
                                                 routeScope.$apply(action);
                                             }
                                         };
+                                    }
+
+                                    $("body").addClass("cjs-transitions-" + app.transitionType);
+                                    if (app.transitionType == "html") {
+                                        $("body").addClass("cjs-scrolling-page");
+                                    } else {
+                                        $("body").addClass("cjs-scrolling-window");
                                     }
 
                                     if (window.Keyboard) {
@@ -2418,14 +2459,18 @@ Chondric.registerSharedUiComponent({
             return;
         }
         window.clearTimeout(self.initialTransitionTimeout);
+
         var state = self.chooseState(self, route, active, available, data);
         state.route = route;
         state.active = active;
         state.available = available;
         state.data = data;
 
-        if (state == self.activeState) {
+        if (self.isNative && self.isNative() && self.setNativeState) {
+            self.setNativeState(self, route, active, available, data, direction);
+        } else if (state == self.activeState) {
             // in place update - no animation
+            self.updateCurrentState(self, state, active, available, data);
         } else {
             var otherState = self.states[((self.states.indexOf(state)) + 1) % self.states.length];
             self.updateTransitionSettings(self, state, otherState, 0, true);
@@ -2462,9 +2507,10 @@ Chondric.registerSharedUiComponent({
             thisState.opacity = 0;
         }
     },
-    updateCurrentState: function(self, state, active, available, data) {
+    updateCurrentState: function(self, state, active, available, data) {},
+    setNativeState: function(self, route, active, available, data) {
         if (window.NativeNav) {
-            window.NativeNav.showNavbar(state.route, active, data.leftButtons, data.title, data.rightButtons, data.titleChanged);
+            window.NativeNav.showNavbar(route, active, data.leftButtons, data.title, data.rightButtons, data.titleChanged);
         }
     },
     controller: function($scope) {
@@ -2621,21 +2667,27 @@ Chondric.registerSharedUiComponent({
 
         if (window.NativeNav) {
             if (active && !self.popuptrigger) {
+                self.scrollX = window.scrollX;
+                self.scrollY = window.scrollY;
                 window.NativeNav.startNativeTransition("popup", function() {
+                    $("body").addClass("cjs-shared-popup-active");
                     if (screen.width < 600) {
                         document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
                     } else {
                         document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
                     }
+                    window.scrollTo(0, 0);
                     self.popuptrigger = {};
                     self.nativeTransition = true;
                     self.app.scopesForRoutes[self.route].$apply();
                 });
             } else if (!active && self.popuptrigger) {
                 window.NativeNav.startNativeTransition("closepopup", function() {
+                    $("body").removeClass("cjs-shared-popup-active");
                     document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
                     self.popuptrigger = null;
                     self.app.scopesForRoutes[self.route].$apply();
+                    window.scrollTo(self.scrollX, self.scrollY);
                 });
             }
         } else {
