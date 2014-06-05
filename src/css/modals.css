@@ -20,6 +20,10 @@
 .nofade.active ~ .modal-overlay {
     background-color: transparent;
 }
+ .cjs-scrolling-window .modal-overlay {
+position: fixed;
+ }
+
 /* popover */
  .popover {
     position: absolute;
@@ -112,14 +116,25 @@
     margin-left: -315px;
     margin-top: -315px;
     z-index: 1100;
-    transition: transform 0.3s ease-in-out;
+    transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
     transform: translate(0, 150%);   
 }
+
+ .cjs-scrolling-window .popup {
+position: fixed;
+visibility: hidden;
+ }
+
 .popup.active {
     display: block;
     position: absolute;    
     transform: translate(0, 0);
 }
+
+ .cjs-scrolling-window .popup.active {
+visibility: visible;
+ }
+
 
 .noflexbox .popup {
     visibility: hidden;    
@@ -166,10 +181,15 @@
     top:0;
     bottom: 0;
     width: 260px;
-    z-index: 1100;
+    z-index: 1201;
     left: 0px;
     right: auto;
 }
+
+ .cjs-scrolling-window .sidepanel {
+position: fixed;
+ }
+
 .sidepanel.right {
     right: 0px;
     left: auto;

@@ -495,6 +495,7 @@ Chondric.App =
         var settings = {
             name: "Base App",
             mightBePhoneGap: true,
+            enableTransitions: true,
             loadPageFromHash: true,
             scriptGroups: [],
             angularModules: [],
@@ -645,7 +646,7 @@ Chondric.App =
                     // for now just check if height matches the full screen
                     var w = $(window).width();
                     var h = $(window).height();
-                    console.log("Size changed: " + w + "x" + h);
+                    //                    console.log("Size changed: " + w + "x" + h);
                     if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
                         $(".chondric-viewport").addClass("hasstatusbar");
                     } else {
@@ -690,13 +691,23 @@ Chondric.App =
                                 // attach common events
                                 attachEvents(function() {
 
+                                    app.transitionType = settings.enableTransitions ? "html" : "none";
+
                                     if (window.NativeNav) {
+                                        if (settings.enableTransitions) app.transitionType = "native";
                                         window.NativeNav.handleAction = function(route, action) {
                                             var routeScope = app.scopesForRoutes[route];
                                             if (routeScope) {
                                                 routeScope.$apply(action);
                                             }
                                         };
+                                    }
+
+                                    $("body").addClass("cjs-transitions-" + app.transitionType);
+                                    if (app.transitionType == "html") {
+                                        $("body").addClass("cjs-scrolling-page");
+                                    } else {
+                                        $("body").addClass("cjs-scrolling-window");
                                     }
 
                                     if (window.Keyboard) {
