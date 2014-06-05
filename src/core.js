@@ -212,6 +212,8 @@ Chondric.App =
 
 
             app.scopesForRoutes = {};
+            app.scrollPosForRoutes = {};
+            app.transitionOriginForRoutes = {};
             app.componentStatesForRoutes = {};
 
             function loadView(url) {
@@ -272,7 +274,7 @@ Chondric.App =
                 }
             }
 
-            $scope.changePage = app.changePage = function(p, transition) {
+            $scope.changePage = app.changePage = function(p, transition, originElement) {
                 var r;
                 if (p instanceof Array) {
                     r = "";
@@ -294,6 +296,26 @@ Chondric.App =
                 $scope.transition.progress = 0;
                 $scope.transition.from = $scope.route;
                 $scope.transition.to = $scope.nextRoute;
+
+
+                if ($scope.transition.from)
+                    app.scrollPosForRoutes[$scope.transition.from] = $scope.transition.fromScroll = {
+                        x: window.scrollX,
+                        y: window.scrollY
+                    };
+                if (originElement) {
+                    // todo: find parent element if necessary and set appropriate origin rect                   
+                    $scope.transition.fromRect = app.transitionOriginForRoutes[$scope.transition.from] = null;
+                } else {
+                    $scope.transition.fromRect = app.transitionOriginForRoutes[$scope.transition.from] = null;
+                }
+                $scope.transition.toRect = app.transitionOriginForRoutes[$scope.transition.to]
+
+
+                $scope.transition.toScroll = app.scrollPosForRoutes[$scope.transition.to] || {
+                    x: 0,
+                    y: 0
+                }
                 window.setTimeout(function() {
                     $scope.noTransition = false;
                     $scope.route = r;
