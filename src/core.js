@@ -308,15 +308,25 @@ Chondric.App =
                 }
 
 
-                if (settings.transitionType == "none") {
+                if (app.transitionMode == "none") {
                     loadView(r);
                     window.setTimeout(function() {
                         $scope.route = r;
                         $scope.$apply();
+                        transitionComponents(fromRoute, toRoute, 1);
+                        $scope.$apply();
                     }, 10);
 
-                } else if (settings.transitionType == "native") {
-
+                } else if (app.transitionMode == "native") {
+                    window.NativeNav.startNativeTransition( /*transition ||*/ "crossfade", function() {
+                        loadView(r);
+                        window.setTimeout(function() {
+                            $scope.route = r;
+                            $scope.$apply();
+                            transitionComponents(fromRoute, toRoute, 1);
+                            $scope.$apply();
+                        }, 10);
+                    });
                 } else {
 
                     $scope.transition.type = transition || "crossfade";
@@ -455,36 +465,45 @@ Chondric.App =
                 }
             }
 
-            $scope.$watch("transition", function(transition) {
-                if (!transition) return;
-                if (!transition.to) return;
-                var fromStates = app.componentStatesForRoutes[transition.from] || {};
-                var toStates = app.componentStatesForRoutes[transition.to] || {};
+            function transitionComponents(fromRoute, toRoute, progress) {
+                if (!toRoute) return;
+
+                var fromStates = app.componentStatesForRoutes[fromRoute] || {};
+                var toStates = app.componentStatesForRoutes[toRoute] || {};
 
                 for (var k in app.sharedUiComponents) {
                     var component = app.sharedUiComponents[k];
                     var fromState = fromStates[k] || {
-                        route: transition.from,
+                        route: fromRoute,
                         active: false,
                         available: false,
                         data: {}
                     };
                     var toState = toStates[k] || {
-                        route: transition.to,
+                        route: toRoute,
                         active: false,
                         available: false,
                         data: {}
                     };
                     if (component.setStatePartial) {
-                        component.setStatePartial(component, fromState, toState, transition.progress);
+                        component.setStatePartial(component, fromState, toState, progress);
                     } else {
-                        if (transition.progress > 0.5) {
+                        if (progress > 0.5) {
                             component.setState(component, toState.route, toState.active, toState.available, toState.data);
                         } else {
                             component.setState(component, fromState.route, fromState.active, fromState.available, fromState.data);
                         }
                     }
                 }
+
+            }
+
+            $scope.$watch("transition", function(transition) {
+                if (!transition) return;
+                if (!transition.to) return;
+
+                transitionComponents(transition.from, transition.to, transition.progress);
+
 
             }, true);
 
@@ -721,10 +740,10 @@ Chondric.App =
                                 // attach common events
                                 attachEvents(function() {
 
-                                    app.transitionType = settings.enableTransitions ? "html" : "none";
+                                    app.transitionMode = settings.enableTransitions ? "html" : "none";
 
                                     if (window.NativeNav) {
-                                        if (settings.enableTransitions) app.transitionType = "native";
+                                        if (settings.enableTransitions) app.transitionMode = "native";
                                         window.NativeNav.handleAction = function(route, action) {
                                             var routeScope = app.scopesForRoutes[route];
                                             if (routeScope) {
@@ -733,8 +752,8 @@ Chondric.App =
                                         };
                                     }
 
-                                    $("body").addClass("cjs-transitions-" + app.transitionType);
-                                    if (app.transitionType == "html") {
+                                    $("body").addClass("cjs-transitions-" + app.transitionMode);
+                                    if (app.transitionMode == "html") {
                                         $("body").addClass("cjs-scrolling-page");
                                     } else {
                                         $("body").addClass("cjs-scrolling-window");
