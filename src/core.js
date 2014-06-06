@@ -318,7 +318,7 @@ Chondric.App =
                     }, 10);
 
                 } else if (app.transitionMode == "native") {
-                    window.NativeNav.startNativeTransition( /*transition ||*/ "crossfade", function() {
+                    window.NativeNav.startNativeTransition( /*transition ||*/ "crossfade", null, function() {
                         loadView(r);
                         window.setTimeout(function() {
                             $scope.route = r;

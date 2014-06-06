@@ -319,7 +319,7 @@ Chondric.App =
                     }, 10);
 
                 } else if (app.transitionMode == "native") {
-                    window.NativeNav.startNativeTransition( /*transition ||*/ "crossfade", function() {
+                    window.NativeNav.startNativeTransition( /*transition ||*/ "crossfade", null, function() {
                         loadView(r);
                         window.setTimeout(function() {
                             $scope.route = r;
@@ -1255,6 +1255,7 @@ Chondric.directive('ngTap', function() {
 
         // called on mousedown or touchstart. Multiple calls are ignored.
         var mouseStart = function(e) {
+            if (e.which != 1) return;
             if (active || touching) return;
             touching = false;
             start(e);
@@ -2703,7 +2704,11 @@ Chondric.registerSharedUiComponent({
             if (active && !self.popuptrigger) {
                 self.scrollX = window.scrollX;
                 self.scrollY = window.scrollY;
-                window.NativeNav.startNativeTransition("popup", function() {
+                self.originRect = null;
+                if (data.element && data.element.length) {
+                    self.originRect = data.element[0].getBoundingClientRect();
+                }
+                window.NativeNav.startNativeTransition("popup", self.originRect, function() {
                     $("body").addClass("cjs-shared-popup-active");
                     if (screen.width < 600) {
                         document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
@@ -2716,7 +2721,7 @@ Chondric.registerSharedUiComponent({
                     self.app.scopesForRoutes[self.route].$apply();
                 });
             } else if (!active && self.popuptrigger) {
-                window.NativeNav.startNativeTransition("closepopup", function() {
+                window.NativeNav.startNativeTransition("closepopup", self.originRect, function() {
                     $("body").removeClass("cjs-shared-popup-active");
                     document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
                     self.popuptrigger = null;
@@ -2728,7 +2733,9 @@ Chondric.registerSharedUiComponent({
             if (!active) {
                 self.popuptrigger = null;
             } else {
-                self.popuptrigger = {};
+                self.popuptrigger = {
+                    element: data.element
+                };
             }
         }
     }

@@ -42,7 +42,11 @@ Chondric.registerSharedUiComponent({
             if (active && !self.popuptrigger) {
                 self.scrollX = window.scrollX;
                 self.scrollY = window.scrollY;
-                window.NativeNav.startNativeTransition("popup", function() {
+                self.originRect = null;
+                if (data.element && data.element.length) {
+                    self.originRect = data.element[0].getBoundingClientRect();
+                }
+                window.NativeNav.startNativeTransition("popup", self.originRect, function() {
                     $("body").addClass("cjs-shared-popup-active");
                     if (screen.width < 600) {
                         document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
@@ -55,7 +59,7 @@ Chondric.registerSharedUiComponent({
                     self.app.scopesForRoutes[self.route].$apply();
                 });
             } else if (!active && self.popuptrigger) {
-                window.NativeNav.startNativeTransition("closepopup", function() {
+                window.NativeNav.startNativeTransition("closepopup", self.originRect, function() {
                     $("body").removeClass("cjs-shared-popup-active");
                     document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
                     self.popuptrigger = null;
@@ -67,7 +71,9 @@ Chondric.registerSharedUiComponent({
             if (!active) {
                 self.popuptrigger = null;
             } else {
-                self.popuptrigger = {};
+                self.popuptrigger = {
+                    element: data.element
+                };
             }
         }
     }
