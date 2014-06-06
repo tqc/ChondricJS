@@ -87,6 +87,7 @@ Chondric.directive('ngTap', function() {
 
         // called on mousedown or touchstart. Multiple calls are ignored.
         var mouseStart = function(e) {
+            if (e.which != 1) return;
             if (active || touching) return;
             touching = false;
             start(e);
