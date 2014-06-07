@@ -2,7 +2,7 @@ Chondric.registerSharedUiComponent({
     id: "cjs-tab-footer",
     templateUrl: "cjs-tab-footer.html",
     isNative: function() {
-        return false;
+        return window.NativeNav && true || false;
     },
     controller: function($scope) {
         var self = $scope.componentDefinition;
@@ -24,6 +24,10 @@ Chondric.registerSharedUiComponent({
         self.active = active;
         self.available = available;
         self.selectedTab = data.selectedTab;
+
+        if (window.NativeNav) {
+            window.NativeNav.showTabbar(route, active, data.buttons, data.selectedTab);
+        }
     }
 
 });
