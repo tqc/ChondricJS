@@ -343,12 +343,12 @@ Chondric.App =
                         $scope.transition.fromScroll = app.scrollPosForRoutes[fromRoute];
                         $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute];
                     }
-                    $scope.transition.toRect = app.transitionOriginForRoutes[$scope.transition.to]
+                    $scope.transition.toRect = app.transitionOriginForRoutes[$scope.transition.to];
 
                     $scope.transition.toScroll = app.scrollPosForRoutes[$scope.transition.to] || {
                         x: 0,
                         y: 0
-                    }
+                    };
                     window.setTimeout(function() {
                         $scope.noTransition = false;
                         $scope.route = r;
@@ -725,12 +725,12 @@ Chondric.App =
                     loadHostSettings(function() {
                         // if in debug mode and there are tests specified, load them
                         if (app.hostSettings.debug && app.hostSettings.tests && app.hostSettings.tests.length) {
-                            $("head").append('<script src="bower_components/mocha/mocha.js"></script>')
-                            $("head").append('<script>mocha.setup("' + (app.hostSettings.mochaInterface || "bdd") + '")</script>')
-                            $("head").append('<link rel="stylesheet" href="bower_components/mocha/mocha.css" />')
-                            $("head").append('<script src="bower_components/chai/chai.js"></script>')
+                            $("head").append('<script src="bower_components/mocha/mocha.js"></script>');
+                            $("head").append('<script>mocha.setup("' + (app.hostSettings.mochaInterface || "bdd") + '")</script>');
+                            $("head").append('<link rel="stylesheet" href="bower_components/mocha/mocha.css" />');
+                            $("head").append('<script src="bower_components/chai/chai.js"></script>');
                             for (var i = 0; i < app.hostSettings.tests.length; i++) {
-                                $("head").append('<script src="' + app.hostSettings.tests[i] + '"></script>')
+                                $("head").append('<script src="' + app.hostSettings.tests[i] + '"></script>');
                             }
                         }
 
@@ -917,11 +917,11 @@ Chondric.factory('sharedUi', function() {
 Chondric.directive('ngStylePrefixer', function() {
 
     var style = document.body.style;
-    var transitionStyle = "transition"
+    var transitionStyle = "transition";
     if (style.transition === undefined && style.webkitTransition !== undefined) transitionStyle = "-webkit-transition";
     else if (style.transition === undefined && style.mozTransition !== undefined) transitionStyle = "-moz-transition";
 
-    var transformStyle = "transform"
+    var transformStyle = "transform";
     if (style.transform === undefined && style.webkitTransform !== undefined) transformStyle = "-webkit-transform";
     else if (style.transform === undefined && style.mozTransform !== undefined) transformStyle = "-moz-transform";
 
@@ -932,11 +932,11 @@ Chondric.directive('ngStylePrefixer', function() {
                 if (oldStyles && (newStyles !== oldStyles)) {
                     for (var k in oldStyles) {
                         element.css(k, '');
-                    };
+                    }
                 }
 
                 if (newStyles) {
-                    var convertedStyles = {}
+                    var convertedStyles = {};
 
                     for (var k in newStyles) {
                         var v = newStyles[k];
@@ -954,7 +954,7 @@ Chondric.directive('ngStylePrefixer', function() {
                 }
             }, true);
         }
-    }
+    };
 });
 angular.module('chondric').run(['$templateCache', function($templateCache) {
   'use strict';
@@ -2709,17 +2709,19 @@ Chondric.registerSharedUiComponent({
                     self.originRect = data.element[0].getBoundingClientRect();
                 }
                 window.NativeNav.startNativeTransition("popup", self.originRect, function() {
-                    $("body").addClass("cjs-shared-popup-active");
-                    if (screen.width < 600) {
-                        document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
-                    } else {
-                        document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
-                    }
-                    window.scrollTo(0, 0);
-                    self.popuptrigger = {};
-                    self.nativeTransition = true;
-                    self.app.scopesForRoutes[self.route].$apply();
-                });
+                        $("body").addClass("cjs-shared-popup-active");
+                        if (screen.width < 600) {
+                            document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                        } else {
+                            document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
+                        }
+                        window.scrollTo(0, 0);
+                        self.popuptrigger = {};
+                        self.nativeTransition = true;
+                        self.app.scopesForRoutes[self.route].$apply();
+                    },
+                    self.scope.hideModal
+                );
             } else if (!active && self.popuptrigger) {
                 window.NativeNav.startNativeTransition("closepopup", self.originRect, function() {
                     $("body").removeClass("cjs-shared-popup-active");

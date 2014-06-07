@@ -47,17 +47,19 @@ Chondric.registerSharedUiComponent({
                     self.originRect = data.element[0].getBoundingClientRect();
                 }
                 window.NativeNav.startNativeTransition("popup", self.originRect, function() {
-                    $("body").addClass("cjs-shared-popup-active");
-                    if (screen.width < 600) {
-                        document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
-                    } else {
-                        document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
-                    }
-                    window.scrollTo(0, 0);
-                    self.popuptrigger = {};
-                    self.nativeTransition = true;
-                    self.app.scopesForRoutes[self.route].$apply();
-                });
+                        $("body").addClass("cjs-shared-popup-active");
+                        if (screen.width < 600) {
+                            document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                        } else {
+                            document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
+                        }
+                        window.scrollTo(0, 0);
+                        self.popuptrigger = {};
+                        self.nativeTransition = true;
+                        self.app.scopesForRoutes[self.route].$apply();
+                    },
+                    self.scope.hideModal
+                );
             } else if (!active && self.popuptrigger) {
                 window.NativeNav.startNativeTransition("closepopup", self.originRect, function() {
                     $("body").removeClass("cjs-shared-popup-active");
