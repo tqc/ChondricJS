@@ -43,16 +43,37 @@
     display: none !important;
 }
 
- .icon-top.icon-custom .maskedicon {
-        background-color: currentColor;
-        -webkit-mask-position: center;
+.icon-custom::after {
+    display: none !important;
+}
+
+ .maskedicon {
+    background-color: currentColor;
+    -webkit-mask-position: center;
     -webkit-mask-size: contain;
     -webkit-mask-repeat: no-repeat;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+ .icon-top.icon-custom .maskedicon {
     display: block;
     height: 40px;
 }
+
+ .icon-left.icon-custom .maskedicon {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+}
+
+ .icon-right.icon-custom .maskedicon {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+}
+
+
 
 /* Standard icons */
 
