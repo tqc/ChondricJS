@@ -347,13 +347,15 @@ Chondric.App =
                     }
 
                     window.NativeNav.startNativeTransition(actualTransition, originRect, function() {
-                        loadView(r);
+                        $(".chondric-page.active").removeClass("active");
                         window.setTimeout(function() {
+                            loadView(r);
                             $scope.route = r;
                             $scope.$apply();
                             transitionComponents(fromRoute, toRoute, 1);
                             $scope.$apply();
-                        }, 10);
+                        }, 0);
+
                     });
                 } else {
 

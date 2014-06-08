@@ -1,4 +1,21 @@
 Chondric.directive('ngTap', function() {
+    var lastTapLocation;
+
+    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+
+    if (iOS) {
+        var cancelMouseEvent = function(event) {
+            if (!lastTapLocation) return;
+            if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        };
+        window.document.addEventListener('mouseup', cancelMouseEvent, true);
+        window.document.addEventListener('mousedown', cancelMouseEvent, true);
+        window.document.addEventListener('click', cancelMouseEvent, true);
+    }
+
 
     return function(scope, element, attrs) {
         element.addClass('tappable');
@@ -94,6 +111,10 @@ Chondric.directive('ngTap', function() {
         };
 
         var touchStart = function(e) {
+            lastTapLocation = {
+                x: e.originalEvent.touches[0].screenX,
+                y: e.originalEvent.touches[0].screenY
+            };
             if (active) return;
             touching = true;
             start(e);

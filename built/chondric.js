@@ -348,13 +348,15 @@ Chondric.App =
                     }
 
                     window.NativeNav.startNativeTransition(actualTransition, originRect, function() {
-                        loadView(r);
+                        $(".chondric-page.active").removeClass("active");
                         window.setTimeout(function() {
+                            loadView(r);
                             $scope.route = r;
                             $scope.$apply();
                             transitionComponents(fromRoute, toRoute, 1);
                             $scope.$apply();
-                        }, 10);
+                        }, 0);
+
                     });
                 } else {
 
@@ -1224,6 +1226,23 @@ Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 
 };
 Chondric.directive('ngTap', function() {
+    var lastTapLocation;
+
+    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+
+    if (iOS) {
+        var cancelMouseEvent = function(event) {
+            if (!lastTapLocation) return;
+            if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        };
+        window.document.addEventListener('mouseup', cancelMouseEvent, true);
+        window.document.addEventListener('mousedown', cancelMouseEvent, true);
+        window.document.addEventListener('click', cancelMouseEvent, true);
+    }
+
 
     return function(scope, element, attrs) {
         element.addClass('tappable');
@@ -1319,6 +1338,10 @@ Chondric.directive('ngTap', function() {
         };
 
         var touchStart = function(e) {
+            lastTapLocation = {
+                x: e.originalEvent.touches[0].screenX,
+                y: e.originalEvent.touches[0].screenY
+            };
             if (active) return;
             touching = true;
             start(e);
@@ -2346,16 +2369,16 @@ Chondric.directive('chondricViewport', function($compile) {
                 // first level
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
-                template = "<div ng-repeat=\"(rk, rv) in openViews\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template = "<div ng-repeat=\"(rk, rv) in openViews track by rk\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
                 template += "</div>";
-                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents\" cjs-shared-component testattr='{{componentId}}'>";
+                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents track by ck\" cjs-shared-component testattr='{{componentId}}'>";
                 template += "</div>";
 
                 //                template += "</div>"
 
             } else if (rv.isSection) {
                 template = "<div ng-controller=\"rv.controller\" >";
-                template += "<div ng-repeat=\"(rk, rv) in rv.subsections\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template += "<div ng-repeat=\"(rk, rv) in rv.subsections track by rk\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
                 template += "</div>";
                 template += "</div>";
 
