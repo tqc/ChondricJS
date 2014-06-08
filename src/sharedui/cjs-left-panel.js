@@ -4,6 +4,8 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-left-panel.html",
     handledSwipeState: "leftBorder",
     transition: "coverLeft",
+    nativeShowTransition: "showleftpanel",
+    nativeHideTransition: "hideleftpanel",
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.baseController("cjs-right-panel", $scope);

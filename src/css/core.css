@@ -436,7 +436,6 @@ visibility: hidden;
 .cjs-scrolling-window .body {
         position: static;
         box-sizing: border-box;
-min-height: 100vh;
 }
 
 .cjs-scrolling-page .body,

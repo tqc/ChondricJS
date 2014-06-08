@@ -16,7 +16,6 @@ Chondric.registerSharedUiComponent({
                 routeScope.$eval(self.data.setTab || "setTab")(val);
             }
         };
-
     },
     setState: function(self, route, active, available, data) {
         self.data = data;

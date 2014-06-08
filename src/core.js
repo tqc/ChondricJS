@@ -164,6 +164,18 @@ Chondric.App =
                 $scope[name] = null;
             };
 
+            $scope.updateSwipeNav = app.updateSwipeNav = function(routeScope, data) {
+                var d = app.swipeNavForRoutes[routeScope.rk] || {};
+                $.extend(d, data);
+                app.swipeNavForRoutes[routeScope.rk] = d;
+                routeScope.swipeNav = d;
+                if ($scope.route == routeScope.rk) {
+                    if (window.NativeNav) {
+                        window.NativeNav.setValidGestures(d);
+                    }
+                }
+            };
+
             $scope.getSharedUiComponentState = app.getSharedUiComponentState = function(routeScope, componentId) {
                 app.scopesForRoutes[routeScope.rk] = routeScope;
 
@@ -186,6 +198,7 @@ Chondric.App =
 
             };
 
+
             $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
                 var cs = app.getSharedUiComponentState(routeScope, componentId);
                 // if parameters are undefined, the previous value will be used
@@ -202,9 +215,11 @@ Chondric.App =
                     uc.asString = uc.asArray.join(" ");
                 }
 
+                var component = app.sharedUiComponents[componentId];
+
+                if (component.getSwipeNav) app.updateSwipeNav(routeScope, component.getSwipeNav(component, cs.active, cs.available));
 
                 if ($scope.route == routeScope.rk) {
-                    var component = app.sharedUiComponents[componentId];
                     component.setState(component, routeScope.rk, cs.active, cs.available, cs.data);
                 }
 
@@ -213,6 +228,7 @@ Chondric.App =
 
             app.scopesForRoutes = {};
             app.scrollPosForRoutes = {};
+            app.swipeNavForRoutes = {};
             app.transitionOriginForRoutes = {};
             app.componentStatesForRoutes = {};
 
@@ -516,6 +532,10 @@ Chondric.App =
                 $location.path(url).replace();
                 loadView(url);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
+                if (window.NativeNav) {
+                    window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
+                }
+
                 window.setTimeout(function() {
                     var sp = app.scrollPosForRoutes[url];
                     if (sp) {
@@ -750,6 +770,31 @@ Chondric.App =
                                                 routeScope.$apply(action);
                                             }
                                         };
+                                        var gestureOpenedComponent = null;
+                                        window.NativeNav.updateViewWithComponent = function(componentId) {
+                                            // fill the frame with a side panel
+                                            console.log("NativeNav requested component " + componentId);
+                                            gestureOpenedComponent = app.sharedUiComponents[componentId];
+                                            if (gestureOpenedComponent.forceShow) gestureOpenedComponent.forceShow(gestureOpenedComponent);
+                                            window.NativeNav.setCloseModalCallback(gestureOpenedComponent.scope.hideModal);
+                                            app.scope.$apply();
+
+                                        };
+
+                                        window.NativeNav.updateViewWithRoute = function(newRoute) {
+                                            // move to the next route
+                                            console.log("NativeNav requested route " + newRoute);
+                                        };
+
+                                        window.NativeNav.cancelGesture = function() {
+                                            console.log("Gesture canceled");
+                                            if (gestureOpenedComponent) {
+                                                if (gestureOpenedComponent.forceHide) gestureOpenedComponent.forceHide(gestureOpenedComponent);
+                                                app.scope.$apply();
+                                            }
+                                        };
+
+
                                     }
 
                                     $("body").addClass("cjs-transitions-" + app.transitionMode);

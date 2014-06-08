@@ -458,7 +458,6 @@ visibility: hidden;
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
-min-height: 100vh;
 }
 
 .cjs-scrolling-page .body,
@@ -1203,6 +1202,8 @@ visibility: visible;
 position: fixed;
  }
 
+
+
 .sidepanel.right {
     right: 0px;
     left: auto;
@@ -1211,6 +1212,26 @@ position: fixed;
     left: 0px;
     right: auto;
 }
+
+
+ .cjs-transitions-native .sidepanel {
+position: absolute;
+top: 0 !important;
+bottom: 0 !important;
+left: 0 !important;
+right: 0 !important;
+width: auto !important;
+-webkit-transform: none !important;
+-ms-transform: none !important;
+transform: none !important;
+-webkit-transition: none !important;
+transition: none !important;
+    display: none !important;
+ }
+ .cjs-transitions-native .sidepanel.active {
+    display: block !important;
+ }
+
 /*
 
 .sidepanel.active {

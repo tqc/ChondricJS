@@ -3,6 +3,8 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-right-panel.html",
     handledSwipeState: "rightBorder",
     transition: "coverRight",
+    nativeShowTransition: "showrightpanel",
+    nativeHideTransition: "hiderightpanel",
     isNative: function() {
         return false;
     },
@@ -41,18 +43,64 @@ Chondric.registerSharedUiComponent({
             transition: self.transition
         };
     },
+    forceHide: function(self) {
+        self.active = false;
+        window.scrollTo(self.scrollX, self.scrollY);
+        document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+
+    },
+    forceShow: function(self) {
+        self.scrollX = window.scrollX;
+        self.scrollY = window.scrollY;
+        self.active = true;
+        document.getElementById("viewport").setAttribute("content", "width=260, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+        window.scrollTo(0, 0);
+    },
     setState: function(self, route, active, available, data) {
         self.data = data;
         self.route = route;
-        self.active = active;
         self.available = available;
 
-        if (!active) {
-            self.setPanelPosition(self, 0);
+        if (window.NativeNav) {
+            if (active && !self.active) {
+                self.originRect = null;
+                if (data.element && data.element.length) {
+                    self.originRect = data.element[0].getBoundingClientRect();
+                }
+                window.NativeNav.startNativeTransition(self.nativeShowTransition, null, function() {
+                        $("body").addClass("cjs-shared-popup-active");
+                        document.getElementById("viewport").setAttribute("content", "width=260, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                        self.active = active;
+                        window.scrollTo(0, 0);
+                        self.app.scopesForRoutes[self.route].$apply();
+                    },
+                    self.scope.hideModal
+                );
+            } else if (!active && self.active) {
+                window.NativeNav.startNativeTransition(self.nativeHideTransition, null, function() {
+                    $("body").removeClass("cjs-shared-popup-active");
+                    document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    self.active = active;
+                    self.app.scopesForRoutes[self.route].$apply();
+                    window.scrollTo(self.scrollX, self.scrollY);
+                });
+            }
         } else {
-            self.setPanelPosition(self, 1);
+            if (!active) {
+                self.setPanelPosition(self, 0);
+            } else {
+                self.setPanelPosition(self, 1);
+            }
         }
 
+
+    },
+    getSwipeNav: function(self, active, available) {
+        var d = {};
+        if (available) d[self.handledSwipeState] = {
+            component: self.id
+        };
+        return d;
     },
     updateSwipe: function(self, swipeState) {
         if (!self.available) return;

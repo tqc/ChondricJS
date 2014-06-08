@@ -3,6 +3,7 @@ Chondric.directive("cjsSwipe", function() {
     return {
         //        restrict: "E",
         link: function(scope, element) {
+            if (window.NativeNav) return;
             var useMouse = true;
             var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
             if (iOS) {

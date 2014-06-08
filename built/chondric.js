@@ -165,6 +165,18 @@ Chondric.App =
                 $scope[name] = null;
             };
 
+            $scope.updateSwipeNav = app.updateSwipeNav = function(routeScope, data) {
+                var d = app.swipeNavForRoutes[routeScope.rk] || {};
+                $.extend(d, data);
+                app.swipeNavForRoutes[routeScope.rk] = d;
+                routeScope.swipeNav = d;
+                if ($scope.route == routeScope.rk) {
+                    if (window.NativeNav) {
+                        window.NativeNav.setValidGestures(d);
+                    }
+                }
+            };
+
             $scope.getSharedUiComponentState = app.getSharedUiComponentState = function(routeScope, componentId) {
                 app.scopesForRoutes[routeScope.rk] = routeScope;
 
@@ -187,6 +199,7 @@ Chondric.App =
 
             };
 
+
             $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
                 var cs = app.getSharedUiComponentState(routeScope, componentId);
                 // if parameters are undefined, the previous value will be used
@@ -203,9 +216,11 @@ Chondric.App =
                     uc.asString = uc.asArray.join(" ");
                 }
 
+                var component = app.sharedUiComponents[componentId];
+
+                if (component.getSwipeNav) app.updateSwipeNav(routeScope, component.getSwipeNav(component, cs.active, cs.available));
 
                 if ($scope.route == routeScope.rk) {
-                    var component = app.sharedUiComponents[componentId];
                     component.setState(component, routeScope.rk, cs.active, cs.available, cs.data);
                 }
 
@@ -214,6 +229,7 @@ Chondric.App =
 
             app.scopesForRoutes = {};
             app.scrollPosForRoutes = {};
+            app.swipeNavForRoutes = {};
             app.transitionOriginForRoutes = {};
             app.componentStatesForRoutes = {};
 
@@ -517,6 +533,10 @@ Chondric.App =
                 $location.path(url).replace();
                 loadView(url);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
+                if (window.NativeNav) {
+                    window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
+                }
+
                 window.setTimeout(function() {
                     var sp = app.scrollPosForRoutes[url];
                     if (sp) {
@@ -751,6 +771,31 @@ Chondric.App =
                                                 routeScope.$apply(action);
                                             }
                                         };
+                                        var gestureOpenedComponent = null;
+                                        window.NativeNav.updateViewWithComponent = function(componentId) {
+                                            // fill the frame with a side panel
+                                            console.log("NativeNav requested component " + componentId);
+                                            gestureOpenedComponent = app.sharedUiComponents[componentId];
+                                            if (gestureOpenedComponent.forceShow) gestureOpenedComponent.forceShow(gestureOpenedComponent);
+                                            window.NativeNav.setCloseModalCallback(gestureOpenedComponent.scope.hideModal);
+                                            app.scope.$apply();
+
+                                        };
+
+                                        window.NativeNav.updateViewWithRoute = function(newRoute) {
+                                            // move to the next route
+                                            console.log("NativeNav requested route " + newRoute);
+                                        };
+
+                                        window.NativeNav.cancelGesture = function() {
+                                            console.log("Gesture canceled");
+                                            if (gestureOpenedComponent) {
+                                                if (gestureOpenedComponent.forceHide) gestureOpenedComponent.forceHide(gestureOpenedComponent);
+                                                app.scope.$apply();
+                                            }
+                                        };
+
+
                                     }
 
                                     $("body").addClass("cjs-transitions-" + app.transitionMode);
@@ -968,7 +1013,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-left-panel.html',
-    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
+    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\" ng-class=\"{active: componentDefinition.active}\">\n" +
     "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
     "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
     "</div>"
@@ -1043,7 +1088,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-right-panel.html',
-    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\">\n" +
+    "<div cjs-sidepanel=\"componentDefinition.popuptrigger\" ng-class=\"{active: componentDefinition.active}\">\n" +
     "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
     "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
     "\n" +
@@ -2047,6 +2092,7 @@ Chondric.directive("cjsSwipe", function() {
     return {
         //        restrict: "E",
         link: function(scope, element) {
+            if (window.NativeNav) return;
             var useMouse = true;
             var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
             if (iOS) {
@@ -2649,7 +2695,6 @@ Chondric.registerSharedUiComponent({
                 routeScope.$eval(self.data.setTab || "setTab")(val);
             }
         };
-
     },
     setState: function(self, route, active, available, data) {
         self.data = data;
@@ -2751,6 +2796,8 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-right-panel.html",
     handledSwipeState: "rightBorder",
     transition: "coverRight",
+    nativeShowTransition: "showrightpanel",
+    nativeHideTransition: "hiderightpanel",
     isNative: function() {
         return false;
     },
@@ -2789,18 +2836,64 @@ Chondric.registerSharedUiComponent({
             transition: self.transition
         };
     },
+    forceHide: function(self) {
+        self.active = false;
+        window.scrollTo(self.scrollX, self.scrollY);
+        document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+
+    },
+    forceShow: function(self) {
+        self.scrollX = window.scrollX;
+        self.scrollY = window.scrollY;
+        self.active = true;
+        document.getElementById("viewport").setAttribute("content", "width=260, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+        window.scrollTo(0, 0);
+    },
     setState: function(self, route, active, available, data) {
         self.data = data;
         self.route = route;
-        self.active = active;
         self.available = available;
 
-        if (!active) {
-            self.setPanelPosition(self, 0);
+        if (window.NativeNav) {
+            if (active && !self.active) {
+                self.originRect = null;
+                if (data.element && data.element.length) {
+                    self.originRect = data.element[0].getBoundingClientRect();
+                }
+                window.NativeNav.startNativeTransition(self.nativeShowTransition, null, function() {
+                        $("body").addClass("cjs-shared-popup-active");
+                        document.getElementById("viewport").setAttribute("content", "width=260, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                        self.active = active;
+                        window.scrollTo(0, 0);
+                        self.app.scopesForRoutes[self.route].$apply();
+                    },
+                    self.scope.hideModal
+                );
+            } else if (!active && self.active) {
+                window.NativeNav.startNativeTransition(self.nativeHideTransition, null, function() {
+                    $("body").removeClass("cjs-shared-popup-active");
+                    document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    self.active = active;
+                    self.app.scopesForRoutes[self.route].$apply();
+                    window.scrollTo(self.scrollX, self.scrollY);
+                });
+            }
         } else {
-            self.setPanelPosition(self, 1);
+            if (!active) {
+                self.setPanelPosition(self, 0);
+            } else {
+                self.setPanelPosition(self, 1);
+            }
         }
 
+
+    },
+    getSwipeNav: function(self, active, available) {
+        var d = {};
+        if (available) d[self.handledSwipeState] = {
+            component: self.id
+        };
+        return d;
     },
     updateSwipe: function(self, swipeState) {
         if (!self.available) return;
@@ -2833,6 +2926,8 @@ Chondric.registerSharedUiComponent({
     templateUrl: "cjs-left-panel.html",
     handledSwipeState: "leftBorder",
     transition: "coverLeft",
+    nativeShowTransition: "showleftpanel",
+    nativeHideTransition: "hideleftpanel",
     controller: function($scope) {
         var self = $scope.componentDefinition;
         self.baseController("cjs-right-panel", $scope);
