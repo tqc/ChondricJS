@@ -308,6 +308,7 @@ Chondric.App =
 
                 var fromRoute = $scope.route;
                 var toRoute = r;
+                var fromRect = null;
 
                 if (fromRoute) {
                     app.scrollPosForRoutes[fromRoute] = {
@@ -315,11 +316,11 @@ Chondric.App =
                         y: window.scrollY
                     };
 
-                    if (originElement) {
+                    if (originElement && originElement.length) {
                         // todo: find parent element if necessary and set appropriate origin rect                   
-                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute] = null;
+                        fromRect = app.transitionOriginForRoutes[fromRoute] = originElement[0].getBoundingClientRect();
                     } else {
-                        $scope.transition.fromRect = app.transitionOriginForRoutes[fromRoute] = null;
+                        fromRect = app.transitionOriginForRoutes[fromRoute] = null;
                     }
                 }
 
@@ -334,7 +335,18 @@ Chondric.App =
                     }, 10);
 
                 } else if (app.transitionMode == "native") {
-                    window.NativeNav.startNativeTransition( /*transition ||*/ "crossfade", null, function() {
+                    var actualTransition = "crossfade";
+                    var originRect = null;
+                    if (transition == "zoomin" && fromRect) {
+                        actualTransition = "zoomin";
+                        originRect = fromRect;
+                    }
+                    if (transition == "zoomout" && app.transitionOriginForRoutes[toRoute]) {
+                        actualTransition = "zoomout";
+                        originRect = app.transitionOriginForRoutes[toRoute];
+                    }
+
+                    window.NativeNav.startNativeTransition(actualTransition, originRect, function() {
                         loadView(r);
                         window.setTimeout(function() {
                             $scope.route = r;
@@ -352,7 +364,7 @@ Chondric.App =
                     $scope.transition.progress = 0;
                     $scope.transition.from = $scope.route;
                     $scope.transition.to = $scope.nextRoute;
-
+                    $scope.transition.fromRect = fromRect;
 
                     if (fromRoute) {
                         $scope.transition.fromScroll = app.scrollPosForRoutes[fromRoute];
