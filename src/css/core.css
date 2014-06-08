@@ -481,6 +481,13 @@ min-height: 0;
  }
 
 
+.cjs-transitions-native .uses-cjs-navigation-bar .body,
+.cjs-transitions-native .popup .navbar ~ .body
+ {
+    padding-top:60px;
+ }
+
+
 @media (min-width: 600px) {
 .hasstatusbar .uses-cjs-navigation-bar .popup .body,
 .hasstatusbar .popup .navbar ~ .body {

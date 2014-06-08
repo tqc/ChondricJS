@@ -2760,7 +2760,7 @@ Chondric.registerSharedUiComponent({
                 window.NativeNav.startNativeTransition("popup", self.originRect, function() {
                         $("body").addClass("cjs-shared-popup-active");
                         if (screen.width < 600) {
-                            document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                            document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
                         } else {
                             document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
                         }
@@ -2774,7 +2774,7 @@ Chondric.registerSharedUiComponent({
             } else if (!active && self.popuptrigger) {
                 window.NativeNav.startNativeTransition("closepopup", self.originRect, function() {
                     $("body").removeClass("cjs-shared-popup-active");
-                    document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
                     self.popuptrigger = null;
                     self.app.scopesForRoutes[self.route].$apply();
                     window.scrollTo(self.scrollX, self.scrollY);
@@ -2839,14 +2839,14 @@ Chondric.registerSharedUiComponent({
     forceHide: function(self) {
         self.active = false;
         window.scrollTo(self.scrollX, self.scrollY);
-        document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+        document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
 
     },
     forceShow: function(self) {
         self.scrollX = window.scrollX;
         self.scrollY = window.scrollY;
         self.active = true;
-        document.getElementById("viewport").setAttribute("content", "width=260, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+        document.getElementById("viewport").setAttribute("content", "width=260, initial-scale=1, maximum-scale=1, user-scalable=0");
         window.scrollTo(0, 0);
     },
     setState: function(self, route, active, available, data) {
@@ -2862,7 +2862,7 @@ Chondric.registerSharedUiComponent({
                 }
                 window.NativeNav.startNativeTransition(self.nativeShowTransition, null, function() {
                         $("body").addClass("cjs-shared-popup-active");
-                        document.getElementById("viewport").setAttribute("content", "width=260, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                        document.getElementById("viewport").setAttribute("content", "width=260, initial-scale=1, maximum-scale=1, user-scalable=0");
                         self.active = active;
                         window.scrollTo(0, 0);
                         self.app.scopesForRoutes[self.route].$apply();
@@ -2872,7 +2872,7 @@ Chondric.registerSharedUiComponent({
             } else if (!active && self.active) {
                 window.NativeNav.startNativeTransition(self.nativeHideTransition, null, function() {
                     $("body").removeClass("cjs-shared-popup-active");
-                    document.getElementById("viewport").setAttribute("content", "width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
                     self.active = active;
                     self.app.scopesForRoutes[self.route].$apply();
                     window.scrollTo(self.scrollX, self.scrollY);
