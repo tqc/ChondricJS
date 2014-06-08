@@ -504,7 +504,6 @@ min-height: 0;
  }
 
 
-.cjs-transitions-native .uses-cjs-navigation-bar .body,
 .cjs-transitions-native .popup .navbar ~ .body
  {
     padding-top:60px;
