@@ -3,7 +3,7 @@ Chondric.directive('ngTap', function() {
 
     var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
-    if (iOS) {
+    if (iOS && false) {
         var cancelMouseEvent = function(event) {
             if (!lastTapLocation) return;
             if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {

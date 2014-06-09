@@ -542,7 +542,7 @@ Chondric.App =
 
             $scope.$watch("route", function(url, oldVal) {
                 if (!url) return;
-                if (document.activeElement) document.activeElement.blur();
+                if (document.activeElement && app.transitionMode != "native") document.activeElement.blur();
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();
@@ -1231,7 +1231,7 @@ Chondric.directive('ngTap', function() {
 
     var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
-    if (iOS) {
+    if (iOS && false) {
         var cancelMouseEvent = function(event) {
             if (!lastTapLocation) return;
             if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
@@ -1593,7 +1593,7 @@ Chondric.directive("cjsPopover", function() {
             }
 
             scope.$watch(attrs.cjsPopover, function(val) {
-                if (document.activeElement && useOverlay) document.activeElement.blur();
+                if (document.activeElement && useOverlay && !window.NativeNav) document.activeElement.blur();
                 var overlay = ensureOverlay(element, useOverlay);
 
                 if (!val) {
@@ -1756,7 +1756,7 @@ Chondric.directive("cjsPopup", function() {
             }
 
             scope.$watch(attrs.cjsPopup, function(val) {
-                if (document.activeElement) document.activeElement.blur();
+                if (document.activeElement && !window.NativeNav) document.activeElement.blur();
                 if (element.hasClass("nativetransition")) {
                     if (!val) {
                         element.removeClass("active");
@@ -2067,7 +2067,7 @@ Chondric.directive("cjsSidepanel", function() {
 
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
-                if (document.activeElement && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
+                if (document.activeElement && !window.NativeNav && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
                     document.activeElement.blur();
                 }
                 var transition = "coverRight";
@@ -2804,6 +2804,7 @@ Chondric.registerSharedUiComponent({
                         self.popuptrigger = {};
                         self.nativeTransition = true;
                         self.app.scopesForRoutes[self.route].$apply();
+                        window.NativeNav.finishNativeTransition();
                     },
                     self.scope.hideModal
                 );
@@ -2814,6 +2815,7 @@ Chondric.registerSharedUiComponent({
                     self.popuptrigger = null;
                     self.app.scopesForRoutes[self.route].$apply();
                     window.scrollTo(self.scrollX, self.scrollY);
+                    window.NativeNav.finishNativeTransition();
                 });
             }
         } else {

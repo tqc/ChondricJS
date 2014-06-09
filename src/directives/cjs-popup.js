@@ -32,7 +32,7 @@ Chondric.directive("cjsPopup", function() {
             }
 
             scope.$watch(attrs.cjsPopup, function(val) {
-                if (document.activeElement) document.activeElement.blur();
+                if (document.activeElement && !window.NativeNav) document.activeElement.blur();
                 if (element.hasClass("nativetransition")) {
                     if (!val) {
                         element.removeClass("active");

@@ -57,6 +57,7 @@ Chondric.registerSharedUiComponent({
                         self.popuptrigger = {};
                         self.nativeTransition = true;
                         self.app.scopesForRoutes[self.route].$apply();
+                        window.NativeNav.finishNativeTransition();
                     },
                     self.scope.hideModal
                 );
@@ -67,6 +68,7 @@ Chondric.registerSharedUiComponent({
                     self.popuptrigger = null;
                     self.app.scopesForRoutes[self.route].$apply();
                     window.scrollTo(self.scrollX, self.scrollY);
+                    window.NativeNav.finishNativeTransition();
                 });
             }
         } else {
