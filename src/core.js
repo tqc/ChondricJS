@@ -354,6 +354,7 @@ Chondric.App =
                             $scope.$apply();
                             transitionComponents(fromRoute, toRoute, 1);
                             $scope.$apply();
+                            window.NativeNav.finishNativeTransition();
                         }, 0);
 
                     });

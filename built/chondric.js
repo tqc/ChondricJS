@@ -355,6 +355,7 @@ Chondric.App =
                             $scope.$apply();
                             transitionComponents(fromRoute, toRoute, 1);
                             $scope.$apply();
+                            window.NativeNav.finishNativeTransition();
                         }, 0);
 
                     });
@@ -2901,6 +2902,7 @@ Chondric.registerSharedUiComponent({
                         self.active = active;
                         window.scrollTo(0, 0);
                         self.app.scopesForRoutes[self.route].$apply();
+                        window.NativeNav.finishNativeTransition();
                     },
                     self.scope.hideModal
                 );
@@ -2911,6 +2913,7 @@ Chondric.registerSharedUiComponent({
                     self.active = active;
                     self.app.scopesForRoutes[self.route].$apply();
                     window.scrollTo(self.scrollX, self.scrollY);
+                    window.NativeNav.finishNativeTransition();
                 });
             }
         } else {
