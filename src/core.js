@@ -339,7 +339,7 @@ Chondric.App =
                     $(document.body).addClass("cjs-transitioning");
                     window.setTimeout(function() {
                         $(document.body).removeClass("cjs-transitioning");
-                    }, 401);
+                    }, 300);
                     var actualTransition = "crossfade";
                     var originRect = null;
                     if (transition == "zoomin" && fromRect) {
