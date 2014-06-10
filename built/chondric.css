@@ -731,6 +731,13 @@ bottom: 0;
 .body #mocha {
     margin: 0;
 }
+
+/* ghost clicks */
+
+.cjs-transitioning {
+    pointer-events: none !important;
+}
+
 /* */
 .cjs-loading-overlay-container {
     position: relative;

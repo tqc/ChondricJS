@@ -335,6 +335,11 @@ Chondric.App =
                     }, 10);
 
                 } else if (app.transitionMode == "native") {
+                    // disable pointer events for 300ms to prevent ghost clicks.
+                    $(document.body).addClass("cjs-transitioning");
+                    window.setTimeout(function() {
+                        $(document.body).removeClass("cjs-transitioning");
+                    }, 401);
                     var actualTransition = "crossfade";
                     var originRect = null;
                     if (transition == "zoomin" && fromRect) {
