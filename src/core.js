@@ -336,8 +336,11 @@ Chondric.App =
 
                 } else if (app.transitionMode == "native") {
                     // disable pointer events for 300ms to prevent ghost clicks.
+                    if (window.jstimer) window.jstimer.start("transitioningTimeout");
+
                     $(document.body).addClass("cjs-transitioning");
                     window.setTimeout(function() {
+                        if (window.jstimer) window.jstimer.finish("transitioningTimeout");
                         $(document.body).removeClass("cjs-transitioning");
                     }, 300);
                     var actualTransition = "crossfade";
@@ -353,13 +356,18 @@ Chondric.App =
 
                     window.NativeNav.startNativeTransition(actualTransition, originRect, function() {
                         $(".chondric-page.active").removeClass("active");
+                        if (window.jstimer) window.jstimer.finish("transitioningCallback1");
+                        if (window.jstimer) window.jstimer.start("transitioningTimeout2");
                         window.setTimeout(function() {
+                            if (window.jstimer) window.jstimer.finish("transitioningTimeout2");
+                            if (window.jstimer) window.jstimer.start("transitioningTimeout3");
                             loadView(r);
                             $scope.route = r;
                             $scope.$apply();
                             transitionComponents(fromRoute, toRoute, 1);
                             $scope.$apply();
                             window.NativeNav.finishNativeTransition();
+                            if (window.jstimer) window.jstimer.finish("transitioningTimeout3");
                         }, 0);
 
                     });

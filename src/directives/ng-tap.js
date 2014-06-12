@@ -13,7 +13,16 @@ Chondric.directive('ngTap', function() {
         };
         window.document.addEventListener('mouseup', cancelMouseEvent, true);
         window.document.addEventListener('mousedown', cancelMouseEvent, true);
-        window.document.addEventListener('click', cancelMouseEvent, true);
+        window.document.addEventListener('click', function(event) {
+            if (window.jstimer) window.jstimer.finish("ghostclick");
+            cancelMouseEvent(event);
+        }, true);
+    }
+
+    if (iOS) {
+        window.document.addEventListener('click', function(event) {
+            if (window.jstimer) window.jstimer.finish("ghostclick");
+        }, true);
     }
 
 
@@ -117,6 +126,7 @@ Chondric.directive('ngTap', function() {
             };
             if (active) return;
             touching = true;
+            if (window.jstimer) window.jstimer.start("tap");
             start(e);
         };
 
