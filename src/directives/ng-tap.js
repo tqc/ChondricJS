@@ -126,7 +126,7 @@ Chondric.directive('ngTap', function() {
             };
             if (active) return;
             touching = true;
-            if (window.jstimer) window.jstimer.start("tap");
+            if (window.jstimer) window.jstimer.start("ghostclick");
             start(e);
         };
 
