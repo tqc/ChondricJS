@@ -25,7 +25,8 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
             element.addClass("cjs-loading-overlay-container");
             $compile(overlay)(scope);
 
-            scope.loadStatus.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), function(taskGroup) {
+
+            function onUpdate(taskGroup) {
                 scope.taskGroup = taskGroup;
                 scope.currentTask = taskGroup.currentTask;
                 if (taskGroup.completed) {
@@ -45,7 +46,12 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
                     scope.error = taskGroup.error;
                     scope.message = taskGroup.message;
                 }
-            });
+            }
+            scope.$watch("loadStatus", function(val) {
+                if (!val) return;
+                val.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), onUpdate);
+            })
+
         }
     };
 });

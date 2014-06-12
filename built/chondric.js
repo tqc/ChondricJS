@@ -337,8 +337,11 @@ Chondric.App =
 
                 } else if (app.transitionMode == "native") {
                     // disable pointer events for 300ms to prevent ghost clicks.
+                    if (window.jstimer) window.jstimer.start("transitioningTimeout");
+
                     $(document.body).addClass("cjs-transitioning");
                     window.setTimeout(function() {
+                        if (window.jstimer) window.jstimer.finish("transitioningTimeout");
                         $(document.body).removeClass("cjs-transitioning");
                     }, 300);
                     var actualTransition = "crossfade";
@@ -354,13 +357,18 @@ Chondric.App =
 
                     window.NativeNav.startNativeTransition(actualTransition, originRect, function() {
                         $(".chondric-page.active").removeClass("active");
+                        if (window.jstimer) window.jstimer.finish("transitioningCallback1");
+                        if (window.jstimer) window.jstimer.start("transitioningTimeout2");
                         window.setTimeout(function() {
+                            if (window.jstimer) window.jstimer.finish("transitioningTimeout2");
+                            if (window.jstimer) window.jstimer.start("transitioningTimeout3");
                             loadView(r);
                             $scope.route = r;
                             $scope.$apply();
                             transitionComponents(fromRoute, toRoute, 1);
                             $scope.$apply();
                             window.NativeNav.finishNativeTransition();
+                            if (window.jstimer) window.jstimer.finish("transitioningTimeout3");
                         }, 0);
 
                     });
@@ -1246,7 +1254,16 @@ Chondric.directive('ngTap', function() {
         };
         window.document.addEventListener('mouseup', cancelMouseEvent, true);
         window.document.addEventListener('mousedown', cancelMouseEvent, true);
-        window.document.addEventListener('click', cancelMouseEvent, true);
+        window.document.addEventListener('click', function(event) {
+            if (window.jstimer) window.jstimer.finish("ghostclick");
+            cancelMouseEvent(event);
+        }, true);
+    }
+
+    if (iOS) {
+        window.document.addEventListener('click', function(event) {
+            if (window.jstimer) window.jstimer.finish("ghostclick");
+        }, true);
     }
 
 
@@ -1350,6 +1367,7 @@ Chondric.directive('ngTap', function() {
             };
             if (active) return;
             touching = true;
+            if (window.jstimer) window.jstimer.start("tap");
             start(e);
         };
 
@@ -1392,7 +1410,8 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
             element.addClass("cjs-loading-overlay-container");
             $compile(overlay)(scope);
 
-            scope.loadStatus.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), function(taskGroup) {
+
+            function onUpdate(taskGroup) {
                 scope.taskGroup = taskGroup;
                 scope.currentTask = taskGroup.currentTask;
                 if (taskGroup.completed) {
@@ -1412,7 +1431,12 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
                     scope.error = taskGroup.error;
                     scope.message = taskGroup.message;
                 }
-            });
+            }
+            scope.$watch("loadStatus", function(val) {
+                if (!val) return;
+                val.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), onUpdate);
+            })
+
         }
     };
 });
