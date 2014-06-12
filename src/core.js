@@ -744,7 +744,7 @@ Chondric.App =
                     var w = $(window).width();
                     var h = $(window).height();
                     //                    console.log("Size changed: " + w + "x" + h);
-                    if (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480) {
+                    if (app.platform == "cordova" && (h == 1024 || h == 768 || h == 320 || h == 568 || h == 480)) {
                         $(".chondric-viewport").addClass("hasstatusbar");
                     } else {
                         $(".chondric-viewport").removeClass("hasstatusbar");
