@@ -1244,27 +1244,21 @@ Chondric.directive('ngTap', function() {
 
     var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
-    if (iOS && false) {
-        var cancelMouseEvent = function(event) {
-            if (!lastTapLocation) return;
-            if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
-                event.stopPropagation();
-                event.preventDefault();
-            }
-        };
-        window.document.addEventListener('mouseup', cancelMouseEvent, true);
-        window.document.addEventListener('mousedown', cancelMouseEvent, true);
-        window.document.addEventListener('click', function(event) {
-            if (window.jstimer) window.jstimer.finish("ghostclick");
-            cancelMouseEvent(event);
-        }, true);
-    }
+    var cancelMouseEvent = function(event) {
+        if (!lastTapLocation) return;
+        if (Math.abs(event.clientX - lastTapLocation.x) < 25 && Math.abs(event.clientY - lastTapLocation.y) < 25) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+    };
+    window.document.addEventListener('mouseup', cancelMouseEvent, true);
+    window.document.addEventListener('mousedown', cancelMouseEvent, true);
+    window.document.addEventListener('click', function(event) {
+        if (window.jstimer) window.jstimer.finish("ghostclick");
+        cancelMouseEvent(event);
+    }, true);
 
-    if (iOS) {
-        window.document.addEventListener('click', function(event) {
-            if (window.jstimer) window.jstimer.finish("ghostclick");
-        }, true);
-    }
+
 
 
     return function(scope, element, attrs) {
@@ -1337,16 +1331,6 @@ Chondric.directive('ngTap', function() {
             startX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.clientX;
             startY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.clientY;
 
-            if (!useMouse) {
-                element.bind('touchmove', move);
-                element.bind('touchend', action);
-
-            } else {
-                element.bind('mousemove', move);
-                element.bind('mouseout', cancel);
-                element.bind('mouseup', action);
-            }
-
             element.addClass('active');
             element.removeClass('deactivated');
             active = true;
@@ -1354,33 +1338,41 @@ Chondric.directive('ngTap', function() {
 
         // called on mousedown or touchstart. Multiple calls are ignored.
         var mouseStart = function(e) {
+            // cancel if we already handled this as a touch event
+            if (lastTapLocation && Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) return;
+
             if (e.which != 1) return;
             if (active || touching) return;
             touching = false;
+
+            useMouse = true;
+            element.bind('mousemove', move);
+            element.bind('mouseout', cancel);
+            element.bind('mouseup', action);
+
+
             start(e);
         };
 
         var touchStart = function(e) {
             lastTapLocation = {
-                x: e.originalEvent.touches[0].screenX,
-                y: e.originalEvent.touches[0].screenY
+                x: e.originalEvent.touches[0].clientX,
+                y: e.originalEvent.touches[0].clientY
             };
             if (active) return;
             touching = true;
-            if (window.jstimer) window.jstimer.start("tap");
+            if (window.jstimer) window.jstimer.start("ghostclick");
+            useMouse = false;
+            element.bind('touchmove', move);
+            element.bind('touchend', action);
+
             start(e);
         };
 
-        var useMouse = true;
+        var useMouse;
 
-        var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
-
-        if (iOS) {
-            useMouse = false;
-            element.bind('touchstart', touchStart);
-        } else {
-            element.bind('mousedown', mouseStart);
-        }
+        element.bind('touchstart', touchStart);
+        element.bind('mousedown', mouseStart);
     };
 });
 Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
