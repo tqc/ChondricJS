@@ -5,7 +5,8 @@ Chondric.directive('ngTap', function() {
 
     var cancelMouseEvent = function(event) {
         if (!lastTapLocation) return;
-        if (Math.abs(event.clientX - lastTapLocation.x) < 25 && Math.abs(event.clientY - lastTapLocation.y) < 25) {
+        console.log(lastTapLocation.y + " - " + event.screenY);
+        if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
             event.stopPropagation();
             event.preventDefault();
         }
@@ -65,6 +66,8 @@ Chondric.directive('ngTap', function() {
                 y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientY : e.clientY
             };
 
+            e.originalEvent.stopPropagation();
+            e.originalEvent.preventDefault();
 
             if (!useMouse) {
                 element.unbind('touchmove', move);
@@ -115,8 +118,8 @@ Chondric.directive('ngTap', function() {
 
         var touchStart = function(e) {
             lastTapLocation = {
-                x: e.originalEvent.touches[0].clientX,
-                y: e.originalEvent.touches[0].clientY
+                x: e.originalEvent.touches[0].screenX,
+                y: e.originalEvent.touches[0].screenY
             };
             if (active) return;
             touching = true;
