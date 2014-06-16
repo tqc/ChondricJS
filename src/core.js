@@ -355,7 +355,7 @@ Chondric.App =
                     }
 
                     window.NativeNav.startNativeTransition(actualTransition, originRect, function() {
-                        $(".chondric-page.active").removeClass("active");
+                        //                        $(".chondric-page.active").removeClass("active");
                         if (window.jstimer) window.jstimer.finish("transitioningCallback1");
                         if (window.jstimer) window.jstimer.start("transitioningTimeout2");
                         window.setTimeout(function() {
