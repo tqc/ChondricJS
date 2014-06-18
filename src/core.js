@@ -554,7 +554,7 @@ Chondric.App =
 
             $scope.$watch("route", function(url, oldVal) {
                 if (!url) return;
-                if (document.activeElement && app.transitionMode != "native") document.activeElement.blur();
+            if (document.activeElement && app.transitionMode != "native" && document.activeElement.tagName != "BODY") document.activeElement.blur();
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();

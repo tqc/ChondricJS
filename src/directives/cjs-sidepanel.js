@@ -284,7 +284,7 @@ Chondric.directive("cjsSidepanel", function() {
 
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
-                if (document.activeElement && !window.NativeNav && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
+                if (document.activeElement && !window.NativeNav && document.activeElement.tagName != "BODY" && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
                     document.activeElement.blur();
                 }
                 var transition = "coverRight";

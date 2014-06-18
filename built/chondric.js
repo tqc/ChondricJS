@@ -555,7 +555,7 @@ Chondric.App =
 
             $scope.$watch("route", function(url, oldVal) {
                 if (!url) return;
-                if (document.activeElement && app.transitionMode != "native") document.activeElement.blur();
+            if (document.activeElement && app.transitionMode != "native" && document.activeElement.tagName != "BODY") document.activeElement.blur();
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();
@@ -1624,7 +1624,7 @@ Chondric.directive("cjsPopover", function() {
             }
 
             scope.$watch(attrs.cjsPopover, function(val) {
-                if (document.activeElement && useOverlay && !window.NativeNav) document.activeElement.blur();
+                if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") document.activeElement.blur();
                 var overlay = ensureOverlay(element, useOverlay);
 
                 if (!val) {
@@ -1787,7 +1787,7 @@ Chondric.directive("cjsPopup", function() {
             }
 
             scope.$watch(attrs.cjsPopup, function(val) {
-                if (document.activeElement && !window.NativeNav) document.activeElement.blur();
+                if (document.activeElement && !window.NativeNav && document.activeElement.tagName != "BODY") document.activeElement.blur();
                 if (element.hasClass("nativetransition")) {
                     if (!val) {
                         element.removeClass("active");
@@ -2098,7 +2098,7 @@ Chondric.directive("cjsSidepanel", function() {
 
             scope.$watch(attrs.cjsSidepanel, function(val, oldval) {
                 if (!val && !oldval) return;
-                if (document.activeElement && !window.NativeNav && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
+                if (document.activeElement && !window.NativeNav && document.activeElement.tagName != "BODY" && (((val && !oldval) || !(val && oldval)) || val.progress != oldval.progress)) {
                     document.activeElement.blur();
                 }
                 var transition = "coverRight";
