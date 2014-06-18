@@ -141,7 +141,7 @@ Chondric.App =
             Chondric.registerSharedUiComponent(component, app.sharedUiComponents);
         };
 
-        app.controller = function($scope, $location) {
+        app.controller = function($scope, $location, $element, $attrs) {
             app.scope = $scope;
             $scope.app = app;
             $scope.allRoutes = allRoutes;
@@ -574,6 +574,9 @@ Chondric.App =
                     }
                 }, 10);
             });
+            app.attrs = $attrs;
+            app.element = $element;
+
             if (options.appCtrl) options.appCtrl($scope);
         }; // end appCtrl
 
@@ -670,12 +673,16 @@ Chondric.App =
 
             if (app.scope.route) return callback(); // already loaded by custominit
 
+            // var startPageFromAttr = $(document.body).attr("start-page") || $(document.body).attr("data-start-page")
+
             if (settings.loadPageFromHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
                 var parts = location.hash.substr(2).split("/");
                 for (var i = 0; i < parts.length; i++) {
                     parts[i] = decodeURIComponent(parts[i]);
                 }
                 app.changePage(parts);
+            } else if (app.attrs && app.attrs.startPage) {
+                app.changePage(app.attrs.startPage, "crossfade");
             } else if (settings.firstPageTemplate) {
                 app.changePage(settings.firstPageTemplate, "crossfade");
             }
