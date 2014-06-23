@@ -1350,7 +1350,9 @@ Chondric.directive('ngTap', function() {
         var mouseStart = function(e) {
             // cancel if we already handled this as a touch event
             if (lastTapLocation && Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) return;
-
+            // because IE doesn't handle pointer-events properly 
+            if (element.hasClass('disabled')) return;
+            // left button only
             if (e.which != 1) return;
             if (active || touching) return;
             touching = false;
