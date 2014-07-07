@@ -18,12 +18,12 @@
 
 
 .cjs-loading-overlay.ui-show {
-    transition: z-index 0.5s ease, opacity:0.3s ease;
+    transition: z-index 0.5s ease, opacity 0.3s ease;
     z-index: 1000;
 }
 
 .cjs-loading-overlay.ui-hide {
-    transition: z-index 0.5s ease, opacity:0.3s ease;
+    transition: z-index 0.5s ease, opacity 0.3s ease;
     z-index: -1;
 }
 

@@ -87,8 +87,7 @@ module.exports = function(grunt) {
             },
             max: {
                 files: {
-                    "built/chondric.js": jsfiles,
-                    "built/chondric.css": cssfiles
+                    "built/chondric.js": jsfiles
                 }
             }
         },
@@ -96,6 +95,16 @@ module.exports = function(grunt) {
             combine: {
                 files: {
                     'built/chondric.min.css': "built/chondric.css"
+                }
+            }
+        },
+        sass: { // Task
+            dist: { // Target
+                options: { // Target options
+                    style: 'expanded'
+                },
+                files: { // Dictionary of files
+                    'built/chondric.css': 'src/css/include.scss'
                 }
             }
         }
@@ -108,7 +117,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-angular-templates');
     grunt.loadNpmTasks('grunt-autoprefixer');
 
+    grunt.loadNpmTasks('grunt-contrib-sass');
+
     // Default task(s).
-    grunt.registerTask('default', ['ngtemplates', 'uglify:min', "concat", "autoprefixer", "cssmin"]);
+    grunt.registerTask('default', ['ngtemplates', 'uglify:min', "concat", "sass", "autoprefixer", "cssmin"]);
 
 };

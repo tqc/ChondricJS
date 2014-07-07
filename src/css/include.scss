@@ -1,0 +1,23 @@
+$browserType: "modernWeb" !default;
+
+
+@if ($browserType == "modernWeb") {
+$useFlexbox: true !global;
+$supportMobile: true !global;
+}
+
+@if ($browserType == "ie") {
+$useFlexbox: false !global;
+$supportMobile: false !global;
+}
+
+@if ($browserType == "native") {
+$useFlexbox: true !global;
+$supportMobile: true !global;
+}
+
+
+@import "core.scss";
+@import "icons.scss";
+@import "loading-overlay.scss";
+@import "modals.scss";
