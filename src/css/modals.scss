@@ -169,6 +169,8 @@ visibility: visible;
     display: none !important;
 }
 
+@if $supportMobile {
+
 @media (max-width: 630px), (max-height: 630px)  {
     .popup {
         width: 100%;
@@ -180,6 +182,8 @@ visibility: visible;
         transform: translate(0, 101%);
     }
 }
+}
+
 /* sidepanel */
  .sidepanel {
     position: absolute;
