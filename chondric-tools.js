@@ -288,14 +288,18 @@ exports.hostApp = function(options) {
                     if (err) {
                         console.log(err);
                     }
-                    if (filename.indexOf(".css") > 0) {
+                    if (filename.indexOf(".map") > 0) {
+                        res.type("application/octet-stream");
+                        d = d.replace(/\"[^\"]*chondric[^\"]*\/src\//ig, "\"/chondric-source/");
+                        return res.send(d);
+                    } else if (filename.indexOf(".css") > 0) {
                         console.log("sending mapped css " + filename);
                         res.type("text/css");
                         try {
                             var css = autoprefixer.process(d).css;
                             return res.send(css);
                         } catch (e) {
-                            console.log("Error processing " + filename)
+                            console.log("Error processing " + filename);
                             console.log(e);
                             return res.send(d);
                         }

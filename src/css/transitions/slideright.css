@@ -9,18 +9,18 @@
 
 
 .chondric-page.slideright .body {
-    transition: transform 0.3s ease-in-out;
+    @include transition( transform 0.3s ease-in-out);
 }
 
 
 .chondric-page.next.slideright .body {
     display: block;
-    transform: translate(-100%, 0);
+   @include transform( translate(-100%, 0));
 }
 
 .chondric-page.prev.slideright .body {
     display: block;
-    transform: translate(100%, 0);
+   @include transform( translate(100%, 0));
 }
 
 .chondric-page.slideright .navbar {
@@ -30,7 +30,7 @@ display: none;
 .chondric-page.active.slideright .navbar {
     display: block;
 opacity: 1;
-transition: opacity 1s ease-in-out;
+@include transition( opacity 1s ease-in-out);
 }
  .chondric-page.next.slideright .navbar {
 display: block;
@@ -42,6 +42,6 @@ z-index: 1;
    pointer-events:none;
 display: block;
 opacity: 0;
-transition: opacity 1s ease-in-out;
+@include transition( opacity 1s ease-in-out);
 z-index: 11;
 }

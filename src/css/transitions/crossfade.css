@@ -5,12 +5,12 @@
     z-index: 11;
 }
 .chondric-page.active.crossfade {
-        transition: opacity 0.3s ease-in-out;
+        @include transition( opacity 0.3s ease-in-out);
 }
 .chondric-page.prev.crossfade {
     pointer-events:none;
     display: block;
     opacity: 1;
-    transition: opacity 0.3s ease-in-out;
+    @include transition( opacity 0.3s ease-in-out);
     z-index: 9;
 }

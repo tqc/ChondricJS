@@ -10,7 +10,7 @@
     pointer-events:none;
     visibility: hidden;
     z-index: 1000;
-    transition: opacity 0.3s ease-in-out;
+    @include transition( opacity 0.3s ease-in-out);
 }
 .modal-overlay.active {
     visibility: visible;
@@ -34,7 +34,7 @@ position: fixed;
     z-index: 1100;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.1s ease-in-out;
+    @include transition( opacity 0.1s ease-in-out);
 }
 .popover.active {
     position: absolute;
@@ -91,7 +91,7 @@ position: fixed;
     left: 0;
     top: 0;
     border-radius: 3px;
-    transform: rotate(45deg);
+   @include transform( rotate(45deg));
 }
 .popover.up .poparrow:after {
     top:-19px;
@@ -116,8 +116,8 @@ position: fixed;
     margin-left: -315px;
     margin-top: -315px;
     z-index: 1100;
-    transition: transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
-    transform: translate(0, 150%);   
+    @include transition( transform 0.3s ease-in-out, visibility 0.3s ease-in-out);
+   @include transform( translate(0, 150%));   
 }
 
  .cjs-scrolling-window .popup {
@@ -128,7 +128,7 @@ visibility: hidden;
 .popup.active {
     display: block;
     position: absolute;    
-    transform: translate(0, 0);
+   @include transform( translate(0, 0));
 }
 
  .cjs-scrolling-window .popup.active {
@@ -155,13 +155,13 @@ visibility: visible;
     width:auto;
     height: auto;
     z-index: 1100;
-    transition: none;
-    transform: none;
+    @include transition( none);
+   @include transform( none);
     display: none;
 }
 .cjs-transitions-native .popup.active {
     display: block;
-    transform: none;
+   @include transform( none);
 }
 
 
@@ -179,7 +179,7 @@ visibility: visible;
         top: 0;
         margin-left: 0;
         margin-top: 0;
-        transform: translate(0, 101%);
+       @include transform( translate(0, 101%));
     }
 }
 }
@@ -218,9 +218,8 @@ top: 0 !important;
 bottom: 0 !important;
 left: 0 !important;
 right: 0 !important;
-width: auto !important;
-transform: none !important;
-transition: none !important;
+width: auto !important;@include transform( none !important);
+@include transition( none !important);
     display: none !important;
  }
  .cjs-transitions-native .sidepanel.active {
@@ -231,7 +230,7 @@ transition: none !important;
 
 .sidepanel.active {
     display: block;
-    transform: translate(0, 0);
+   @include transform( translate(0, 0));
 }
 */
  .sidepanel .navbar {
@@ -310,27 +309,27 @@ transition: none !important;
 .chondric-page.haspushpanel .navbar,
 .chondric-page.haspushpanel .tabbar
 {
-    transition: transform 0.3s ease-in-out;
+    @include transition( transform 0.3s ease-in-out);
 }
 
 .chondric-page.pushedleft .body,
 .chondric-page.pushedleft .navbar,
 .chondric-page.pushedleft .tabbar
 {
-    transform: translate(-261px, 0);
+   @include transform( translate(-261px, 0));
 }
 
 .chondric-page.pushedright .body,
 .chondric-page.pushedright .navbar,
 .chondric-page.pushedright .tabbar
 {
-    transform: translate(261px, 0);
+   @include transform( translate(261px, 0));
 }
 
 .chondric-page.haspushpanel .sidepanel .body,
 .chondric-page.haspushpanel .sidepanel .navbar,
 .chondric-page.haspushpanel .sidepanel .tabbar
 {
-    transform: translate(0, 0);
+   @include transform( translate(0, 0));
 }
 */

@@ -58,15 +58,12 @@ body {
 .chondric-page.next {
     pointer-events:none;
 }
-.chondric-page.notransition {
-    transition: none !important;
-}
-.chondric-page.notransition .page {
-    transition: none !important;
-}
+.chondric-page.notransition,
+.chondric-page.notransition .page,
 .chondric-page.notransition .navbar {
-    transition: none !important;
+    @include transition (none !important);
 }
+
 /* Old styles */
 
 .chondric-viewport {
@@ -103,31 +100,31 @@ input, textarea, [contenteditable=true] {
 }
 .sidebar.left {
     left: 12px;
-    transform: rotate(90deg);
-    transform-origin: 0 0;
+   @include transform( rotate(90deg));
+   @include transform-origin( 0 0);
 }
 .sidebar.right {
-    transform: rotate(270deg);
-    transform-origin: 100% 0;
+   @include transform( rotate(270deg));
+   @include transform-origin( 100% 0);
 }
 .sidebar .arrow {
     display: block;
     position: absolute;
 }
 .sidebar.up .arrow {
-    transform: rotate(270deg);
+   @include transform( rotate(270deg));
     left: 5px;
 }
 .sidebar.down .arrow {
-    transform: rotate(90deg);
+   @include transform( rotate(90deg));
     left: 5px;
 }
 .sidebar.left .arrow {
-    transform: rotate(90deg);
+   @include transform( rotate(90deg));
     left: 5px;
 }
 .sidebar.right .arrow {
-    transform: rotate(90deg);
+   @include transform( rotate(90deg));
     right: 5px;
 }
 .sidebar .pageName {
@@ -448,7 +445,7 @@ visibility: hidden;
     left:0;
     right:0;
     bottom:0;
-    transition: padding-bottom 0.3s ease;
+    @include transition (padding-bottom 0.3s ease);
 }
 
 
@@ -676,7 +673,7 @@ text-transform: inherit;
 
 /* angular ui-toggle - mostly used in conjunction with loading overlay */
 .ui-show {
-  transition: opacity 0.3s ease; 
+  @include transition (opacity 0.3s ease); 
 }
 .ui-hide {
   opacity: 0;

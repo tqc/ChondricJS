@@ -16,6 +16,7 @@ $useFlexbox: true !global;
 $supportMobile: true !global;
 }
 
+@import "../../bourbon/_bourbon.scss";
 
 @import "core.scss";
 @import "icons.scss";

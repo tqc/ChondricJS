@@ -18,12 +18,12 @@
 
 
 .cjs-loading-overlay.ui-show {
-    transition: z-index 0.5s ease, opacity 0.3s ease;
+    @include transition( z-index 0.5s ease, opacity 0.3s ease);
     z-index: 1000;
 }
 
 .cjs-loading-overlay.ui-hide {
-    transition: z-index 0.5s ease, opacity 0.3s ease;
+    @include transition( z-index 0.5s ease, opacity 0.3s ease);
     z-index: -1;
 }
 
@@ -80,9 +80,9 @@ display: inline;
 /**
  * (C)Leanest CSS spinner ever
  */
- @-webkit-keyframes spin {
+@include keyframes(spin) {
     to {
-        transform: rotate(1turn);
+       @include transform( rotate(1turn));
     }
 }
 .cjs-loading-overlay .progress {
@@ -93,7 +93,7 @@ display: inline;
     font-size: 12px;
     text-indent: 999em;
     overflow: hidden;
-    -webkit-animation: spin 1s infinite steps(8);
+    @include animation(spin 1s infinite steps(8));
 }
 
 .cjs-loading-overlay-full .progress {
@@ -132,21 +132,21 @@ display: inline;
     background: #eee;
     box-shadow: 0 3.5em #eee;
     /* container height - part height */
-    transform-origin: 50% 2.5em;
+   @include transform-origin( 50% 2.5em);
     /* container height / 2 */
 }
 .cjs-loading-overlay .progress:before {
     background: #555;
 }
 .cjs-loading-overlay .progress:after {
-    transform: rotate(-45deg);
+   @include transform( rotate(-45deg));
     background: #777;
 }
 .cjs-loading-overlay .progress > div:before {
-    transform: rotate(-90deg);
+   @include transform( rotate(-90deg));
     background: #999;
 }
 .cjs-loading-overlay .progress > div:after {
-    transform: rotate(-135deg);
+   @include transform( rotate(-135deg));
     background: #bbb;
 }
