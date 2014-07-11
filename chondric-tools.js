@@ -198,6 +198,25 @@ exports.update = function(apphostdir, appdef) {
 };
 
 exports.hostApp = function(options) {
+
+    if (options.scss) {
+        var spawn = require('child_process').spawn;
+        var isWin = /^win/.test(process.platform);
+        var fileparams = [];
+        for (var k in options.scss) {
+            fileparams.push(options.scss[k] + ":" + k);
+        }
+
+        var sass = spawn(isWin ? "sass.bat" : "sass", ["--watch", "--sourcemap"].concat(fileparams));
+        sass.stdout.on('data', function(data) {
+            console.log('SASS: ' + data);
+        });
+
+        sass.stderr.on('data', function(data) {
+            console.log('SASS: ' + data);
+        });
+    }
+
     var express = exports.express = require('express');
 
     var expressSession = require("express-session");
@@ -245,7 +264,7 @@ exports.hostApp = function(options) {
         "/demo/lib/chondric.js": ["../../chondric/src/core.js"];
         "/demo/lib/chondric.css": ["../../chondric/src/css/core.css"];
 */
-
+        /*
         options.frameworkDebug["/demo/lib/chondric.css"] = [
             srcDir + "/css/core.css",
             srcDir + "/css/loading-overlay.css",
@@ -255,7 +274,7 @@ exports.hostApp = function(options) {
             srcDir + "/css/transitions/slideleft.css",
             srcDir + "/css/transitions/slideright.css"
         ];
-
+*/
         options.frameworkDebug["/demo/lib/chondric.js"] = [
             srcDir + "/core.js",
             builtDir + "/template.js",
