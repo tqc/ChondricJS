@@ -212,7 +212,7 @@ exports.hostApp = function(options) {
             fileparams.push(options.scss[k] + ":" + k);
         }
 
-        var sass = spawn(isWin ? "sass.bat" : "sass", ["--watch", "--sourcemap", "--unix-newlines"].concat(fileparams));
+        var sass = spawn(isWin ? "sass.bat" : "sass", ["--watch", "--sourcemap", "--style", "expanded", "--unix-newlines"].concat(fileparams));
         sass.stdout.on('data', function(data) {
             console.log('SASS: ' + data);
         });
