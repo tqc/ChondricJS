@@ -138,13 +138,18 @@ exports.update = function(apphostdir, appdef) {
 
     mkdirp.sync(path.resolve(appdir, "lib"));
 
+
     updateFile(appdir, ".jshintrc", "template.apphtml.jshintrc", standardSubstitution);
     updateFile(appdir, "app.js", "app.js", standardSubstitution);
     updateFile(appdir, "db.js", "db.js", standardSubstitution);
     updateFile(appdir, "splash.html", "splash.html", standardSubstitution);
     updateFile(appdir, "icon.html", "icon.html", standardSubstitution);
     updateFile(appdir, "preview.html", "preview.html", standardSubstitution);
-    updateFile(appdir, "app.css", "app.css", standardSubstitution);
+
+    var csssrcdir = path.resolve(appdir, "css/src");
+    mkdirp.sync(csssrcdir);
+    updateFile(csssrcdir, "app.scss", "app.scss", standardSubstitution);
+
 
     var frameworkscriptrefs = "<script src=\"bower_components/jquery/dist/jquery.min.js\"></script>\n";
     frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";

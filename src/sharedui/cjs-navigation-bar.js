@@ -34,11 +34,11 @@ Chondric.registerSharedUiComponent({
         self.activeState = null;
     },
     setState: function(self, route, active, available, data, direction) {
-        console.log(self.id + ".setState(" + route + "," + active + "," + available + "," + data + "," + direction + ")");
-        console.log(data);
+        //        console.log(self.id + ".setState(" + route + "," + active + "," + available + "," + data + "," + direction + ")");
+        //        console.log(data);
 
         if (!data || !Object.keys(data).length) {
-            console.log("no data");
+            //   console.log("navbar setState - no data");
         }
 
 
@@ -58,14 +58,14 @@ Chondric.registerSharedUiComponent({
         state.data = data;
 
         if (self.isNative && self.isNative() && self.setNativeState) {
-            console.log("native")
+            //   console.log("native")
             self.setNativeState(self, route, active, available, data, direction);
         } else if (state == self.activeState) {
             // in place update - no animation
-            console.log("in place");
+            //    console.log("in place");
             self.updateCurrentState(self, state, active, available, data);
         } else {
-            console.log("new state");
+            //    console.log("new state");
 
             var otherState = self.states[((self.states.indexOf(state)) + 1) % self.states.length];
             self.updateTransitionSettings(self, state, otherState, 0, true);
@@ -83,8 +83,8 @@ Chondric.registerSharedUiComponent({
         return (window.NativeNav && true) || false;
     },
     updateTransitionSettings: function(self, thisState, otherState, position, isActivating) {
-        console.log("navbar updateTransitionSettings - " + isActivating);
-        console.log(thisState);
+        // console.log("navbar updateTransitionSettings - " + isActivating);
+        //        console.log(thisState);
         // set fields for individual components
         // position will be 0 for active, -1 or +1 for inactive depending on transition direction
         thisState.isActivating = isActivating;
