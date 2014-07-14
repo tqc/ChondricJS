@@ -7,6 +7,20 @@ Chondric.directive('ngTap', function() {
         if (!lastTapLocation) return;
         console.log(lastTapLocation.y + " - " + event.screenY);
         if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
+
+            // ie8 fix
+            if (!event.stopPropagation) {
+                event.stopPropagation = function() {
+                    event.cancelBubble = true; //ie
+                };
+            }
+
+            if (!event.preventDefault) {
+                event.preventDefault = function() {
+                    event.returnValue = false; //ie
+                };
+            }
+
             event.stopPropagation();
             event.preventDefault();
         }
@@ -65,6 +79,19 @@ Chondric.directive('ngTap', function() {
                 x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientX : e.clientX,
                 y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientY : e.clientY
             };
+
+            // ie8 fix
+            if (!e.originalEvent.stopPropagation) {
+                e.originalEvent.stopPropagation = function() {
+                    e.originalEvent.cancelBubble = true; //ie
+                };
+            }
+
+            if (!e.originalEvent.preventDefault) {
+                e.originalEvent.preventDefault = function() {
+                    e.originalEvent.returnValue = false; //ie
+                };
+            }
 
             e.originalEvent.stopPropagation();
             e.originalEvent.preventDefault();
