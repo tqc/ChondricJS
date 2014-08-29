@@ -30,6 +30,8 @@ Chondric.directive('ngTap', function() {
         var startX = 0;
         var startY = 0;
 
+        var touchTimeout = 0;
+
         // detect move and cancel tap if drag started
         var move = function(e) {
             var x = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.clientX;
@@ -55,6 +57,8 @@ Chondric.directive('ngTap', function() {
 
             touching = false;
             active = false;
+
+            if (touchTimeout) window.clearTimeout(touchTimeout);
         };
 
         // called when a tap is completed
@@ -65,10 +69,10 @@ Chondric.directive('ngTap', function() {
                 x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientX : e.clientX,
                 y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientY : e.clientY
             };
-
+/*
             e.originalEvent.stopPropagation();
             e.originalEvent.preventDefault();
-
+*/
             if (!useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
@@ -123,6 +127,12 @@ Chondric.directive('ngTap', function() {
                 x: e.originalEvent.touches[0].screenX,
                 y: e.originalEvent.touches[0].screenY
             };
+
+            touchTimeout = window.setTimeout(function() {
+                touchTimeout = 0;
+                cancel();
+            }, 500);
+
             if (active) return;
             touching = true;
             if (window.jstimer) window.jstimer.start("ghostclick");
