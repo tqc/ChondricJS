@@ -59,8 +59,15 @@ Chondric.directive("cjsPopover", function() {
                     var menupos = {};
                     // TODO: should get actual size of the element, but it is display: none at this point.
 
-                    var sw = element[0].offsetParent.offsetWidth;
-                    var sh = element[0].offsetParent.offsetHeight;
+//                    var sw = element[0].offsetParent.offsetWidth;
+//                    var sh = element[0].offsetParent.offsetHeight;
+
+    var parentRect = element[0].offsetParent.getBoundingClientRect();
+
+                    var sw = $(document).width();
+                    var sh = $(document).height();
+
+
 
                     var horizontalCutoff = sw / 2;
                     var verticalCutoff = sh / 2;
@@ -108,26 +115,26 @@ Chondric.directive("cjsPopover", function() {
 
                     if (horizontal) {
                         if (actualX < horizontalCutoff) {
-                            menupos.left = (actualX + 13) + "px";
+                            menupos.left = (actualX + 13 - parentRect.left) + "px";
                             menupos.right = "auto";
                             element.addClass("right").removeClass("left");
                         } else {
-                            menupos.right = (sw - actualX + 13) + "px";
+                            menupos.right = (parentRect.right - actualX + 13) + "px";
                             menupos.left = "auto";
                             element.addClass("left").removeClass("right");
                         }
-                        menupos.top = (actualY - menuheight / 2) + "px";
+                        menupos.top = (actualY - menuheight / 2 - parentRect.top) + "px";
                     } else {
                         if (actualY < verticalCutoff) {
-                            menupos.top = (actualY + 13) + "px";
+                            menupos.top = (actualY + 13 - parentRect.top) + "px";
                             menupos.bottom = "auto";
                             element.addClass("down").removeClass("up");
                         } else {
-                            menupos.bottom = (sh - actualY + 13) + "px";
+                            menupos.bottom = (actualY + 13 -parentRect.top) + "px";
                             menupos.top = "auto";
                             element.addClass("up").removeClass("down");
                         }
-                        menupos.left = (actualX - menuwidth / 2) + "px";
+                        menupos.left = (actualX - menuwidth / 2 - parentRect.left) + "px";
                     }
 
                     /* 
