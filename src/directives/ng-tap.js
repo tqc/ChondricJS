@@ -132,6 +132,7 @@ Chondric.directive('ngTap', function() {
 
         // called on mousedown or touchstart. Multiple calls are ignored.
         var mouseStart = function(e) {
+            if (!useMouse) return;
             // cancel if we already handled this as a touch event
             if (lastTapLocation && Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) return;
             // because IE doesn't handle pointer-events properly 
@@ -171,7 +172,7 @@ Chondric.directive('ngTap', function() {
             start(e);
         };
 
-        var useMouse;
+        var useMouse = true;
 
         element.bind('touchstart', touchStart);
         element.bind('mousedown', mouseStart);
