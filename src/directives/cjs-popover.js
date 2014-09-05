@@ -130,7 +130,7 @@ Chondric.directive("cjsPopover", function() {
                             menupos.bottom = "auto";
                             element.addClass("down").removeClass("up");
                         } else {
-                            menupos.bottom = (actualY + 13 -parentRect.bottom) + "px";
+                            menupos.bottom = (parentRect.bottom - actualY + 13) + "px";
                             menupos.top = "auto";
                             element.addClass("up").removeClass("down");
                         }
