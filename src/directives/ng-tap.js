@@ -5,7 +5,12 @@ console.log("init tap");
 
     // set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
     // triggers ng-tap on the button behind it.
-    var useMouse = true;
+window.useMouse = true;
+
+    // todo: turn useMouse back on if a genuine mouse event shows up
+    window.document.addEventListener('touchstart', function(event) {
+        window.useMouse = false;
+    }, true);
 
     // however, system elements such as dropdowns and text areas can still be triggered by the ghost click,
     // so we have this code to try and kill the click events created 300ms after a handled touch event.
@@ -35,29 +40,31 @@ console.log("init tap");
             // setting the focus here since node.setActive pulls up the keyboard anyway - may as well
             // have the input going somewhere valid.
             
-            event.target.focus();
+            //event.target.focus();
 
         }
     };
     window.document.addEventListener('mouseup', function(event) {
         hideGhostClickCatcher();
-     //   cancelMouseEvent(event);
+    //    cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('mousedown', function(event) {
         hideGhostClickCatcher();
-     //   cancelMouseEvent(event);
+    //    cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('click', function(event) {
         hideGhostClickCatcher();
         if (window.jstimer) window.jstimer.finish("ghostclick");
-     //   cancelMouseEvent(event);
+    //    cancelMouseEvent(event);
     }, true);
 
 
-    var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>')
+    var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
     $(document.body).append(ghostClickCatcher);
     ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
     function showGhostClickCatcher() {
+        // todo: probably should also adjust position to align with tap location
+        // otherwise tapping elsewhere on the page is disabled unnecessarily.
          ghostClickCatcher.css( "display", "block" );
     }
 
@@ -92,7 +99,7 @@ console.log("init tap");
            
             if (touchTimeout) window.clearTimeout(touchTimeout);
 
-            if (!useMouse) {
+            if (!window.useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
             } else {
@@ -144,7 +151,7 @@ console.log("init tap");
             e.originalEvent.stopPropagation();
             e.originalEvent.preventDefault();
 */
-            if (!useMouse) {
+            if (!window.useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
             } else {
@@ -178,7 +185,7 @@ console.log("init tap");
             if (e.originalEvent.handled) return;
             e.originalEvent.handled = true;
 
-            if (!useMouse) return;
+            if (!window.useMouse) return;
             // cancel if we already handled this as a touch event
             if (lastTapLocation && Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) return;
             // because IE doesn't handle pointer-events properly 
@@ -188,7 +195,7 @@ console.log("init tap");
             if (active || touching) return;
             touching = false;
 
-            useMouse = true;
+            window.useMouse = true;
             element.bind('mousemove', move);
             element.bind('mouseout', cancel);
             element.bind('mouseup', action);
@@ -214,7 +221,7 @@ console.log("init tap");
             if (active) return;
             touching = true;
             if (window.jstimer) window.jstimer.start("ghostclick");
-            useMouse = false;
+            window.useMouse = false;
             element.bind('touchmove', move);
             element.bind('touchend', action);
 

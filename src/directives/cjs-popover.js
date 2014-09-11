@@ -8,22 +8,15 @@ Chondric.directive("cjsPopover", function() {
             var menuwidth = parseFloat(attrs.menuwidth) || 280;
             var menuheight = parseFloat(attrs.menuheight) || 150;
 
-            var useMouse = true;
-
-            var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
-
-            if (iOS) {
-                useMouse = false;
-            }
-
-
             element.addClass("modal");
             element.addClass("popover");
 
             function clickOutsidePopup(e) {
-                if (element[0] != e.target && !element[0].contains(e.target)) {
-                    scope.$apply("hideModal('" + attrs.cjsPopover + "')");
-                }
+                var r = element[0].getBoundingClientRect();
+                var x = e.changedTouches ? e.changedTouches[0].clientX : e.touches ? e.touches[0].clientX : e.clientX;
+                var y = e.changedTouches ? e.changedTouches[0].clientY : e.touches ? e.touches[0].clientY : e.clientY;
+                if (x > r.left && x < r.right && y > r.top && y < r.bottom) return;
+                scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             }
 
 
@@ -50,9 +43,9 @@ Chondric.directive("cjsPopover", function() {
                         overlay.removeClass("active");
                     }
                     element.removeClass("active");
-                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 } else {
-                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                     menuheight = element.height() || menuheight;
                     menuwidth = element.width() || menuwidth;
 

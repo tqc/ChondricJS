@@ -240,18 +240,13 @@ Chondric.directive("cjsSidepanel", function() {
         //        restrict: "E",
         link: function(scope, element, attrs) {
 
-            var useMouse = true;
-
-            var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
-
-            if (iOS) {
-                useMouse = false;
-            }
 
             function clickOutsidePopup(e) {
-                if (element[0] != e.target && !element[0].contains(e.target)) {
-                    scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
-                }
+                var r = element[0].getBoundingClientRect();
+                var x = e.changedTouches ? e.changedTouches[0].clientX : e.touches ? e.touches[0].clientX : e.clientX;
+                var y = e.changedTouches ? e.changedTouches[0].clientY : e.touches ? e.touches[0].clientY : e.clientY;
+                if (x > r.left && x < r.right && y > r.top && y < r.bottom) return;
+                scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             }
 
             element.addClass("modal");
@@ -313,7 +308,7 @@ Chondric.directive("cjsSidepanel", function() {
 
                 if (progress == 1) {
                     overlay.addClass("active");
-                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
 
                     if (!oldprogress) {
                         // ensure initial position was set
@@ -329,11 +324,11 @@ Chondric.directive("cjsSidepanel", function() {
                         panelTransitions[transition].reset(element, parentPageElement, overlay);
                     }, time);
                     overlay.removeClass("active");
-                    window.document.removeEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 } else {
                     panelTransitions[transition].progress(element, parentPageElement, overlay, progress);
                     overlay.addClass("active");
-                    window.document.addEventListener(useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 }
 
             });
