@@ -1255,7 +1255,8 @@ console.log("init tap");
     // triggers ng-tap on the button behind it.
     var useMouse = true;
 
-
+//    var fakeInput = $("<input type='text' id='fakeInput'/>");
+  //  $(document.body).append(fakeInput);
     // however, system elements such as dropdowns and text areas can still be triggered by the ghost click,
     // so we have this code to try and kill the click events created 300ms after a handled touch event.
     var cancelMouseEvent = function(event) {
@@ -1276,16 +1277,39 @@ console.log("init tap");
                     event.returnValue = false; //ie
                 };
             }
-
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
             event.stopPropagation();
             event.preventDefault();
+
+            // todo: probably need to check that target was not previously focused - eg tap on a link
+            // inside contenteditable
+            //fakeInput[0].focus();
+            //document.activeElement.blur();
+
+            // setting the focus here since node.setActive pulls up the keyboard anyway - may as well
+            // have the input goind somewhere valid.
+            event.target.disabled = true;
+           // event.target.focus();
+
         }
     };
-    window.document.addEventListener('mouseup', cancelMouseEvent, true);
-    window.document.addEventListener('mousedown', cancelMouseEvent, true);
+    window.document.addEventListener('mouseup', function(event) {
+        cancelMouseEvent(event);
+
+            // event.target.disabled = false;
+    }, true);
+    window.document.addEventListener('mousedown', function(event) {
+        cancelMouseEvent(event);
+
+    
+    }, true);
     window.document.addEventListener('click', function(event) {
+            //        fakeInput[0].focus();
+
         if (window.jstimer) window.jstimer.finish("ghostclick");
         cancelMouseEvent(event);
+
+    //         event.target.disabled = false;
     }, true);
 
 
@@ -1315,7 +1339,7 @@ console.log("init tap");
         var cancel = function() {
            
             if (touchTimeout) window.clearTimeout(touchTimeout);
-            
+
             if (!useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
@@ -1417,6 +1441,7 @@ console.log("init tap");
         };
 
         var touchStart = function(e) {
+
             if (e.originalEvent.handled) return;
             e.originalEvent.handled = true;
             lastTapLocation = {
