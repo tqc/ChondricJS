@@ -1,11 +1,19 @@
 Chondric.directive('ngTap', function() {
     var lastTapLocation;
-
+console.log("init tap");
     var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
+    // set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
+    // triggers ng-tap on the button behind it.
+    var useMouse = true;
+
+
+    // however, system elements such as dropdowns and text areas can still be triggered by the ghost click,
+    // so we have this code to try and kill the click events created 300ms after a handled touch event.
     var cancelMouseEvent = function(event) {
+        console.log("no last tap - event at " + event.screenY);
         if (!lastTapLocation) return;
-        console.log(lastTapLocation.y + " - " + event.screenY);
+        console.log("checking ghost click: "+lastTapLocation.y + " - " + event.screenY);
         if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
 
             // ie8 fix
@@ -57,6 +65,9 @@ Chondric.directive('ngTap', function() {
 
         // called if the mouse moves too much or leaves the element
         var cancel = function() {
+           
+            if (touchTimeout) window.clearTimeout(touchTimeout);
+            
             if (!useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
@@ -72,11 +83,14 @@ Chondric.directive('ngTap', function() {
             touching = false;
             active = false;
 
-            if (touchTimeout) window.clearTimeout(touchTimeout);
         };
 
         // called when a tap is completed
         var action = function(e) {
+            if (touchTimeout) window.clearTimeout(touchTimeout);
+
+            if (e.originalEvent.handled) return;
+            e.originalEvent.handled = true;
 
             scope.lastTap = {
                 element: element,
@@ -132,6 +146,9 @@ Chondric.directive('ngTap', function() {
 
         // called on mousedown or touchstart. Multiple calls are ignored.
         var mouseStart = function(e) {
+            if (e.originalEvent.handled) return;
+            e.originalEvent.handled = true;
+
             if (!useMouse) return;
             // cancel if we already handled this as a touch event
             if (lastTapLocation && Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) return;
@@ -152,6 +169,8 @@ Chondric.directive('ngTap', function() {
         };
 
         var touchStart = function(e) {
+            if (e.originalEvent.handled) return;
+            e.originalEvent.handled = true;
             lastTapLocation = {
                 x: e.originalEvent.touches[0].screenX,
                 y: e.originalEvent.touches[0].screenY
@@ -172,7 +191,6 @@ Chondric.directive('ngTap', function() {
             start(e);
         };
 
-        var useMouse = true;
 
         element.bind('touchstart', touchStart);
         element.bind('mousedown', mouseStart);
