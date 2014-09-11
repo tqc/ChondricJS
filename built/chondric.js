@@ -1255,8 +1255,6 @@ console.log("init tap");
     // triggers ng-tap on the button behind it.
     var useMouse = true;
 
-//    var fakeInput = $("<input type='text' id='fakeInput'/>");
-  //  $(document.body).append(fakeInput);
     // however, system elements such as dropdowns and text areas can still be triggered by the ghost click,
     // so we have this code to try and kill the click events created 300ms after a handled touch event.
     var cancelMouseEvent = function(event) {
@@ -1281,37 +1279,39 @@ console.log("init tap");
             event.stopPropagation();
             event.preventDefault();
 
-            // todo: probably need to check that target was not previously focused - eg tap on a link
-            // inside contenteditable
-            //fakeInput[0].focus();
-            //document.activeElement.blur();
 
             // setting the focus here since node.setActive pulls up the keyboard anyway - may as well
-            // have the input goind somewhere valid.
-            event.target.disabled = true;
-           // event.target.focus();
+            // have the input going somewhere valid.
+            
+            event.target.focus();
 
         }
     };
     window.document.addEventListener('mouseup', function(event) {
-        cancelMouseEvent(event);
-
-            // event.target.disabled = false;
+        hideGhostClickCatcher();
+     //   cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('mousedown', function(event) {
-        cancelMouseEvent(event);
-
-    
+        hideGhostClickCatcher();
+     //   cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('click', function(event) {
-            //        fakeInput[0].focus();
-
+        hideGhostClickCatcher();
         if (window.jstimer) window.jstimer.finish("ghostclick");
-        cancelMouseEvent(event);
-
-    //         event.target.disabled = false;
+     //   cancelMouseEvent(event);
     }, true);
 
+
+    var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>')
+    $(document.body).append(ghostClickCatcher);
+    ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
+    function showGhostClickCatcher() {
+         ghostClickCatcher.css( "display", "block" );
+    }
+
+    function hideGhostClickCatcher() {
+        ghostClickCatcher.css( "display", "none" );
+    }
 
 
 
@@ -1363,6 +1363,11 @@ console.log("init tap");
 
             if (e.originalEvent.handled) return;
             e.originalEvent.handled = true;
+
+            if (e.originalEvent.changedTouches) {
+                showGhostClickCatcher();
+            }
+
 
             scope.lastTap = {
                 element: element,

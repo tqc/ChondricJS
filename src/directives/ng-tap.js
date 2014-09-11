@@ -40,16 +40,30 @@ console.log("init tap");
         }
     };
     window.document.addEventListener('mouseup', function(event) {
-        cancelMouseEvent(event);
+        hideGhostClickCatcher();
+     //   cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('mousedown', function(event) {
-        cancelMouseEvent(event);
+        hideGhostClickCatcher();
+     //   cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('click', function(event) {
+        hideGhostClickCatcher();
         if (window.jstimer) window.jstimer.finish("ghostclick");
-        cancelMouseEvent(event);
+     //   cancelMouseEvent(event);
     }, true);
 
+
+    var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>')
+    $(document.body).append(ghostClickCatcher);
+    ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
+    function showGhostClickCatcher() {
+         ghostClickCatcher.css( "display", "block" );
+    }
+
+    function hideGhostClickCatcher() {
+        ghostClickCatcher.css( "display", "none" );
+    }
 
 
 
@@ -101,6 +115,11 @@ console.log("init tap");
 
             if (e.originalEvent.handled) return;
             e.originalEvent.handled = true;
+
+            if (e.originalEvent.changedTouches) {
+                showGhostClickCatcher();
+            }
+
 
             scope.lastTap = {
                 element: element,
