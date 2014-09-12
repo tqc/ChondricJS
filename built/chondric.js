@@ -1962,6 +1962,7 @@ Chondric.directive("cjsSidepanel", function() {
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
                 var time = (prevProgress) * 300;
+                if (time === 0) return 0;
                 var spwidth = panel.width();
                 overlay.css({
                     "visibility": "visible",
@@ -2077,6 +2078,7 @@ Chondric.directive("cjsSidepanel", function() {
             cancel: function(panel, page, overlay, prevProgress) {
                 // move off screen with transition, return timing
                 var time = (prevProgress) * 300;
+                if (time === 0) return 0;
                 var spwidth = panel.width();
                 overlay.css({
                     "visibility": "visible",
