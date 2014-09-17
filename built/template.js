@@ -94,7 +94,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-shared-popup.html',
-    "<div cjs-popup=\"componentDefinition.popuptrigger\" ng-class=\"{nativetransition: componentDefinition.nativeTransition}\">\n" +
+    "<div cjs-popup=\"componentDefinition.popuptrigger\" ng-class=\"{nativetransition: componentDefinition.nativeTransition}\" class=\"{{componentDefinition.data.additionalClasses}}\">\n" +
     "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
     "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
     "\n" +
