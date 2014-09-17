@@ -1132,7 +1132,7 @@ angular.module('chondric').run(['$templateCache', function($templateCache) {
 
 
   $templateCache.put('cjs-shared-popup.html',
-    "<div cjs-popup=\"componentDefinition.popuptrigger\" ng-class=\"{nativetransition: componentDefinition.nativeTransition}\" class=\"{{componentDefinition.data.additionalClasses}}\">\n" +
+    "<div cjs-popup=\"componentDefinition.popuptrigger\" ng-class=\"{nativetransition: componentDefinition.nativeTransition}\">\n" +
     "<div ng-if=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\" ng-include=\"componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl\"></div>\n" +
     "<div ng-if=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" cjs-json-template=\"componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate\" data=\"componentDefinition.data\"></div>\n" +
     "\n" +
@@ -1855,7 +1855,7 @@ Chondric.directive("cjsPopup", function() {
         //        restrict: "E",
         link: function(scope, element, attrs) {
 
-   
+
             function clickOutsidePopup(e) {
                 var r = element[0].getBoundingClientRect();
                 var x = e.changedTouches ? e.changedTouches[0].clientX : e.touches ? e.touches[0].clientX : e.clientX;
@@ -1896,6 +1896,8 @@ Chondric.directive("cjsPopup", function() {
 
                         overlay.addClass("active");
                         element.addClass("active");
+                        if (val.additionalClasses) element.addClass(val.additionalClasses);
+
                     }
 
                 }
@@ -1903,6 +1905,7 @@ Chondric.directive("cjsPopup", function() {
         }
     };
 });
+
 // todo: remopve this once transitions are fully implemented
 /* jshint unused: false */
 
@@ -2942,12 +2945,14 @@ Chondric.registerSharedUiComponent({
                 self.popuptrigger = null;
             } else {
                 self.popuptrigger = {
-                    element: data.element
+                    element: data.element,
+                    additionalClasses: data.additionalClasses
                 };
             }
         }
     }
 });
+
 Chondric.registerSharedUiComponent({
     id: "cjs-right-panel",
     templateUrl: "cjs-right-panel.html",

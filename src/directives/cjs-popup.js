@@ -4,7 +4,7 @@ Chondric.directive("cjsPopup", function() {
         //        restrict: "E",
         link: function(scope, element, attrs) {
 
-   
+
             function clickOutsidePopup(e) {
                 var r = element[0].getBoundingClientRect();
                 var x = e.changedTouches ? e.changedTouches[0].clientX : e.touches ? e.touches[0].clientX : e.clientX;
@@ -45,6 +45,8 @@ Chondric.directive("cjsPopup", function() {
 
                         overlay.addClass("active");
                         element.addClass("active");
+                        if (val.additionalClasses) element.addClass(val.additionalClasses);
+
                     }
 
                 }

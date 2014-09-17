@@ -76,7 +76,8 @@ Chondric.registerSharedUiComponent({
                 self.popuptrigger = null;
             } else {
                 self.popuptrigger = {
-                    element: data.element
+                    element: data.element,
+                    additionalClasses: data.additionalClasses
                 };
             }
         }
