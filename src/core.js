@@ -232,7 +232,7 @@ Chondric.App =
             app.transitionOriginForRoutes = {};
             app.componentStatesForRoutes = {};
 
-            function loadView(url) {
+            var loadView = app.loadView = function(url) {
                 if (!url) {
                     // first run - load start page
                     throw new Error("loadView requires a valid route URL");
@@ -559,7 +559,7 @@ Chondric.App =
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();
                 loadView(url);
-                viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute]);
+                viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute].concat(app.preloadedRoutes || []));
                 if (window.NativeNav) {
                     window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
                 }
