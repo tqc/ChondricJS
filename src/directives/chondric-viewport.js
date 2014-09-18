@@ -3,9 +3,10 @@ Chondric.directive('chondricViewport', function($compile) {
         scope: true,
         link: function(scope, element, attrs) {
             //            console.log("viewport directive");
-            var rk = scope.$eval("rk");
             var rv = scope.$eval("rv");
+            var rk;
             if (rv) {
+                scope.rk = rk = rv.route;
                 scope.pageParams = rv.params || {};
                 // add route parameters directly to the scope
                 for (var k in rv.params) {
@@ -21,7 +22,7 @@ Chondric.directive('chondricViewport', function($compile) {
                 // first level
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
-                template = "<div ng-repeat=\"(rk, rv) in openViews track by rk\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template = "<div ng-repeat=\"rv in openViewArray track by rv.route\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute}\" cjs-transition-style route=\"{{rv.route}}\">";
                 template += "</div>";
                 template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents track by ck\" cjs-shared-component testattr='{{componentId}}'>";
                 template += "</div>";
@@ -30,7 +31,7 @@ Chondric.directive('chondricViewport', function($compile) {
 
             } else if (rv.isSection) {
                 template = "<div ng-controller=\"rv.controller\" >";
-                template += "<div ng-repeat=\"(rk, rv) in rv.subsections track by rk\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template += "<div ng-repeat=\"rv in rv.subsectionArray | orderBy:'position' track by rv.route \" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute}\" cjs-transition-style position=\"{{rv.position}}\" route=\"{{rv.route}}\">";
                 template += "</div>";
                 template += "</div>";
 

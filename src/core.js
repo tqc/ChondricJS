@@ -232,7 +232,22 @@ Chondric.App =
             app.transitionOriginForRoutes = {};
             app.componentStatesForRoutes = {};
 
-            var loadView = app.loadView = function(url) {
+            $scope.openViewArray = [];
+
+            function updateOpenViewArray(parentObject, parentArray) {
+                parentArray.splice(0, parentArray.length);
+                for (var k in parentObject) {
+                    var v = parentObject[k];
+                    parentArray.push(v);
+                    if (v.subsections) {
+                        v.subsectionArray = v.subsectionArray || [];
+                        updateOpenViewArray(v.subsections, v.subsectionArray);
+                    }
+                }
+            }
+
+
+            var loadView = app.loadView = function(url, position) {
                 if (!url) {
                     // first run - load start page
                     throw new Error("loadView requires a valid route URL");
@@ -268,6 +283,7 @@ Chondric.App =
                         var section = openViews[ar];
                         if (!section) {
                             section = openViews[ar] = {
+                                route: ar,
                                 controller: template.controller,
                                 isSection: true,
                                 params: params,
@@ -279,16 +295,19 @@ Chondric.App =
                         var page = openViews[ar];
                         if (!page) {
                             page = openViews[ar] = {
+                                route: ar,
                                 controller: template.controller,
                                 templateUrl: template.templateUrl,
                                 templateId: template.templateId,
                                 params: params
                             };
                         }
-                        return;
+                        if (position) page.position = position;
                     }
+                    updateOpenViewArray($scope.openViews, $scope.openViewArray);
+
                 }
-            }
+            };
 
             $scope.changePage = app.changePage = function(p, transition, originElement) {
                 var r;
@@ -507,6 +526,9 @@ Chondric.App =
                     }
 
                 }
+
+                updateOpenViewArray($scope.openViews, $scope.openViewArray);
+
             }
 
             function transitionComponents(fromRoute, toRoute, progress) {

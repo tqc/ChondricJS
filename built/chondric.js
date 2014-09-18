@@ -233,7 +233,22 @@ Chondric.App =
             app.transitionOriginForRoutes = {};
             app.componentStatesForRoutes = {};
 
-            var loadView = app.loadView = function(url) {
+            $scope.openViewArray = [];
+
+            function updateOpenViewArray(parentObject, parentArray) {
+                parentArray.splice(0, parentArray.length);
+                for (var k in parentObject) {
+                    var v = parentObject[k];
+                    parentArray.push(v);
+                    if (v.subsections) {
+                        v.subsectionArray = v.subsectionArray || [];
+                        updateOpenViewArray(v.subsections, v.subsectionArray);
+                    }
+                }
+            }
+
+
+            var loadView = app.loadView = function(url, position) {
                 if (!url) {
                     // first run - load start page
                     throw new Error("loadView requires a valid route URL");
@@ -269,6 +284,7 @@ Chondric.App =
                         var section = openViews[ar];
                         if (!section) {
                             section = openViews[ar] = {
+                                route: ar,
                                 controller: template.controller,
                                 isSection: true,
                                 params: params,
@@ -280,16 +296,19 @@ Chondric.App =
                         var page = openViews[ar];
                         if (!page) {
                             page = openViews[ar] = {
+                                route: ar,
                                 controller: template.controller,
                                 templateUrl: template.templateUrl,
                                 templateId: template.templateId,
                                 params: params
                             };
                         }
-                        return;
+                        if (position) page.position = position;
                     }
+                    updateOpenViewArray($scope.openViews, $scope.openViewArray);
+
                 }
-            }
+            };
 
             $scope.changePage = app.changePage = function(p, transition, originElement) {
                 var r;
@@ -508,6 +527,9 @@ Chondric.App =
                     }
 
                 }
+
+                updateOpenViewArray($scope.openViews, $scope.openViewArray);
+
             }
 
             function transitionComponents(fromRoute, toRoute, progress) {
@@ -2474,9 +2496,10 @@ Chondric.directive('chondricViewport', function($compile) {
         scope: true,
         link: function(scope, element, attrs) {
             //            console.log("viewport directive");
-            var rk = scope.$eval("rk");
             var rv = scope.$eval("rv");
+            var rk;
             if (rv) {
+                scope.rk = rk = rv.route;
                 scope.pageParams = rv.params || {};
                 // add route parameters directly to the scope
                 for (var k in rv.params) {
@@ -2492,7 +2515,7 @@ Chondric.directive('chondricViewport', function($compile) {
                 // first level
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
-                template = "<div ng-repeat=\"(rk, rv) in openViews track by rk\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template = "<div ng-repeat=\"rv in openViewArray track by rv.route\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute}\" cjs-transition-style route=\"{{rv.route}}\">";
                 template += "</div>";
                 template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents track by ck\" cjs-shared-component testattr='{{componentId}}'>";
                 template += "</div>";
@@ -2501,7 +2524,7 @@ Chondric.directive('chondricViewport', function($compile) {
 
             } else if (rv.isSection) {
                 template = "<div ng-controller=\"rv.controller\" >";
-                template += "<div ng-repeat=\"(rk, rv) in rv.subsections track by rk\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rk == route, next: rk == nextRoute, prev: rk == lastRoute}\" cjs-transition-style route=\"{{rk}}\">";
+                template += "<div ng-repeat=\"rv in rv.subsectionArray | orderBy:'position' track by rv.route \" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute}\" cjs-transition-style position=\"{{rv.position}}\" route=\"{{rv.route}}\">";
                 template += "</div>";
                 template += "</div>";
 
