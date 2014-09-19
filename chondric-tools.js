@@ -155,7 +155,7 @@ exports.update = function(apphostdir, appdef) {
     frameworkscriptrefs += "<script src=\"bower_components/angular/angular.min.js\"></script>\n";
     frameworkscriptrefs += "<script src=\"bower_components/angular-sanitize/angular-sanitize.min.js\"></script>\n";
     frameworkscriptrefs += "<script src=\"bower_components/angular-ui-utils/ui-utils.min.js\"></script>\n";
-    frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
+  //  frameworkscriptrefs += "<link rel=\"stylesheet\" href=\"bower_components/pure/pure-min.css\"/>\n";
 
     var scriptrefs = "";
     // create pages
