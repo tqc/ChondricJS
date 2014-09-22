@@ -1,7 +1,7 @@
 Chondric.directive('ngTap', function() {
     var lastTapLocation;
 console.log("init tap");
-    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+//    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
     // set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
     // triggers ng-tap on the button behind it.

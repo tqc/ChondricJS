@@ -5,10 +5,10 @@ Chondric.directive("cjsSwipe", function() {
         link: function(scope, element) {
             if (window.NativeNav) return;
             var useMouse = true;
-            var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
-            if (iOS) {
-                useMouse = false;
-            }
+//            var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+//            if (iOS) {
+//                useMouse = false;
+//            }
 
             var startX = 0;
             var startY = 0;
