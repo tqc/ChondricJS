@@ -364,7 +364,7 @@ exports.hostApp = function(options) {
             return next();
         });
 
-        var updatescripts = function(req, res, filename) {
+        var updatescripts = app.updatescripts = function(req, res, filename) {
             //console.log("serving framework script")
             fs.readFile(path.resolve(process.cwd(), "apphtml/" + filename), "utf8", function(err, d) {
 
