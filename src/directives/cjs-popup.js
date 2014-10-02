@@ -3,6 +3,7 @@ Chondric.directive("cjsPopup", function() {
     return {
         //        restrict: "E",
         link: function(scope, element, attrs) {
+            var previousAdditionalClasses;
 
 
             function clickOutsidePopup(e) {
@@ -12,7 +13,6 @@ Chondric.directive("cjsPopup", function() {
                 if (x > r.left && x < r.right && y > r.top && y < r.bottom) return;
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             }
-
 
             element.addClass("modal");
             element.addClass("popup");
@@ -42,11 +42,12 @@ Chondric.directive("cjsPopup", function() {
                         window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                     } else {
                         window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                        if (previousAdditionalClasses) element.removeClass(previousAdditionalClasses);
+                        previousAdditionalClasses = val.additionalClasses;
 
                         overlay.addClass("active");
-                        element.addClass("active");
+                        element.addClass("active");                        
                         if (val.additionalClasses) element.addClass(val.additionalClasses);
-
                     }
 
                 }
