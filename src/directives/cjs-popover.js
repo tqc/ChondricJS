@@ -82,7 +82,10 @@ Chondric.directive("cjsPopover", function() {
                             idealY = cr.top + cr.height / 2;
                         } else {
                             // x at center of button, y at left or right of button
-                            idealX = cr.left + cr.width / 2;
+                            var w = cr.width;
+                            if (!w) w = cr.right-cr.left;
+
+                            idealX = cr.left + w / 2;
                             if (cr.bottom > verticalCutoff) {
                                 idealY = cr.top;
                             } else {
@@ -126,7 +129,7 @@ Chondric.directive("cjsPopover", function() {
                             menupos.bottom = (parentRect.bottom - actualY + 13) + "px";
                             menupos.top = "auto";
                             element.addClass("up").removeClass("down");
-                        }
+                        }                        
                         menupos.left = (actualX - menuwidth / 2 - parentRect.left) + "px";
                     }
 

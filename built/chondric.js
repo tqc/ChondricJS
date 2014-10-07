@@ -1271,11 +1271,16 @@ Chondric.VersionedDatabase = function(db, updatefunctions, tables) {
 Chondric.directive('ngTap', function() {
     var lastTapLocation;
 console.log("init tap");
+
+
 //    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
     // set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
     // triggers ng-tap on the button behind it.
 window.useMouse = true;
+
+if (window.document.addEventListener) {
+// no addEventListener means IE8, so definitely no touch or ghost click issues
 
     // todo: turn useMouse back on if a genuine mouse event shows up
     window.document.addEventListener('touchstart', function(event) {
@@ -1342,7 +1347,7 @@ window.useMouse = true;
         ghostClickCatcher.css( "display", "none" );
     }
 
-
+}
 
     return function(scope, element, attrs) {
         element.addClass('tappable');
@@ -1782,7 +1787,10 @@ Chondric.directive("cjsPopover", function() {
                             idealY = cr.top + cr.height / 2;
                         } else {
                             // x at center of button, y at left or right of button
-                            idealX = cr.left + cr.width / 2;
+                            var w = cr.width;
+                            if (!w) w = cr.right-cr.left;
+
+                            idealX = cr.left + w / 2;
                             if (cr.bottom > verticalCutoff) {
                                 idealY = cr.top;
                             } else {
@@ -1826,7 +1834,7 @@ Chondric.directive("cjsPopover", function() {
                             menupos.bottom = (parentRect.bottom - actualY + 13) + "px";
                             menupos.top = "auto";
                             element.addClass("up").removeClass("down");
-                        }
+                        }                        
                         menupos.left = (actualX - menuwidth / 2 - parentRect.left) + "px";
                     }
 
