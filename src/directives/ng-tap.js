@@ -1,11 +1,16 @@
 Chondric.directive('ngTap', function() {
     var lastTapLocation;
 console.log("init tap");
+
+
 //    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
     // set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
     // triggers ng-tap on the button behind it.
 window.useMouse = true;
+
+if (window.document.addEventListener) {
+// no addEventListener means IE8, so definitely no touch or ghost click issues
 
     // todo: turn useMouse back on if a genuine mouse event shows up
     window.document.addEventListener('touchstart', function(event) {
@@ -72,7 +77,7 @@ window.useMouse = true;
         ghostClickCatcher.css( "display", "none" );
     }
 
-
+}
 
     return function(scope, element, attrs) {
         element.addClass('tappable');
