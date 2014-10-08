@@ -1,0 +1,30 @@
+@mixin legacy {
+    @if $browserType == "ie" {
+        @content;
+    }
+}
+
+@mixin modern {
+    @if $browserType != "ie" {
+        @content;
+    }
+}
+
+@mixin mobile {
+    @if $supportMobile {
+    @media (max-width: 767px) {
+        @content;
+    }
+    }
+}
+
+@mixin tablet {
+    @if $browserType != "ie" {
+    @media (min-width: 768px) {
+        @content;
+    }
+    }
+    @else {
+        @content;       
+    }
+}

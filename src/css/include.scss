@@ -18,6 +18,9 @@ $supportMobile: true !global;
 
 @import "../../bourbon/_bourbon.scss";
 
+@import "mixins.scss";
+
+
 @import "core.scss";
 @import "icons.scss";
 @import "loading-overlay.scss";
