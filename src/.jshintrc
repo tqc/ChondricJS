@@ -1,6 +1,7 @@
 {
   "browser": true,
-  "esnext": true,
+  "esnext": false,
+  "es3": true,
   "globals": {"Chondric": true, "angular":true, "$":true, "console": true},
   "globalstrict": false,
   "quotmark": false,
