@@ -40,7 +40,7 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
                     if (attrs.showUnloaded === undefined)
                         contentElement.addClass("ui-hide").removeClass("ui-show");
                     contentElement.addClass("cjs-unloaded").removeClass("cjs-loaded");
-                    contentElement.addClass("cjs-unloaded")
+                    contentElement.addClass("cjs-unloaded");
                     overlay.addClass("ui-show").removeClass("ui-hide");
                     scope.title = taskGroup.title;
                     scope.error = taskGroup.error;
@@ -50,7 +50,7 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
             scope.$watch("loadStatus", function(val) {
                 if (!val) return;
                 val.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), onUpdate);
-            })
+            });
 
         }
     };

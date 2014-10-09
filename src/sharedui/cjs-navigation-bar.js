@@ -10,10 +10,11 @@ Chondric.registerSharedUiComponent({
 
     },
     chooseState: function(self, route, active, available, data) {
-        for (var i = 0; i < self.states.length; i++) {
+        var i;
+        for (i = 0; i < self.states.length; i++) {
             if (self.states[i].route == route) return self.states[i];
         }
-        for (var i = 0; i < self.states.length; i++) {
+        for (i = 0; i < self.states.length; i++) {
             if (self.states[i] != self.activeState) return self.states[i];
         }
     },

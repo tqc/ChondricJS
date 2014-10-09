@@ -1031,8 +1031,9 @@ Chondric.directive('ngStylePrefixer', function() {
         restrict: "AC",
         link: function(scope, element, attr) {
             scope.$watch(attr.ngStylePrefixer, function ngStyleWatchAction(newStyles, oldStyles) {
+                var k;
                 if (oldStyles && (newStyles !== oldStyles)) {
-                    for (var k in oldStyles) {
+                    for (k in oldStyles) {
                         element.css(k, '');
                     }
                 }
@@ -1040,7 +1041,7 @@ Chondric.directive('ngStylePrefixer', function() {
                 if (newStyles) {
                     var convertedStyles = {};
 
-                    for (var k in newStyles) {
+                    for (k in newStyles) {
                         var v = newStyles[k];
                         if (k == "transform") {
                             k = transformStyle;
@@ -1282,70 +1283,38 @@ window.useMouse = true;
 if (window.document.addEventListener) {
 // no addEventListener means IE8, so definitely no touch or ghost click issues
 
+    var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
+    $(document.body).append(ghostClickCatcher);
+    var showGhostClickCatcher = function () {
+        // todo: probably should also adjust position to align with tap location
+        // otherwise tapping elsewhere on the page is disabled unnecessarily.
+         ghostClickCatcher.css( "display", "block" );
+    };
+
+    var hideGhostClickCatcher = function() {
+        ghostClickCatcher.css( "display", "none" );
+    };
+
+    ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
+
     // todo: turn useMouse back on if a genuine mouse event shows up
     window.document.addEventListener('touchstart', function(event) {
         window.useMouse = false;
     }, true);
 
-    // however, system elements such as dropdowns and text areas can still be triggered by the ghost click,
-    // so we have this code to try and kill the click events created 300ms after a handled touch event.
-    var cancelMouseEvent = function(event) {
-        console.log("no last tap - event at " + event.screenY);
-        if (!lastTapLocation) return;
-        console.log("checking ghost click: "+lastTapLocation.y + " - " + event.screenY);
-        if (Math.abs(event.screenX - lastTapLocation.x) < 25 && Math.abs(event.screenY - lastTapLocation.y) < 25) {
-
-            // ie8 fix
-            if (!event.stopPropagation) {
-                event.stopPropagation = function() {
-                    event.cancelBubble = true; //ie
-                };
-            }
-
-            if (!event.preventDefault) {
-                event.preventDefault = function() {
-                    event.returnValue = false; //ie
-                };
-            }
-        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-            event.stopPropagation();
-            event.preventDefault();
-
-
-            // setting the focus here since node.setActive pulls up the keyboard anyway - may as well
-            // have the input going somewhere valid.
-            
-            //event.target.focus();
-
-        }
-    };
     window.document.addEventListener('mouseup', function(event) {
         hideGhostClickCatcher();
-    //    cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('mousedown', function(event) {
         hideGhostClickCatcher();
-    //    cancelMouseEvent(event);
     }, true);
     window.document.addEventListener('click', function(event) {
         hideGhostClickCatcher();
         if (window.jstimer) window.jstimer.finish("ghostclick");
-    //    cancelMouseEvent(event);
     }, true);
 
 
-    var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
-    $(document.body).append(ghostClickCatcher);
-    ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
-    function showGhostClickCatcher() {
-        // todo: probably should also adjust position to align with tap location
-        // otherwise tapping elsewhere on the page is disabled unnecessarily.
-         ghostClickCatcher.css( "display", "block" );
-    }
 
-    function hideGhostClickCatcher() {
-        ghostClickCatcher.css( "display", "none" );
-    }
 
 }
 
@@ -1550,7 +1519,7 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
                     if (attrs.showUnloaded === undefined)
                         contentElement.addClass("ui-hide").removeClass("ui-show");
                     contentElement.addClass("cjs-unloaded").removeClass("cjs-loaded");
-                    contentElement.addClass("cjs-unloaded")
+                    contentElement.addClass("cjs-unloaded");
                     overlay.addClass("ui-show").removeClass("ui-hide");
                     scope.title = taskGroup.title;
                     scope.error = taskGroup.error;
@@ -1560,7 +1529,7 @@ Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
             scope.$watch("loadStatus", function(val) {
                 if (!val) return;
                 val.onUpdate(scope.$eval(attrs.cjsLoadingOverlay), onUpdate);
-            })
+            });
 
         }
     };
@@ -2684,10 +2653,11 @@ Chondric.registerSharedUiComponent({
 
     },
     chooseState: function(self, route, active, available, data) {
-        for (var i = 0; i < self.states.length; i++) {
+        var i;
+        for (i = 0; i < self.states.length; i++) {
             if (self.states[i].route == route) return self.states[i];
         }
-        for (var i = 0; i < self.states.length; i++) {
+        for (i = 0; i < self.states.length; i++) {
             if (self.states[i] != self.activeState) return self.states[i];
         }
     },

@@ -1030,8 +1030,9 @@ Chondric.directive('ngStylePrefixer', function() {
         restrict: "AC",
         link: function(scope, element, attr) {
             scope.$watch(attr.ngStylePrefixer, function ngStyleWatchAction(newStyles, oldStyles) {
+                var k;
                 if (oldStyles && (newStyles !== oldStyles)) {
-                    for (var k in oldStyles) {
+                    for (k in oldStyles) {
                         element.css(k, '');
                     }
                 }
@@ -1039,7 +1040,7 @@ Chondric.directive('ngStylePrefixer', function() {
                 if (newStyles) {
                     var convertedStyles = {};
 
-                    for (var k in newStyles) {
+                    for (k in newStyles) {
                         var v = newStyles[k];
                         if (k == "transform") {
                             k = transformStyle;
