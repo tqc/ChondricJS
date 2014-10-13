@@ -24,7 +24,7 @@
 
 .cjs-loading-overlay.ui-hide {
     @include transition( z-index 0.5s ease, opacity 0.3s ease);
-    z-index: 0;
+    z-index: -1;
 }
 
 .cjs-loaded {
