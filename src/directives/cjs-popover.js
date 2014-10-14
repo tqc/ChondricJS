@@ -58,7 +58,7 @@ Chondric.directive("cjsPopover", function() {
     var parentRect = element[0].offsetParent.getBoundingClientRect();
 
                     var sw = $(document).width();
-                    var sh = $(document).height();
+                    var sh = $(window).height();
 
 
 
@@ -86,7 +86,7 @@ Chondric.directive("cjsPopover", function() {
                             if (!w) w = cr.right-cr.left;
 
                             idealX = cr.left + w / 2;
-                            if (cr.bottom > verticalCutoff) {
+                            if (cr.top > verticalCutoff) {
                                 idealY = cr.top;
                             } else {
                                 idealY = cr.bottom;
