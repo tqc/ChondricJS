@@ -46,8 +46,8 @@ Chondric.directive("cjsPopover", function() {
                     window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                 } else {
                     window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
-                    menuheight = element.height() || menuheight;
-                    menuwidth = element.width() || menuwidth;
+                    menuheight = element.outerHeight() || menuheight;
+                    menuwidth = element.outerWidth() || menuwidth;
 
                     var menupos = {};
                     // TODO: should get actual size of the element, but it is display: none at this point.
@@ -57,7 +57,7 @@ Chondric.directive("cjsPopover", function() {
 
     var parentRect = element[0].offsetParent.getBoundingClientRect();
 
-                    var sw = $(document).width();
+                    var sw = $(window).width();
                     var sh = $(window).height();
 
 
@@ -67,10 +67,10 @@ Chondric.directive("cjsPopover", function() {
                     var idealX = 0;
                     var idealY = 0;
 
-
+                    var cr;
                     if (val.element && val.element[0]) {
                         var button = val.element[0];
-                        var cr = button.getBoundingClientRect();
+                        cr = button.getBoundingClientRect();
 
                         if (horizontal) {
                             // x at left or right of button, y center of button
@@ -121,7 +121,7 @@ Chondric.directive("cjsPopover", function() {
                         }
                         menupos.top = (actualY - menuheight / 2 - parentRect.top) + "px";
                     } else {
-                        if (actualY < verticalCutoff) {
+                        if (actualY < verticalCutoff || (cr && actualY > cr.top)) {
                             menupos.top = (actualY + 13 - parentRect.top) + "px";
                             menupos.bottom = "auto";
                             element.addClass("down").removeClass("up");
