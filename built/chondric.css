@@ -730,6 +730,7 @@ input.inline {
 }
 
 .ui-hide {
+  display: none;
   opacity: 0;
 }
 

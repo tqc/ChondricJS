@@ -676,6 +676,9 @@ text-transform: inherit;
   @include transition (opacity 0.3s ease); 
 }
 .ui-hide {
+    // the opacity version is causing all sorts of issues. just use display:none and restore animation later
+    // using ng-hide-enter etc
+display: none;
   opacity: 0;
 }
 
