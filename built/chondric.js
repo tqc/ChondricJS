@@ -1475,6 +1475,11 @@ if (window.document.addEventListener) {
 
         element.bind('touchstart', touchStart);
         element.bind('mousedown', mouseStart);
+
+        element.bind('keypress', function(e) {
+            action(e);
+        });
+
     };
 });
 Chondric.directive('cjsLoadingOverlay', function($templateCache, $compile) {
@@ -1693,6 +1698,10 @@ Chondric.directive("cjsPopover", function() {
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             }
 
+            function closeWithKey(e) {
+                e.preventDefault();
+                clickOutsidePopup(e);
+            }
 
             function ensureOverlay(element, useOverlay) {
                 var parentPageElement = element.closest(".chondric-page");
@@ -1707,29 +1716,45 @@ Chondric.directive("cjsPopover", function() {
                     return overlay;
                 }
             }
-
+            var lastFocused = null;
             scope.$watch(attrs.cjsPopover, function(val) {
-                if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") document.activeElement.blur();
+
                 var overlay = ensureOverlay(element, useOverlay);
 
                 if (!val) {
+                    if (lastFocused) {
+                        lastFocused.focus();
+                        lastFocused = null;
+                    } else {
+                        if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") {
+                            document.activeElement.blur();
+                        }
+                    }
                     if (useOverlay) {
                         overlay.removeClass("active");
                     }
                     element.removeClass("active");
                     window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.removeEventListener('keydown', closeWithKey, true);
                 } else {
+                    if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") {
+                        lastFocused = document.activeElement;
+                    }
+                    element.focus();
+
+
                     window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.addEventListener('keydown', closeWithKey, true);
                     menuheight = element.outerHeight() || menuheight;
                     menuwidth = element.outerWidth() || menuwidth;
 
                     var menupos = {};
                     // TODO: should get actual size of the element, but it is display: none at this point.
 
-//                    var sw = element[0].offsetParent.offsetWidth;
-//                    var sh = element[0].offsetParent.offsetHeight;
+                    //                    var sw = element[0].offsetParent.offsetWidth;
+                    //                    var sh = element[0].offsetParent.offsetHeight;
 
-    var parentRect = element[0].offsetParent.getBoundingClientRect();
+                    var parentRect = element[0].offsetParent.getBoundingClientRect();
 
                     var sw = $(window).width();
                     var sh = $(window).height();
@@ -1757,7 +1782,7 @@ Chondric.directive("cjsPopover", function() {
                         } else {
                             // x at center of button, y at left or right of button
                             var w = cr.width;
-                            if (!w) w = cr.right-cr.left;
+                            if (!w) w = cr.right - cr.left;
 
                             idealX = cr.left + w / 2;
                             if (cr.top > verticalCutoff) {
@@ -1803,7 +1828,7 @@ Chondric.directive("cjsPopover", function() {
                             menupos.bottom = (parentRect.bottom - actualY + 13) + "px";
                             menupos.top = "auto";
                             element.addClass("up").removeClass("down");
-                        }                        
+                        }
                         menupos.left = (actualX - menuwidth / 2 - parentRect.left) + "px";
                     }
 
@@ -1848,6 +1873,7 @@ Chondric.directive("cjsPopover", function() {
         }
     };
 });
+
 Chondric.directive("cjsPopup", function() {
 
     return {
@@ -1864,6 +1890,34 @@ Chondric.directive("cjsPopup", function() {
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             }
 
+
+            var tabbableElements = 'a[href], area[href], input:not([disabled]),' +
+                'select:not([disabled]), textarea:not([disabled]),' +
+                'button:not([disabled]), iframe, object, embed, *[tabindex],' +
+                '*[contenteditable]';
+
+            function closeWithKey(e) {
+                var keyCode = e.which || e.keyCode;
+                if (keyCode === 27) {
+                    e.preventDefault();
+                    clickOutsidePopup(e);
+                } else if (keyCode === 9) {
+                    var te = $(tabbableElements, element);
+                    var ae = $(":focus", element);
+                    if (e.shiftKey) {
+                        if (document.activeElement == te[0] || ae.length === 0) {
+                            e.preventDefault();
+                            te[te.length-1].focus();
+                        }
+                    } else {
+                        if (document.activeElement == te[te.length - 1] || ae.length === 0) {
+                            e.preventDefault();
+                            te[0].focus();
+                        }
+                    }
+                }
+            }
+
             element.addClass("modal");
             element.addClass("popup");
 
@@ -1876,8 +1930,9 @@ Chondric.directive("cjsPopup", function() {
                 parentPageElement.append(overlay);
             }
 
+            var lastFocused = null;
+
             scope.$watch(attrs.cjsPopup, function(val) {
-                if (document.activeElement && !window.NativeNav && document.activeElement.tagName != "BODY") document.activeElement.blur();
                 if (element.hasClass("nativetransition")) {
                     if (!val) {
                         element.removeClass("active");
@@ -1887,16 +1942,39 @@ Chondric.directive("cjsPopup", function() {
 
                 } else {
                     if (!val) {
+
+                        if (lastFocused) {
+                            lastFocused.focus();
+                            lastFocused = null;
+                        } else {
+                            if (document.activeElement && !window.NativeNav && document.activeElement.tagName != "BODY") {
+                                document.activeElement.blur();
+                            }
+                        }
+
                         overlay.removeClass("active");
                         element.removeClass("active");
                         window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                        window.document.body.removeEventListener('keydown', closeWithKey, true);
                     } else {
+
+                        if (document.activeElement && !window.NativeNav && document.activeElement.tagName != "BODY") {
+                            lastFocused = document.activeElement;
+                        }
+                        element.focus();
+                        var te = $(tabbableElements, element);
+                        if (te.length > 0) te[0].focus();
+
+
+                        window.document.body.addEventListener('keydown', closeWithKey, true);
+
+
                         window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                         if (previousAdditionalClasses) element.removeClass(previousAdditionalClasses);
                         previousAdditionalClasses = val.additionalClasses;
 
                         overlay.addClass("active");
-                        element.addClass("active");                        
+                        element.addClass("active");
                         if (val.additionalClasses) element.addClass(val.additionalClasses);
                     }
 

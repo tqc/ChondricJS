@@ -19,6 +19,10 @@ Chondric.directive("cjsPopover", function() {
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
             }
 
+            function closeWithKey(e) {
+                e.preventDefault();
+                clickOutsidePopup(e);
+            }
 
             function ensureOverlay(element, useOverlay) {
                 var parentPageElement = element.closest(".chondric-page");
@@ -33,29 +37,45 @@ Chondric.directive("cjsPopover", function() {
                     return overlay;
                 }
             }
-
+            var lastFocused = null;
             scope.$watch(attrs.cjsPopover, function(val) {
-                if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") document.activeElement.blur();
+
                 var overlay = ensureOverlay(element, useOverlay);
 
                 if (!val) {
+                    if (lastFocused) {
+                        lastFocused.focus();
+                        lastFocused = null;
+                    } else {
+                        if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") {
+                            document.activeElement.blur();
+                        }
+                    }
                     if (useOverlay) {
                         overlay.removeClass("active");
                     }
                     element.removeClass("active");
                     window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.removeEventListener('keydown', closeWithKey, true);
                 } else {
+                    if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") {
+                        lastFocused = document.activeElement;
+                    }
+                    element.focus();
+
+
                     window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                    window.document.body.addEventListener('keydown', closeWithKey, true);
                     menuheight = element.outerHeight() || menuheight;
                     menuwidth = element.outerWidth() || menuwidth;
 
                     var menupos = {};
                     // TODO: should get actual size of the element, but it is display: none at this point.
 
-//                    var sw = element[0].offsetParent.offsetWidth;
-//                    var sh = element[0].offsetParent.offsetHeight;
+                    //                    var sw = element[0].offsetParent.offsetWidth;
+                    //                    var sh = element[0].offsetParent.offsetHeight;
 
-    var parentRect = element[0].offsetParent.getBoundingClientRect();
+                    var parentRect = element[0].offsetParent.getBoundingClientRect();
 
                     var sw = $(window).width();
                     var sh = $(window).height();
@@ -83,7 +103,7 @@ Chondric.directive("cjsPopover", function() {
                         } else {
                             // x at center of button, y at left or right of button
                             var w = cr.width;
-                            if (!w) w = cr.right-cr.left;
+                            if (!w) w = cr.right - cr.left;
 
                             idealX = cr.left + w / 2;
                             if (cr.top > verticalCutoff) {
@@ -129,7 +149,7 @@ Chondric.directive("cjsPopover", function() {
                             menupos.bottom = (parentRect.bottom - actualY + 13) + "px";
                             menupos.top = "auto";
                             element.addClass("up").removeClass("down");
-                        }                        
+                        }
                         menupos.left = (actualX - menuwidth / 2 - parentRect.left) + "px";
                     }
 

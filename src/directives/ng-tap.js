@@ -204,5 +204,10 @@ if (window.document.addEventListener) {
 
         element.bind('touchstart', touchStart);
         element.bind('mousedown', mouseStart);
+
+        element.bind('keypress', function(e) {
+            action(e);
+        });
+
     };
 });
