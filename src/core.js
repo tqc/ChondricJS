@@ -122,8 +122,8 @@ Chondric.App =
             allRoutes[route] = {
                 isSection: true,
                 controller: pageController
-                //            templateUrl: viewOptions.templateUrl,
-                //            templateId: viewOptions.templateId,
+                    //            templateUrl: viewOptions.templateUrl,
+                    //            templateId: viewOptions.templateId,
             };
         };
 
@@ -576,7 +576,12 @@ Chondric.App =
 
             $scope.$watch("route", function(url, oldVal) {
                 if (!url) return;
-            if (document.activeElement && app.transitionMode != "native" && document.activeElement.tagName != "BODY") document.activeElement.blur();
+                if (document.activeElement && app.transitionMode != "native" && document.activeElement.tagName != "BODY") {
+                    if ($(document.activeElement).closest(".body").length > 0) {
+                        // only blur if the active element was inside a page body - page headers etc can remain focused.
+                        document.activeElement.blur();
+                    }
+                }
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();
@@ -960,7 +965,7 @@ Chondric.App =
         });
 
         return app;
-};
+    };
 
 Chondric.factory('sharedUi', function() {
     // A simplified interface for the shared ui components
