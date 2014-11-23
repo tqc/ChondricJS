@@ -31,6 +31,14 @@
         "grunt-autoprefixer": "~0.7.3",
         "grunt-contrib-sass": "~0.7.3"
     },
+ "browserify": {
+    "transform": [
+      "browserify-shim"
+    ]
+  },
+      "browserify-shim": {
+        "angular": "global:angular"
+    },
     "optionalDependencies": {},
     "license": "MIT",
     "engines": {
