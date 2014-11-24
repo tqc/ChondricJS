@@ -22,9 +22,11 @@ export class App {
 
         this.module.directive('cjsSharedComponent', require("./directives/cjs-shared-component.js").cjsSharedComponent);
         this.module.directive('chondricViewport', require("./directives/chondric-viewport.js").chondricViewport);
+        this.module.factory('sharedUi', require("./sharedui/shareduiprovider.js").default);
+        this.module.factory('loadStatus', require("./loadstatus/loadstatusprovider.js").default);
 
         this.sharedUiComponents = {};
-
+        this.additionalInjections = [];
 
         // this.sharedUiComponents.popup = new require("./sharedui/popup.js").SharedPopup();
 
@@ -32,13 +34,22 @@ export class App {
     }
 
     registerPage(pageclass) {
+        if (pageclass["default"]) pageclass = pageclass["default"];
         console.log("Registering page " + pageclass.name + " on route " + pageclass.routeTemplate);
         this.allRoutes[pageclass.routeTemplate] = pageclass;
     }
 
     registerSection(pageclass) {
+        if (pageclass["default"]) pageclass = pageclass["default"];
         console.log("Registering section " + pageclass.name + " on route " + pageclass.routeTemplate);
         this.allRoutes[pageclass.routeTemplate] = pageclass;
+    }
+
+    registerSharedUiComponent(pageclass) {
+        if (pageclass["default"]) pageclass = pageclass["default"];
+        console.log("Registering shared UI component " + pageclass.name);
+
+        this.sharedUiComponents[pageclass.componentName || pageclass.name] = new pageclass();
     }
 
 
@@ -100,8 +111,8 @@ export class App {
             } else {
                 var page = openViews[ar];
                 if (!page) {
-                    page = openViews[ar] = 
-                    new template(params);
+                    page = openViews[ar] =
+                        new template(params);
                     page.route = ar;
                 }
                 if (position) page.position = position;
@@ -231,7 +242,8 @@ export class App {
     initController() {
         console.log("initController");
         var app = this;
-        var appCtrl = function($scope, $location, $element, $attrs) {
+        var inj = ["$scope", "$location", "$element", "$attrs"].concat(this.additionalInjections);
+        var appCtrl = function($scope, $location, $element, $attrs, a, b, c, d, e) {
             console.log("running app module controller");
             app.scope = $scope;
             $scope.app = app;
@@ -422,17 +434,19 @@ export class App {
             });
             app.attrs = $attrs;
             app.element = $element;
-            app.appCtrl($scope);
+
+            app.appCtrl($scope, a, b, c, d, e);
+
             app.init();
         }; // end appCtrl
-        app.module.controller("appCtrl", appCtrl);
+        app.module.controller("appCtrl", inj.concat([appCtrl]));
     }
 
     init() {
         console.log("App Init");
         this.customInit();
     }
-    appCtrl($scope) {
+    appCtrl($scope, $http) {
         console.log("App controller on core");
     }
     start() {

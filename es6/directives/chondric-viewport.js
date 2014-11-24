@@ -45,11 +45,14 @@ export function chondricViewport($compile) {
 
             } else if (rv.template) {
                 template = "<div  ng-controller=\"rv.controller\" class=\"{{usedComponents.asString}}\">";
-                template+=rv.template;
-                template += '</div>';                
-            }
-            else {
-                template = "<span>Template not set</span>";            
+                template += rv.template;
+                template += '</div>';
+                scope.usedComponents = {
+                    asArray: [],
+                    asString: ""
+                };
+            } else {
+                template = "<span>Template not set</span>";
             }
 
             var newElement = angular.element(template);
