@@ -246,6 +246,11 @@ export class App {
         var appCtrl = function($scope, $location, $element, $attrs, a, b, c, d, e) {
             console.log("running app module controller");
             app.scope = $scope;
+
+            if ($attrs.startPage) {
+                app.startPageFromHtml = $attrs.startPage;
+            }
+
             $scope.app = app;
             $scope.allRoutes = app.allRoutes;
             $scope.route = null;
