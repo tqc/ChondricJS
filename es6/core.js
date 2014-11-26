@@ -242,10 +242,11 @@ export class App {
     initController() {
         console.log("initController");
         var app = this;
-        var inj = ["$scope", "$location", "$element", "$attrs"].concat(this.additionalInjections);
-        var appCtrl = function($scope, $location, $element, $attrs, a, b, c, d, e) {
+        var inj = ["$scope", "$location", "$element", "$attrs", "$rootScope"].concat(this.additionalInjections);
+        var appCtrl = function($scope, $location, $element, $attrs, $rootScope, a, b, c, d, e) {
             console.log("running app module controller");
             app.scope = $scope;
+            app.rootScope = $rootScope;
 
             if ($attrs.startPage) {
                 app.startPageFromHtml = $attrs.startPage;
@@ -457,14 +458,7 @@ export class App {
     start() {
         var app = this;
         this.initController();
-
-        app.module.run(["$rootScope", "$compile", "$controller",
-            function($rootScope) {
-                app.rootScope = $rootScope;
-                //app.init();
-            }
-        ]);
-
+        // TODO: wait for cordova before bootstrap if necessary
         angular.element(document).ready(function() {
             angular.bootstrap(document, [app.moduleName]);
         });
