@@ -19,9 +19,12 @@ export class App {
         this.module = angular.module(this.moduleName, []);
 
         this.module.directive('ngTap', require("./directives/ng-tap.js").ngTap);
+        this.module.directive('ngStylePrefixer', require("./directives/ng-style-prefixer.js").default);
 
         this.module.directive('cjsSharedComponent', require("./directives/cjs-shared-component.js").cjsSharedComponent);
         this.module.directive('chondricViewport', require("./directives/chondric-viewport.js").chondricViewport);
+
+
         this.module.factory('sharedUi', require("./sharedui/shareduiprovider.js").default);
         this.module.factory('loadStatus', require("./loadstatus/loadstatusprovider.js").default);
 
@@ -31,6 +34,8 @@ export class App {
         // this.sharedUiComponents.popup = new require("./sharedui/popup.js").SharedPopup();
 
         this.allRoutes = {};
+
+        this.noop = function() {};
     }
 
     registerPage(pageclass, route, options) {
@@ -50,8 +55,10 @@ export class App {
     registerSharedUiComponent(pageclass) {
         if (pageclass["default"]) pageclass = pageclass["default"];
         console.log("Registering shared UI component " + pageclass.name);
+        var component = new pageclass();
+        component.app = this;
 
-        this.sharedUiComponents[pageclass.componentName || pageclass.name] = new pageclass();
+        this.sharedUiComponents[pageclass.componentName || pageclass.name] = component;
     }
 
 
@@ -106,8 +113,7 @@ export class App {
 
             var page = openViews[ar];
             if (!page) {
-                openViews[ar] = page = new template.pageclass(params, template.options);
-                page.route = ar;
+                openViews[ar] = page = new template.pageclass(ar, params, template.options);
             }
             if (page.subsections) openViews = page.subsections;
             if (position) page.position = position;
@@ -311,7 +317,7 @@ export class App {
 
                 var component = app.sharedUiComponents[componentId];
 
-                if (component.getSwipeNav) app.updateSwipeNav(routeScope, component.getSwipeNav(component, cs.active, cs.available));
+                //if (component.getSwipeNav) app.updateSwipeNav(routeScope, component.getSwipeNav(component, cs.active, cs.available));
 
                 if ($scope.route == routeScope.rk) {
                     component.setState(component, routeScope.rk, cs.active, cs.available, cs.data);
@@ -330,7 +336,9 @@ export class App {
 
 
 
-            $scope.changePage = app.changePage;
+            $scope.changePage = function(a,b,c) {
+                app.changePage(a,b,c);
+                };
 
             function viewCleanup(viewCollection, preservedRoutes) {
                 for (var k in viewCollection) {

@@ -1,0 +1,5 @@
+<div cjs-popup="componentDefinition.popuptrigger" ng-class="{nativetransition: componentDefinition.nativeTransition}">
+<div ng-if="componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl" ng-include="componentDefinition.data.templateUrl || componentDefinition.contentTemplateUrl"></div>
+<div ng-if="componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate" cjs-json-template="componentDefinition.data.jsonTemplate || componentDefinition.contentJsonTemplate" data="componentDefinition.data"></div>
+
+</div>

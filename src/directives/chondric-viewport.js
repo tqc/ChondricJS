@@ -24,7 +24,7 @@ Chondric.directive('chondricViewport', function($compile) {
                 //                template = "<div class=\"chondric-viewport\">"
                 template = "<div ng-repeat=\"rv in openViewArray track by rv.route\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute}\" cjs-transition-style route=\"{{rv.route}}\">";
                 template += "</div>";
-                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents track by ck\" cjs-shared-component testattr='{{componentId}}'>";
+                template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents track by ck\" cjs-shared-component>";
                 template += "</div>";
 
                 //                template += "</div>"
