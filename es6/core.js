@@ -33,16 +33,18 @@ export class App {
         this.allRoutes = {};
     }
 
-    registerPage(pageclass) {
+    registerPage(pageclass, route, options) {
         if (pageclass["default"]) pageclass = pageclass["default"];
-        console.log("Registering page " + pageclass.name + " on route " + pageclass.routeTemplate);
-        this.allRoutes[pageclass.routeTemplate] = pageclass;
+        route = route || pageclass.routeTemplate;
+        console.log("Registering page " + pageclass.name + " on route " + route);
+        this.allRoutes[route] = {
+            pageclass: pageclass,
+            options: options || {}
+        };
     }
 
-    registerSection(pageclass) {
-        if (pageclass["default"]) pageclass = pageclass["default"];
-        console.log("Registering section " + pageclass.name + " on route " + pageclass.routeTemplate);
-        this.allRoutes[pageclass.routeTemplate] = pageclass;
+    registerSection(pageclass, route, options) {
+        this.registerPage(pageclass, route, options);
     }
 
     registerSharedUiComponent(pageclass) {
@@ -101,22 +103,15 @@ export class App {
                 if (mrp[j][0] == "$" && parts[j]) params[mrp[j].substr(1)] = decodeURIComponent(parts[j]);
                 if (parts[j]) ar += "/" + parts[j];
             }
-            if (template.isSection) {
-                var section = openViews[ar];
-                if (!section) {
-                    openViews[ar] = section = new template(params);
-                    section.route = ar;
-                }
-                openViews = section.subsections;
-            } else {
-                var page = openViews[ar];
-                if (!page) {
-                    page = openViews[ar] =
-                        new template(params);
-                    page.route = ar;
-                }
-                if (position) page.position = position;
+
+            var page = openViews[ar];
+            if (!page) {
+                openViews[ar] = page = new template.pageclass(params, template.options);
+                page.route = ar;
             }
+            if (page.subsections) openViews = page.subsections;
+            if (position) page.position = position;
+
             app.updateOpenViewArray($scope.openViews, $scope.openViewArray);
 
         }
