@@ -7,7 +7,7 @@ export function cjsSharedComponent($compile) {
             if (cd.isNative && cd.isNative()) return;
             element.addClass("sharedcomponent-" + cd.id);
             var template = "";
-            template += "<div ng-if='!componentDefinition.isNative()' ng-controller=\"componentDefinition.controller\" >";
+            template += "<div ng-controller=\"componentDefinition.controller\" >";
             if (cd.template) {
                 template += cd.template;
             } else if (cd.templateUrl) {

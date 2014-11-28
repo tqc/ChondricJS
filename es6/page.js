@@ -3,6 +3,12 @@ export class Page {
     	options = options || {
     		sharedUi: {}
     	};
+        if (!route) {
+            throw new Error("Error creating page - route missing");
+        }
+        if (!params) {
+            throw new Error("Error creating page - params missing");
+        }
         this.route = route;
         this.params = params;
         this.options = options;
