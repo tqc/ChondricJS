@@ -13,6 +13,7 @@ export {
 
 export class App {
     constructor(options) {
+        this.options = options;
         this.title = options.title;
         this.moduleName = options.moduleName || "chondric";
 
@@ -336,9 +337,19 @@ export class App {
 
 
 
-            $scope.changePage = function(a,b,c) {
-                app.changePage(a,b,c);
-                };
+            $scope.changePage = function(a, b, c) {
+                app.changePage(a, b, c);
+            };
+
+            $rootScope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
+                if (!oldUrl || !newUrl || oldUrl == newUrl) return;
+                var ind = newUrl.indexOf("#");
+                if (ind < 0) return;
+                var hash = newUrl.substr(ind+1);
+                if (hash.indexOf("access_token=") >= 0) return;
+                if (hash == $scope.route) return;
+                app.changePage(hash);
+            });
 
             function viewCleanup(viewCollection, preservedRoutes) {
                 for (var k in viewCollection) {
@@ -457,6 +468,31 @@ export class App {
     }
     appCtrl($scope, $http) {
         console.log("App controller on core");
+    }
+    getStartPage(route) {
+        // start page may come from one of several places:
+        // parameter set by calling customInit function
+        // hash from url - optional. App may disable this if pages have to be accessed in a particular order.
+        // attribute set in calling html
+        // default from this.defaultStartPage
+
+        if (route) return route;
+        if (this.options.useLocationHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
+            var parts = location.hash.substr(2).split("/");
+            for (var i = 0; i < parts.length; i++) {
+                parts[i] = decodeURIComponent(parts[i]);
+            }
+            return parts;
+        }
+        if (this.startPageFromHtml) return this.startPageFromHtml;
+        if (this.options.defaultStartPage) return this.defaultStartPage;
+        return "/start";
+    }
+    loadStartPage(route) {
+        route = this.getStartPage(route);
+
+        this.changePage(route);
+
     }
     start() {
         var app = this;
