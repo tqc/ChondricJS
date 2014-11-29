@@ -2,7 +2,7 @@ body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.4em;
     background-color:#efeff4;
     margin: 0;
     -webkit-tap-highlight-color:transparent;
@@ -39,7 +39,11 @@ body {
     left:0;
     bottom:0;
     right: 0;
-    overflow: hidden;
+    overflow: hidden; 
+    .body {
+        padding-top: 45px;
+        padding-bottom: 80px;
+    }
 }
 
 .cjs-scrolling-window .chondric-page {
@@ -195,7 +199,7 @@ body.debugmode::after {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
     color: #000;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.4em;
 }
 /* buttons */
  button {
@@ -610,10 +614,10 @@ min-height: 0;
 /* Content Styles */
  .body {
 }
-.body p {
+p {
     margin: 10px 15px;
 }
-.body h2 {
+h2 {
     white-space: nowrap;
     text-overflow: ellipsis;
     font-size: 14px;

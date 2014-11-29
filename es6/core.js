@@ -58,8 +58,8 @@ export class App {
         console.log("Registering shared UI component " + pageclass.name);
         var component = new pageclass();
         component.app = this;
-
-        this.sharedUiComponents[pageclass.componentName || pageclass.name] = component;
+        component.componentId = component.componentId || component.componentName || pageclass.componentName || pageclass.name;
+        this.sharedUiComponents[component.componentId] = component;
     }
 
 
@@ -235,6 +235,7 @@ export class App {
                 $scope.transition.progress = 1;
                 $scope.$apply();
             }, 100);
+
         }
     }
 
@@ -345,7 +346,7 @@ export class App {
                 if (!oldUrl || !newUrl || oldUrl == newUrl) return;
                 var ind = newUrl.indexOf("#");
                 if (ind < 0) return;
-                var hash = newUrl.substr(ind+1);
+                var hash = newUrl.substr(ind + 1);
                 if (hash.indexOf("access_token=") >= 0) return;
                 if (hash == $scope.route) return;
                 app.changePage(hash);
@@ -408,7 +409,7 @@ export class App {
                     } else {
                         if (progress > 0.5) {
                             component.setState(component, toState.route, toState.active, toState.available, toState.data);
-                        } else {
+                        } else if (fromState.route) {
                             component.setState(component, fromState.route, fromState.active, fromState.available, fromState.data);
                         }
                     }
