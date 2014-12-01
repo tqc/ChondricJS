@@ -12,6 +12,7 @@ export class Page {
         this.route = route;
         this.params = params;
         this.options = options;
+        this.isBlockPage = true;
 
         var page = this;
 

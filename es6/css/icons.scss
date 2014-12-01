@@ -1,0 +1,95 @@
+/* Icons */
+
+/*
+ * A button has class icon-top, icon-left, or icon-right to add an icon.
+ * An additional class, eg icon-default determines the actual icon used.
+ * Since ::before and ::after pseudo elements are used, an icon may need to be defined twice
+ */
+
+/* Left icon */
+ .icon-left::before {
+    content:"?";
+    display: inline-block;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: bottom;
+    margin-right: 5px;
+    line-height: 44px;
+    height: 100%;
+}
+/* Right icon */
+ .icon-right::after {
+    content:"?";
+    display: inline-block;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: bottom;
+    margin-left: 5px;
+    line-height: 44px;
+    height: 100%;
+}
+/* Top icon */
+ .icon-top::before {
+    content:"?";
+    background-position: center;
+    background-repeat: no-repeat;
+    display: block;
+    line-height: 40px;
+}
+
+.icon-custom::before {
+    display: none !important;
+}
+
+.icon-custom::after {
+    display: none !important;
+}
+
+ .maskedicon {
+    background-color: currentColor;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+ .icon-top.icon-custom .maskedicon {
+    display: block;
+    height: 40px;
+}
+
+ .icon-left.icon-custom .maskedicon {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+}
+
+ .icon-right.icon-custom .maskedicon {
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+}
+
+
+
+/* Standard icons */
+
+
+.icon-top.icon-default::before, .icon-left.icon-default::before, .icon-right.icon-default::after {
+    content:"\2610";
+    font-size: 200%
+}
+.icon-top.icon-leftarrow::before, .icon-left.icon-leftarrow::before, .icon-right.icon-leftarrow::after {
+    content:"";
+    width: 18px;
+    background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='0 0 90 120' xmlns='http://www.w3.org/2000/svg'><path d='m63.75 11.25 10 10-40 40 40 40-10 10-50-50z' fill='%23007aff'/></svg>");
+}
+.icon-top.icon-rightarrow::before, .icon-left.icon-rightarrow::before, .icon-right.icon-rightarrow::after {
+    content:"";
+    width: 18px;
+    background-image: url("data:image/svg+xml;charset=utf-8,<svg viewBox='0 0 90 120' xmlns='http://www.w3.org/2000/svg'><path d='m63.75 11.25 10 10-40 40 40 40-10 10-50-50z' fill='%23007aff'/></svg>");
+}
+

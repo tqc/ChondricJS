@@ -5,6 +5,7 @@ export class Section extends Page {
     	super(route, params, options);
         this.isSection = true;
         this.subsections = {};
+        this.isBlockPage = false;
 
         this.template = require("./section.html");
     }

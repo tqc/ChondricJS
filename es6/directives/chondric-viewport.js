@@ -22,7 +22,7 @@ export function chondricViewport($compile) {
                 // first level
                 element.addClass("chondric-viewport");
                 //                template = "<div class=\"chondric-viewport\">"
-                template = "<div ng-repeat=\"rv in openViewArray track by rv.route\" ng-if=\"route.indexOf(rv.route) == 0\" chondric-viewport=\"1\" class=\"{{rv.templateId}}\" ng-class=\"{'chondric-section': rv.isSection, 'chondric-page': !rv.isSection, active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute}\" cjs-transition-style route=\"{{rv.route}}\">";
+                template = "<div ng-repeat=\"rv in openViewArray track by rv.route\" ng-if=\"route.indexOf(rv.route) == 0\" chondric-viewport=\"1\" class=\"chondric-page {{rv.templateId}}\" ng-class=\"{active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute, block: rv.isBlockPage}\" cjs-transition-style route=\"{{rv.route}}\">";
                 template += "</div>";
                 template += "<div ng-repeat=\"(ck, componentDefinition) in sharedUiComponents track by ck\" cjs-shared-component testattr='{{componentDefinition.componentId}}'>";
                 template += "</div>";

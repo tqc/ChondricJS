@@ -1,0 +1,67 @@
+$viewportType: "fixed" !default;
+
+/*    
+    * native - everything static. popups are full screen with no animation or chrome - i.e. most options turned off
+    * expanding iframe - mostly static display, but viewport has absolute positioning and overflow hidden to prevent giant iframes on iOS. only valid for simple in-page apps. If new header works without position absolute, no need for complex page padding etc.
+    * expanding - all static.
+    * fixed - block pages get absolute positioning. 
+*/
+
+.chondric-viewport {
+    // default styling - don't need much, but make sure we have a stacking context and that anything animated from
+    // off screen won't trigger scrolling.
+    z-index: 1;
+    overflow:hidden;
+    @if $viewportType == "native" {
+        -webkit-user-select:none;
+    }
+    @if $viewportType == "fixed" {
+        position: absolute;
+        top:0;
+        left:0;
+        bottom:0;
+        right: 0;
+    }
+}
+
+@if $viewportType == "expanding" {
+    .chondric-viewport.embedded {
+     position: static;
+    }
+
+    .chondric-viewport.fullscreen {
+        position: absolute;
+        top:0;
+        left:0;
+        bottom:0;
+        right: 0;
+    }
+}
+
+@if $viewportType == "fixed" {
+    .chondric-page.block {
+        position: absolute;
+        top:0;
+        left:0;
+        bottom:0;
+        right: 0;       
+    }
+}
+
+
+/*
+.chondric-viewport {
+    position: relative !important;
+    overflow: visible !important;
+    padding-top: 47px;
+    padding-bottom: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
+ 
+    border: solid 2px #6B8C00;
+    border-radius: 15px ;
+    
+    background-color: #E7E7E7;
+}
+
+*/
