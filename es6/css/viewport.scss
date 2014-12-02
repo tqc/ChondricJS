@@ -1,4 +1,7 @@
 $viewportType: "fixed" !default;
+
+$pageMargins: () !default;
+
 /*    
     * native - everything static. popups are full screen with no animation or chrome - i.e. most options turned off
     * expanding iframe - mostly static display, but viewport has absolute positioning and overflow hidden to prevent giant iframes on iOS. only valid for simple in-page apps. If new header works without position absolute, no need for complex page padding etc.
@@ -11,10 +14,10 @@ $viewportType: "fixed" !default;
     // off screen won't trigger scrolling.
     z-index: 1;
     overflow: hidden;
-    @if $viewportType=="native" {
+    @if $viewportType == "native" {
         -webkit-user-select: none;
     }
-    @if $viewportType=="fixed" {
+    @if $viewportType == "fixed" {
         position: absolute;
         top: 0;
         left: 0;
@@ -22,7 +25,8 @@ $viewportType: "fixed" !default;
         right: 0;
     }
 }
-@if $viewportType=="expanding" {
+
+@if $viewportType == "expanding" {
     .chondric-viewport.embedded {
         position: static;
     }
@@ -40,29 +44,46 @@ $viewportType: "fixed" !default;
             right: 0;
             overflow: auto;
             -webkit-overflow-scrolling: touch;
-            > .page-content {
-
+            @each $sel, $val in $pageMargins {
+                &#{$sel} > .page-content {
+                    padding: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+                }
             }
         }
     }
 }
-@if $viewportType=="fixed" {
+
+@if $viewportType == "fixed" {
     .chondric-page.block {
         position: absolute;
         top: 0;
         left: 0;
         bottom: 0;
         right: 0;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        > .page-content {
+            box-sizing:border-box;
+            min-height: 100%;
+        }
+        @each $sel, $val in $pageMargins {
+            &#{$sel} > .page-content {
+                padding: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+            }
+        }
     }
 }
+
 .chondric-page {
     display: none;
 }
+
 .chondric-page.active {
     display: block;
     opacity: 1;
     z-index: 10;
 }
+
 /*
 .chondric-viewport {
     position: relative !important;

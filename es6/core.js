@@ -281,7 +281,7 @@ export class App {
             };
 
             $scope.getSharedUiComponentState = app.getSharedUiComponentState = function(routeScope, componentId) {
-                app.scopesForRoutes[routeScope.rk] = routeScope;
+                app.scopesForRoutes[routeScope.pageRoute] = routeScope;
 
                 var component = app.sharedUiComponents[componentId];
                 if (!component) {
@@ -290,9 +290,9 @@ export class App {
                     );
                 }
 
-                var csfr = app.componentStatesForRoutes[routeScope.rk] = app.componentStatesForRoutes[routeScope.rk] || {};
+                var csfr = app.componentStatesForRoutes[routeScope.pageRoute] = app.componentStatesForRoutes[routeScope.pageRoute] || {};
                 var cs = csfr[componentId] = csfr[componentId] || {
-                    route: routeScope.rk,
+                    route: routeScope.pageRoute,
                     active: false,
                     available: false,
                     data: {}
@@ -322,8 +322,8 @@ export class App {
 
                 //if (component.getSwipeNav) app.updateSwipeNav(routeScope, component.getSwipeNav(component, cs.active, cs.available));
 
-                if ($scope.route == routeScope.rk) {
-                    component.setState(component, routeScope.rk, cs.active, cs.available, cs.data);
+                if ($scope.route == routeScope.pageRoute) {
+                    component.setState(component, routeScope.pageRoute, cs.active, cs.available, cs.data);
                 }
 
             };

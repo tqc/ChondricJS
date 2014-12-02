@@ -4,6 +4,7 @@ export function chondricPage($compile) {
         controller: "page.pageCtrl",
         link: function(scope, element, attrs) {
 
+
             // clean up the generated html a little
             element.removeAttr("ng-repeat");
             element.removeAttr("chondric-page");
@@ -37,15 +38,9 @@ export function chondricPage($compile) {
             // custom nav components may need to be outside the scrolling area.
             if (isBlockPage) template= "<div class=\"page-content\">"+template+"</div>";
 
-            scope.usedComponents = {
-                asArray: [],
-                asString: ""
-            };
-
             element.html(template);
             $compile(element.contents())(scope);
 
-            page.params = page.params || {};
    
             element.attr("route", page.route);
 
@@ -61,12 +56,6 @@ export function chondricPage($compile) {
                     element.removeClass("active");                    
                 }
             });
-
-            // add route parameters directly to the scope
-            for (var k in page.params) {
-                scope[k] = page.params[k];
-            }
-            scope.pageRoute = page.route;
         }
     };
 }

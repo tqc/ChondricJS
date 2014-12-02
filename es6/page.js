@@ -46,6 +46,21 @@ export class Page {
 
             var xsharedUi = sharedUi.init($scope, options.sharedUi);
 
+            // add this here because the controller runs before the chondric-page directive
+            $scope.usedComponents = {
+                asArray: [],
+                asString: ""
+            };
+            page.params = page.params || {};
+
+            // add route parameters directly to the scope
+            for (var k in page.params) {
+                $scope[k] = page.params[k];
+            }
+            $scope.pageRoute = page.route;
+
+
+
             page.controller($scope, xsharedUi, xloadStatus);
 
             $scope.$watch("route", function(newVal, oldVal) {

@@ -9,18 +9,8 @@ export function chondricViewport($compile) {
 
 
             //            console.log("viewport directive");
-            var rv = scope.$eval("rv");
-            var rk;
-            if (rv) {
-                scope.rk = rk = rv.route;
-                scope.pageParams = rv.params || {};
-                // add route parameters directly to the scope
-                for (var k in rv.params) {
-                    scope[k] = rv.params[k];
-                }
-            }
-            if (rk) scope.pageRoute = rk;
             element.addClass("chondric-viewport");
+
 
 /*
             if (!rk && attrs["chondric-viewport"] == "1") return;

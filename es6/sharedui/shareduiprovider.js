@@ -5,7 +5,7 @@ export default function sharedUiFactory() {
         init: function($scope, componentAliases) {
             var service = {};
             var app = $scope.app;
-            service.route = $scope.rk;
+            service.route = $scope.page.route;
             $scope.sharedUi = service;
             service.addComponent = function(alias, componentKey) {
                 service[alias] = {
