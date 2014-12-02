@@ -1,1 +1,2 @@
-<div ng-repeat="rv in rv.subsectionArray | orderBy:'position' track by rv.route" ng-if="route.indexOf(rv.route) == 0" chondric-viewport="1" class="chondric-page {{rv.templateId}}" ng-class="{active: rv.route == route, next: rv.route == nextRoute, prev: rv.route == lastRoute, block: rv.isBlockPage}" cjs-transition-style position="{{rv.position}}" route="{{rv.route}}"></div>
+<div ng-repeat="page in page.subsections track by page.route" chondric-page>
+</div>

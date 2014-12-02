@@ -23,6 +23,7 @@ export class App {
         this.module.directive('ngStylePrefixer', require("./directives/ng-style-prefixer.js").default);
 
         this.module.directive('cjsSharedComponent', require("./directives/cjs-shared-component.js").cjsSharedComponent);
+        this.module.directive('chondricPage', require("./directives/chondric-page.js").chondricPage);
         this.module.directive('chondricViewport', require("./directives/chondric-viewport.js").chondricViewport);
 
 

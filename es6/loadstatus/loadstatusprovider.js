@@ -1,4 +1,4 @@
-export default function loadStatusFactory() {
+export default function loadStatusFactory($timeout) {
     // simple UI to track loading status
     return {
         init: function($scope, tasks) {
@@ -23,24 +23,32 @@ export default function loadStatusFactory() {
                     message: "Message Here...",
                     error: null,
                     start: function() {
-                        task.active = true;
-                        task.error = null;
-                        task.progressCurrent = 0;
+                        $timeout(function() {
+                            task.active = true;
+                            task.error = null;
+                            task.progressCurrent = 0;
+                        });
                     },
                     finish: function() {
-                        task.progressCurrent = task.progressTotal;
-                        task.completed = true;
-                        task.active = false;
+                        $timeout(function() {
+                            task.progressCurrent = task.progressTotal;
+                            task.completed = true;
+                            task.active = false;
+                        });
                     },
                     fail: function(message) {
-                        task.active = false;
-                        task.error = message;
+                        $timeout(function() {
+                            task.active = false;
+                            task.error = message;
+                        });
                     },
                     progress: function(progress, total, message) {
-                        task.active = true;
-                        task.progressCurrent = progress;
-                        if (total !== undefined) task.progressTotal = total;
-                        if (message !== undefined) task.message = message;
+                        $timeout(function() {
+                            task.active = true;
+                            task.progressCurrent = progress;
+                            if (total !== undefined) task.progressTotal = total;
+                            if (message !== undefined) task.message = message;
+                        });
                     }
                 };
                 $.extend(task, taskOptions);

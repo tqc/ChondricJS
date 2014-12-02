@@ -1,7 +1,13 @@
 export function chondricViewport($compile) {
     return {
         scope: true,
+        template: require("./chondric-viewport.html"),
         link: function(scope, element, attrs) {
+            // clean up the generated html a little
+            element.removeAttr("chondric-viewport");
+            element.removeAttr("data-chondric-viewport");
+
+
             //            console.log("viewport directive");
             var rv = scope.$eval("rv");
             var rk;
@@ -14,7 +20,9 @@ export function chondricViewport($compile) {
                 }
             }
             if (rk) scope.pageRoute = rk;
+            element.addClass("chondric-viewport");
 
+/*
             if (!rk && attrs["chondric-viewport"] == "1") return;
 
             var template = "";
@@ -45,6 +53,7 @@ export function chondricViewport($compile) {
             $compile(newElement)(scope);
             element.html("");
             element.append(newElement);
+            */
         }
     };
 }

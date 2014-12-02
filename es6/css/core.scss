@@ -10,14 +10,6 @@ body {
 
 
 
-.chondric-section {
-}
-
-
-.chondric-page {
-    // doesn't work right when a page might be a section - restore after fixing active detection
-    //display: none;
-}
 
 .cjs-scrolling-page .chondric-page {
     position: absolute;
@@ -35,12 +27,6 @@ body {
 .cjs-scrolling-window .chondric-page {
 }
 
-
-.chondric-page.active {
-    display: block;
-    opacity: 1;
-    z-index: 10;
-}
 
 .chondric-page.prev {
     pointer-events:none;

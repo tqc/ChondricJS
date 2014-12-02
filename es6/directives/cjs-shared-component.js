@@ -2,6 +2,10 @@ export function cjsSharedComponent($compile) {
     return {
         scope: true,
         link: function(scope, element) {
+            // clean up the generated html a little
+            element.removeAttr("ng-repeat");
+            element.removeAttr("cjs-shared-component");
+
             var cd = scope.componentDefinition;
             // no need to create html elements when using the native implementation
             if (cd.isNative && cd.isNative()) return;
