@@ -340,6 +340,8 @@ export class App {
 
 
             $scope.changePage = function(a, b, c) {
+                // because angular expressions can pass in lastTap but not lastTap.element in angular 1.3
+                if (c.element) c = c.element;
                 app.changePage(a, b, c);
             };
 
