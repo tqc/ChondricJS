@@ -149,19 +149,12 @@
         //                });
         //        }
 
-        function buildCss() {
-            var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
-
-            var iesrc = '$browserType: "ie";\n@import "' + cssEntryPoint + '";';
-
-            var ieCssFile = path.resolve(tempFolder, "index-ie.scss");
-            fs.writeFileSync(ieCssFile, iesrc);
-
+        function buildCssFile(inputFile, outputFile) {
 
             // using spawn because libsass sourcemaps are buggy
 
             var spawn = require("child_process").spawn;
-            var p = spawn(sassPath, ["--sourcemap", cssEntryPoint, varFolder + "/app.css"], {
+            var p = spawn(sassPath, ["--sourcemap", "-I", ".", inputFile, varFolder + "/"+outputFile], {
                 cwd: cwd
             });
             p.stdout.on('data', function(data) {
@@ -175,19 +168,18 @@
                 console.log("Done sass build with code " + code);
             });
 
-            p = spawn(sassPath, ["--sourcemap", ieCssFile, varFolder + "/app-ie.css"], {
-                cwd: cwd
-            });
-            p.stdout.on('data', function(data) {
-                console.log(""+data);
-            });
+        }
 
-            p.stderr.on('data', function(data) {
-                console.log(""+data);
-            });
-            p.on("close", function(code) {
-                console.log("Done sass build for IE with code " + code);
-            });
+        function buildCss() {
+            var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
+
+            var iesrc = '$browserType: "ie";\n@import "' + cssEntryPoint + '";';
+
+            var ieCssFile = path.resolve(tempFolder, "index-ie.scss");
+            fs.writeFileSync(ieCssFile, iesrc);
+
+            buildCssFile(cssEntryPoint, "app.css");
+            buildCssFile(ieCssFile, "app-ie.css");           
         }
 
         copyHtml();
