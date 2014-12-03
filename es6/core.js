@@ -38,6 +38,7 @@ export class App {
         this.allRoutes = {};
 
         this.noop = function() {};
+        this.hostSettings = require("build/hostsettings");
     }
 
     registerPage(pageclass, route, options) {

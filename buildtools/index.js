@@ -43,6 +43,8 @@
     tools.init = function(opt) {
         extend(options, opt);
         options.moduleMappings.chondric = path.resolve(__dirname, "../es6");
+
+
     };
 
     tools.test = function() {
@@ -50,6 +52,8 @@
     };
 
     tools.buildVariation = function(variation, env, watch) {
+
+
         var debugMode = true;
         console.log("building " + variation + " for " + env);
         var buildfolder = path.resolve(cwd, options.buildfolder);
@@ -60,7 +64,17 @@
         var varFolder = path.resolve(buildfolder, env, variation);
         if (!fs.existsSync(varFolder)) fs.mkdirSync(varFolder);
 
-        var moduleMappings = [];
+
+        var hostSettings = {};
+        extend(hostSettings, options.hostSettings);
+        extend(hostSettings, options[env]);
+        fs.writeFileSync(path.resolve(tempFolder, "hostsettings.js"), "module.exports="+JSON.stringify(hostSettings), "utf-8");
+
+        var moduleMappings = [{
+            src: 'hostsettings.js',
+            expose: 'build',
+            cwd: tempFolder
+        }];
         for (var k in options.moduleMappings) {
             moduleMappings.push({
                 src: './**/*.js',
