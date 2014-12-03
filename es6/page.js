@@ -38,7 +38,7 @@ export class Page {
 
 
 
-        page.pageCtrl = function($scope, sharedUi, loadStatus) {
+        page.pageCtrl = ["$scope","sharedUi", "loadStatus",  function($scope, sharedUi, loadStatus) {
             for (var k in params) {
                 $scope[k] = params[k];
             }
@@ -86,7 +86,7 @@ export class Page {
                     page.deactivationHandled = true;
                 }
             });
-        };
+        }];
     }
     controller($scope) {
         $scope.testValue1 = "Test value from base";

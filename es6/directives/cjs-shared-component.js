@@ -1,4 +1,4 @@
-export function cjsSharedComponent($compile) {
+export var cjsSharedComponent = ["$compile", function ($compile) {
     return {
         scope: true,
         link: function(scope, element) {
@@ -11,7 +11,7 @@ export function cjsSharedComponent($compile) {
             if (cd.isNative && cd.isNative()) return;
             element.addClass("sharedcomponent-" + cd.id);
             var template = "";
-            template += "<div ng-controller=\"componentDefinition.controller\" >";
+            template += "<div ng-controller=\"componentDefinition.ctrl\" >";
             if (cd.template) {
                 template += cd.template;
             } else if (cd.templateUrl) {
@@ -25,4 +25,4 @@ export function cjsSharedComponent($compile) {
             element.append(newElement);
         }
     };
-}
+}]

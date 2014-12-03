@@ -1,4 +1,4 @@
-var angular = require('angular');
+//var angular = require('angular');
 
 
 //import {ngTap} from "./directives/ng-tap.js";

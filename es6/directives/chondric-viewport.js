@@ -1,4 +1,4 @@
-export function chondricViewport($compile) {
+export var chondricViewport = ["$compile",function ($compile) {
     return {
         scope: true,
         template: require("./chondric-viewport.html"),
@@ -46,4 +46,4 @@ export function chondricViewport($compile) {
             */
         }
     };
-}
+}]

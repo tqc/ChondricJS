@@ -1,4 +1,4 @@
-export default function loadStatusFactory($timeout) {
+export default ["$timeout",function loadStatusFactory($timeout) {
     // simple UI to track loading status
     return {
         init: function($scope, tasks) {
@@ -126,4 +126,4 @@ export default function loadStatusFactory($timeout) {
             return service;
         }
     };
-}
+}];

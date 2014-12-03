@@ -1,4 +1,4 @@
-export function chondricPage($compile) {
+export var chondricPage = ["$compile",function ($compile) {
     return {
         scope: true,
         controller: "page.pageCtrl",
@@ -58,4 +58,4 @@ export function chondricPage($compile) {
             });
         }
     };
-}
+}]
