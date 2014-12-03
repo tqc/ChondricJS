@@ -33,7 +33,7 @@
         serverapp: {
 
         },
-        sourceFolder: "./clientapp",
+        sourceFolder: "./src",
         cssEntryPoint: "./css/index.scss",
         moduleMappings: {},
         customBrowserifyTransforms: [],
@@ -52,9 +52,8 @@
     };
 
     tools.buildVariation = function(variation, env, watch) {
-
-
         var debugMode = true;
+
         console.log("building " + variation + " for " + env);
         var buildfolder = path.resolve(cwd, options.buildfolder);
         var tempFolder = path.resolve(buildfolder, "temp");
@@ -68,7 +67,7 @@
         var hostSettings = {};
         extend(hostSettings, options.hostSettings);
         extend(hostSettings, options[env]);
-        fs.writeFileSync(path.resolve(tempFolder, "hostsettings.js"), "module.exports="+JSON.stringify(hostSettings), "utf-8");
+        fs.writeFileSync(path.resolve(tempFolder, "hostsettings.js"), "module.exports=" + JSON.stringify(hostSettings), "utf-8");
 
         var moduleMappings = [{
             src: 'hostsettings.js',
@@ -92,11 +91,11 @@
                     debug: debugMode
                 })
                 .add(es6ify.runtime)
-                .plugin(remapify, moduleMappings);
-            b.transform(stringify({
-                extensions: ['.txt', '.html'],
-                minify: true
-            }));
+                .plugin(remapify, moduleMappings)
+                .transform(stringify({
+                    extensions: ['.txt', '.html'],
+                    minify: true
+                }));
             for (var i = 0; i < options.customBrowserifyTransforms.length; i++) {
                 b = b.transform(options.customBrowserifyTransforms[i]());
             }
@@ -136,13 +135,19 @@
 
 
         function copyImages() {
-            gulp.src(__dirname + '/apphtml/images/**/*')
-                .pipe(gulp.dest(options.buildfolder + "/" + env + "/" + variation + "/images"))
-                .on("end", function() {
-                    gulp.src(process.cwd() + "/images/**/*")
-                        .pipe(gulp.dest(options.buildfolder + "/" + env + "/" + variation + "/images"));
-                });
+            gulp.src(sourceFolder + '/images/**/*')
+                .pipe(gulp.dest(varFolder + "/images"));
         }
+
+
+        //        function copyImages() {
+        //            gulp.src(__dirname + '/apphtml/images/**/*')
+        //                .pipe(gulp.dest(options.buildfolder + "/" + env + "/" + variation + "/images"))
+        //                .on("end", function() {
+        //                    gulp.src(process.cwd() + "/images/**/*")
+        //                        .pipe(gulp.dest(options.buildfolder + "/" + env + "/" + variation + "/images"));
+        //                });
+        //        }
 
         function buildCss() {
             var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
@@ -156,19 +161,33 @@
             // using spawn because libsass sourcemaps are buggy
 
             var spawn = require("child_process").spawn;
-            spawn(sassPath, ["--sourcemap", cssEntryPoint, varFolder + "/app.css"], {
-                    cwd: cwd
-                })
-                .on("close", function(code) {
-                    console.log("Done sass build with code " + code);
-                });
+            var p = spawn(sassPath, ["--sourcemap", cssEntryPoint, varFolder + "/app.css"], {
+                cwd: cwd
+            });
+            p.stdout.on('data', function(data) {
+                console.log(""+data);
+            });
 
-            spawn(sassPath, ["--sourcemap", ieCssFile, varFolder + "/app-ie.css"], {
-                    cwd: cwd
-                })
-                .on("close", function(code) {
-                    console.log("Done sass build for IE with code " + code);
-                });
+            p.stderr.on('data', function(data) {
+                console.log(""+data);
+            });
+            p.on("close", function(code) {
+                console.log("Done sass build with code " + code);
+            });
+
+            p = spawn(sassPath, ["--sourcemap", ieCssFile, varFolder + "/app-ie.css"], {
+                cwd: cwd
+            });
+            p.stdout.on('data', function(data) {
+                console.log(""+data);
+            });
+
+            p.stderr.on('data', function(data) {
+                console.log(""+data);
+            });
+            p.on("close", function(code) {
+                console.log("Done sass build for IE with code " + code);
+            });
         }
 
         copyHtml();

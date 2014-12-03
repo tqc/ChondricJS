@@ -16,14 +16,14 @@ $useFlexbox: true !global;
 $supportMobile: true !global;
 }
 
-@import "../../node_modules/bourbon/dist/_bourbon.scss";
+@import "../../bourbon/bourbon";
 
-@import "mixins.scss";
+@import "./mixins.scss";
 
-@import "viewport.scss";
+@import "./viewport.scss";
 
 
-@import "core.scss";
-@import "icons.scss";
-@import "loading-overlay.scss";
-@import "modals.scss";
+@import "./core.scss";
+@import "./icons.scss";
+@import "./loading-overlay.scss";
+@import "./modals.scss";
