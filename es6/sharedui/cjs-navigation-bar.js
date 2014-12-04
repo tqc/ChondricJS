@@ -9,7 +9,7 @@ export default class cjsNavigationBar extends MultistateComponent {
         return (window.NativeNav && true) || false;
     }
     updateTransitionSettings(self, thisState, otherState, position, isActivating) {
-         console.log("navbar updateTransitionSettings - " + position+ " - "+ isActivating);
+       //  console.log("navbar updateTransitionSettings - " + position+ " - "+ isActivating);
         //        console.log(thisState);
         // set fields for individual components
         // position will be 0 for active, -1 or +1 for inactive depending on transition direction

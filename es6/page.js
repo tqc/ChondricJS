@@ -64,7 +64,7 @@ export class Page {
             page.controller($scope, xsharedUi, xloadStatus);
 
             $scope.$watch("route", function(newVal, oldVal) {
-                console.log("Watch for " + $scope.pageRoute + " - Changed from " + oldVal + " to " + newVal);
+                //console.log("Watch for " + $scope.pageRoute + " - Changed from " + oldVal + " to " + newVal);
                 if (newVal == $scope.pageRoute) {
                     // activated
                     page.activated($scope);

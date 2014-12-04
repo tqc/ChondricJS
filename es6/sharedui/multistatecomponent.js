@@ -36,8 +36,8 @@ export class MultistateComponent extends SharedUiComponent {
         self.activeState = null;
     }
     setState(self, route, active, available, data, direction) {
-                console.log(self.componentId + ".setState(" + route + "," + active + "," + available + "," + data + "," + direction + ")");
-                console.log(data);
+               // console.log(self.componentId + ".setState(" + route + "," + active + "," + available + "," + data + "," + direction + ")");
+               // console.log(data);
 
         if (!data || !Object.keys(data).length) {
             //   console.log("navbar setState - no data");
@@ -74,6 +74,6 @@ export class MultistateComponent extends SharedUiComponent {
             self.updateTransitionSettings(self, otherState, state, direction > 0 ? 1 : -1, false);
             self.activeState = state;
         }
-        console.log(self.states);
+        //console.log(self.states);
     }
 }
