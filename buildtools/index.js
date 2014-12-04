@@ -24,6 +24,8 @@
     var source = require('vinyl-source-stream');
     var extend = require("extend");
 
+    var chokidar = require('chokidar');
+
     var tools = module.exports;
     var cwd = process.cwd();
 
@@ -37,6 +39,7 @@
         cssEntryPoint: "./css/index.scss",
         moduleMappings: {},
         customBrowserifyTransforms: [],
+        additionalWatchPaths: [],
         buildfolder: "./build",
     };
 
@@ -52,7 +55,9 @@
     };
 
     tools.buildVariation = function(variation, env, watch) {
-        var debugMode = true;
+        var debugMode = env != "prod"; //true;
+        if (options.debug !== undefined) debugMode = options.debug;
+        if (options[env] && options[env].debug !== undefined) debugMode = options[env].debug;
 
         console.log("building " + variation + " for " + env);
         var buildfolder = path.resolve(cwd, options.buildfolder);
@@ -150,11 +155,12 @@
         //        }
 
         function buildCssFile(inputFile, outputFile) {
-
+            var params = (debugMode ? ["--sourcemap", "--style", "nested"] : ["--style", "compressed"])
+            .concat(["-I", ".", inputFile, varFolder + "/"+outputFile]);
             // using spawn because libsass sourcemaps are buggy
 
             var spawn = require("child_process").spawn;
-            var p = spawn(sassPath, ["--sourcemap", "-I", ".", inputFile, varFolder + "/"+outputFile], {
+            var p = spawn(sassPath, params, {
                 cwd: cwd
             });
             p.stdout.on('data', function(data) {
@@ -189,29 +195,42 @@
 
         if (watch) {
 
-            gaze([
-                __dirname + '/clientapp/**/*.html',
-                __dirname + '/clientapp/**/*.js',
-                process.cwd() + '/src/**/*.js',
-                __dirname + "node_modules/chondric-tools/es6/**/*"
-            ], function(err, watcher) {
-                this.on('all', function(event, filepath) {
-                    buildClientJs();
-                });
+            var paths = [
+                path.resolve(__dirname, "../es6"),
+                sourceFolder
+            ]
+            .concat(options.additionalWatchPaths);
+
+            // watch the css folder if it isn't already watched as part of the source folder
+            var cssFolder = path.dirname(path.resolve(cwd, options.cssEntryPoint));
+            if (cssFolder.indexOf(sourceFolder) !== 0) paths.push(cssFolder);
+
+            var watcher = chokidar.watch(paths, {
+                ignored: /[\/\\]\./, 
+                persistent: true,
+                ignoreInitial: true
             });
 
-            gaze([
-                __dirname + 'clientapp/**/*.scss',
-                process.cwd() + '/css/**/*.scss',
-                __dirname + "node_modules/chondric-tools/src/css/**/*.scss"
-            ], function(err, watcher) {
-                this.on('all', function(event, filepath) {
+            watcher.on("all", function(type, file) {
+                console.log(type+" event for "+file);
+                var ext = path.extname(file);
+                if (ext == ".scss") {
+                    console.log("CSS needs rebuild");
                     buildCss();
-                });
+                }
+                else if (ext == ".js" || ext == ".html") {
+                    console.log("Browserify package needs rebuild");
+                    buildClientJs();
+                }
+                else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") {
+                    console.log("Todo: Image changed - should copy it to the build folder");
+                }
+            // if the changed file is .js or .html, need to run browserify
+            // copy html only copies a single file, so maybe just include that in the browserify process
+
+            // src/images just needs to be copied if anything changes, and it can't contain anything used by browserify
+
             });
-
-            //  gulp.watch('clientapp/*.html', [copyHtml]);
-
 
         }
     };
