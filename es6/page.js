@@ -13,6 +13,7 @@ export class Page {
         this.params = params;
         this.options = options;
         this.isBlockPage = true;
+        if (options.template) this.template = options.template;
 
         var page = this;
 
