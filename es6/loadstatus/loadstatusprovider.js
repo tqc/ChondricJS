@@ -20,17 +20,19 @@ export default ["$timeout",function loadStatusFactory($timeout) {
                     progressCurrent: 0,
                     progressTotal: 1,
                     active: false,
-                    message: "Message Here...",
+                    message: "",
                     error: null,
-                    start: function() {
+                    start: function(message) {
                         $timeout(function() {
+                            task.message = message || "";
                             task.active = true;
                             task.error = null;
                             task.progressCurrent = 0;
                         });
                     },
-                    finish: function() {
+                    finish: function(message) {
                         $timeout(function() {
+                            task.message = message || "";
                             task.progressCurrent = task.progressTotal;
                             task.completed = true;
                             task.active = false;

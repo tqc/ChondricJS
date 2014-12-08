@@ -1,95 +1,113 @@
+/* Viewport preload */
+
+.viewport-preload {
+    &:after {
+        content: "Loading...";
+        display: block;
+        margin-top: 130px;
+        text-align: center;
+        font-size: 20pt;
+        color: #666;
+        @include animation(fadeIn 0.5s ease-in-out infinite alternate);
+    }
+}
+
+@include keyframes(fadeIn) {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-loading {
+    position: relative;
+    text-align: center;
+    margin-bottom: 50px;
+    color: #666;
+    .progress {
+        margin: 70px auto 30px auto;
+    }
+    .title {
+        font-size: 20pt;
+    }
+    .message {
+
+    }
+
+}
+
+
 /* */
+
 .cjs-loading-overlay-container {
     position: relative;
 }
 /* Loading overlay */
- .cjs-loading-overlay {
+
+.cjs-loading-overlay {
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
     background-color: transparent;
-    pointer-events:none;
+    pointer-events: none;
     z-index: 1000;
     text-align: center;
     font-size: large;
 }
-
-
 .cjs-loading-overlay.ui-show {
     @include transition( z-index 0.5s ease, opacity 0.3s ease);
     z-index: 1000;
 }
-
 .cjs-loading-overlay.ui-hide {
     @include transition( z-index 0.5s ease, opacity 0.3s ease);
     z-index: -1;
 }
-
 .cjs-loaded {
     z-index: 1;
 }
-
 .cjs-loading-overlay-compact {
     text-align: left;
 }
-
 .cjs-loading-overlay .error {
-    color:red;
+    color: red;
 }
-
 .cjs-loading-overlay-full .error {
     margin-top: 270px;
 }
-
 .cjs-loading-overlay-compact .error {
-display: inline;
-text-align: left;
+    display: inline;
+    text-align: left;
 }
-
-
-.cjs-loading-overlay .message {
-
+.cjs-loading-overlay .message {} .cjs-loading-overlay-full .message {} .cjs-loading-overlay-compact .message {
+    display: inline;
+    text-align: left;
 }
-
-.cjs-loading-overlay-full .message {
-    
-}
-
-.cjs-loading-overlay-compact .message {
-display: inline;
-text-align: left;
-}
-
 .cjs-loading-overlay-compact .buttons {
-display: inline;
+    display: inline;
 }
-
 .cjs-loading-overlay button {
     margin-top: 30px;
     display: inline-block;
 }
-
 .cjs-loading-overlay-compact button {
     margin: 5px;
 }
-
-
 /* simple */
-
-
 /* css spinner from http://lea.verou.me/2013/11/cleanest-css-spinner-ever/ */
-
 /**
  * (C)Leanest CSS spinner ever
  */
+
 @include keyframes(spin) {
     to {
-       @include transform( rotate(1turn));
+        @include transform( rotate(1turn));
     }
 }
-.cjs-loading-overlay .progress {
+.progress {
     position: relative;
     display: block;
     width: 5em;
@@ -98,59 +116,59 @@ display: inline;
     text-indent: 999em;
     overflow: hidden;
     @include animation(spin 1s infinite steps(8));
-}
 
-.cjs-loading-overlay-full .progress {
+.cjs-loading-overlay-full & {
     margin: 100px auto 50px auto;
 }
-
-.cjs-loading-overlay-compact .progress {
-    display:inline-block;
+.cjs-loading-overlay-compact & {
+    display: inline-block;
     vertical-align: middle;
     margin: 5px;
 }
-
-.cjs-loading-overlay-simple .progress {
+.cjs-loading-overlay-simple & {
     margin: 100px auto 50px auto;
 }
 
 
-.cjs-loading-overlay .small.progress {
+
+&.small {
     font-size: 6px;
 }
-.cjs-loading-overlay .large.progress {
+&.large {
     font-size: 24px;
 }
-.cjs-loading-overlay .progress:before, 
-.cjs-loading-overlay .progress:after, 
-.cjs-loading-overlay .progress > div:before, 
-.cjs-loading-overlay .progress > div:after {
-    content:'';
+
+&:before, &:after, & > div:before, & > div:after {
+    content: '';
     position: absolute;
     top: 0;
     left: 2.25em;
     /* (container width - part width)/2  */
+    
     width: .5em;
     height: 1.5em;
     border-radius: .2em;
     background: #eee;
     box-shadow: 0 3.5em #eee;
     /* container height - part height */
-   @include transform-origin( 50% 2.5em);
+    
+    @include transform-origin( 50% 2.5em);
     /* container height / 2 */
 }
-.cjs-loading-overlay .progress:before {
+&:before {
     background: #555;
 }
-.cjs-loading-overlay .progress:after {
-   @include transform( rotate(-45deg));
+&:after {
+    @include transform( rotate(-45deg));
     background: #777;
 }
-.cjs-loading-overlay .progress > div:before {
-   @include transform( rotate(-90deg));
+& > div:before {
+    @include transform( rotate(-90deg));
     background: #999;
 }
-.cjs-loading-overlay .progress > div:after {
-   @include transform( rotate(-135deg));
+& > div:after {
+    @include transform( rotate(-135deg));
     background: #bbb;
+}
+
 }

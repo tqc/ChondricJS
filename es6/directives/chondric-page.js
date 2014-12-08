@@ -30,7 +30,26 @@ export var chondricPage = ["$compile",function ($compile) {
 
             var template = page.template || "<span>Template not set</span>";
 
-            if (page.requiredTask) template = "<div ng-if=\"!loadStatus."+page.requiredTask+".completed\">Required task: {{loadStatus."+page.requiredTask+"}}</div><div ng-if=\"loadStatus."+page.requiredTask+".completed\">"+template+"</div>";
+            if (page.requiredTask) {
+                template = "<div ng-if=\"!loadStatus."+page.requiredTask+".completed\" class=\"page-loading\">"+page.preloadContent+"</div><div ng-if=\"loadStatus."+page.requiredTask+".completed\">"+template+"</div>";
+
+                scope.$watch("loadStatus.allTasks", function(tasks) {
+                    if (!tasks) return; 
+                    scope.currentTask = null;
+                    for (var i = 0; i < tasks.length; i++) {
+                        var task = tasks[i];
+                        if (task.active || task.error) {
+                            scope.currentTask = task;
+                            break;
+                        }
+                        if (task.key == page.requiredTask) {
+                            scope.currentTask = task;
+                            break;
+                        }
+                    }
+                }, true);
+
+            }
 
             // the page-content element includes any necessary padding to avoid nav elements
             // set the background on page-content rather than chondric-page so that it scrolls.

@@ -15,6 +15,8 @@ export class Page {
         this.isBlockPage = true;
         if (options.template) this.template = options.template;
 
+        this.preloadContent = options.preloadContent || require("./preload.html");
+
         var page = this;
 
         for (var k in options.sharedUi) {

@@ -8,6 +8,8 @@ export var chondricViewport = ["$compile",function ($compile) {
             element.removeAttr("data-chondric-viewport");
 
 
+            element.removeClass("viewport-preload");
+
             //            console.log("viewport directive");
             element.addClass("chondric-viewport");
 
