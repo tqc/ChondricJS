@@ -81,6 +81,11 @@
         }];
         for (var k in options.moduleMappings) {
             moduleMappings.push({
+                src: './**/*.html',
+                expose: k,
+                cwd: options.moduleMappings[k],
+            });
+            moduleMappings.push({
                 src: './**/*.js',
                 expose: k,
                 cwd: options.moduleMappings[k],
@@ -93,7 +98,8 @@
 
         function buildClientJs() {
             var b = browserify({
-                    debug: debugMode
+                    debug: debugMode,
+                    extensions: [".txt", ".html"]
                 })
                 .add(es6ify.runtime)
                 .plugin(remapify, moduleMappings)
