@@ -51,74 +51,7 @@ input, textarea, [contenteditable=true] {
 .clear {
     clear: both;
 }
-.sidebar {
-    position: absolute;
-    width: 400px;
-    border: none;
-    background-color: black;
-    color: white;
-    height: 12px;
-    text-align: center;
-    font: 10px Helvetica;
-    font-weight: bold;
-}
-.sidebar.up {
-    top: 0px;
-    margin-left: 10px;
-}
-.sidebar.down {
-    bottom: 0px;
-    margin-left: 10px;
-}
-.sidebar.left {
-    left: 12px;
-   @include transform( rotate(90deg));
-   @include transform-origin( 0 0);
-}
-.sidebar.right {
-   @include transform( rotate(270deg));
-   @include transform-origin( 100% 0);
-}
-.sidebar .arrow {
-    display: block;
-    position: absolute;
-}
-.sidebar.up .arrow {
-   @include transform( rotate(270deg));
-    left: 5px;
-}
-.sidebar.down .arrow {
-   @include transform( rotate(90deg));
-    left: 5px;
-}
-.sidebar.left .arrow {
-   @include transform( rotate(90deg));
-    left: 5px;
-}
-.sidebar.right .arrow {
-   @include transform( rotate(90deg));
-    right: 5px;
-}
-.sidebar .pageName {
-}
-/*
-.hasupsidebar>.ui-header, .hasupsidebar>.ui-content {
-    margin-top:15px;
-}
-.hasdownsidebar>.ui-header, .hasdownsidebar>.ui-content {
-    margin-bottom:15px;
-}
-.hasleftsidebar>.ui-header, .hasleftsidebar>.ui-content {
-    margin-left:15px;
-}
-.hasrightsidebar>.ui-header, .hasrightsidebar>.ui-content {
-    margin-right:15px;
-}
 
-*/
- .scrollcontainer {
-    overflow: auto;
-}
 /* Debug Mode */
  .debugonly {
     display:none !important;
@@ -140,28 +73,7 @@ body.debugmode::after {
     font-weight: bold;
     z-index: 100;
 }
-/* loading overlay */
- .loadingOverlay {
-    display:none;
-    position:absolute;
-    left: 0;
-    right:0;
-    top:0;
-    bottom:0;
-    background-color: transparent;
-    text-align: center;
-    padding-top: 300px;
-}
-.page.loading .loadingOverlay {
-    display: block;
-}
-.loadingOverlay::before {
-    content:"Loading Page";
-}
-.loadingOverlay a {
-    display: block;
-    margin-top: 10px;
-}
+
 /* IOS 7 Default styles */
  body {
     font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
