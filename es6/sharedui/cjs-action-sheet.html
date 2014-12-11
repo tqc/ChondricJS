@@ -1,4 +1,4 @@
 <div cjs-popover="componentDefinition.popuptrigger">
-    <div class="poparrow"></div>
+    <div class="poparrow" ng-if="componentDefinition.active"></div>
     <button ng-repeat="b in componentDefinition.data.items" ng-tap="handleSharedPopupButtonClick(b)">{{b.title}}</button>
 </div>
