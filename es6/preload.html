@@ -4,7 +4,9 @@
     </div>
     <div class="title" ng-show="currentTask.title && !currentTask.error">{{currentTask.title}}</div>
     <div class="message" ng-show="!currentTask.error">{{currentTask.message || "Loading"}}</div>
-   <div class="error" ng-show="currentTask.error">{{currentTask.error}}</div>
+   <div class="error" ng-show="currentTask.error">
+    {{currentTask.error.message || currentTask.error}}
+   </div>
     <div class="buttons">
         <button ng-show="currentTask.retry && currentTask.error" ng-tap="currentTask.retry()">Retry</button>
         <button ng-show="currentTask.cancel" ng-tap="currentTask.cancel()">Cancel</button>
