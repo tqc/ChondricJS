@@ -16,6 +16,8 @@ $useFlexbox: true !global;
 $supportMobile: true !global;
 }
 
+$requireIos7: false !default;
+
 @import "../../bourbon/bourbon";
 
 @import "./mixins.scss";
@@ -23,6 +25,7 @@ $supportMobile: true !global;
 @import "./viewport.scss";
 
 
+@import "./ios7.scss";
 @import "./core.scss";
 @import "./icons.scss";
 @import "./loading-overlay.scss";

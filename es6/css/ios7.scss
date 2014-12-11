@@ -1,0 +1,222 @@
+@if $requireIos7 {
+
+
+/* IOS 7 Default styles */
+ body {
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    color: #000;
+    font-size: 14px;
+    line-height: 1.4em;
+}
+/* buttons */
+ button {
+    background-color: transparent;
+    border: 1px solid #007aff;
+    color: #007aff;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+    border-radius: 5px;
+    line-height: 2em;
+    padding: 0 10px;
+    height: 29px;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    margin: 10px;
+}
+button.fullwidth {
+    display: block;
+    width: 95%;
+}
+button.active {
+    background-color: rgba(0, 122, 255, .15);
+}
+
+button.selected {
+    color:white;
+    background-color: #007aff;
+}
+
+button:focus {
+    outline: none;
+}
+
+button.icon-only {
+    width: 27px;
+    overflow: hidden;
+    padding: 0 5px;
+}
+
+ .navbar {
+    position: absolute;
+    top:0;
+    left: 0;
+    right:0;
+    background-color: #f7f7f8;
+    background-color: rgba(248, 248, 248, 0.9);
+    height: 44px;
+    z-index: 10;
+    border-bottom: 1px solid #c4c4c4;
+    font-size: 17px;
+}
+
+
+/* Header */
+
+@media (min-width: 600px) {
+
+.hasstatusbar .popup .navbar {
+    padding-top:0px;
+}
+}
+
+.navbar>.v1,.navbar>.v2 {
+     position: absolute;
+    top:0;
+    left: 0;
+    right:0;
+    bottom: 0;
+}
+
+.hasstatusbar .navbar>.v1,.hasstatusbar .navbar>.v2 {
+    top:20px;
+}
+
+
+.navbar.nobg {
+    background-color: transparent;
+}
+.navbar button {
+    color: #007aff;
+    background: transparent;
+    border: none;
+    padding: 0 5px;
+    line-height: 44px;
+    height: 44px;
+    margin: 0 5px;
+    font-size: inherit;
+}
+.navbar button.active {
+    background: transparent;
+    opacity: 0.3;
+}
+.navbar button.left {
+    float:left;
+}
+.navbar button.right {
+    float:right;
+}
+.navbar h1 {
+    position: absolute;
+    bottom:0;
+    left: 33%;
+    right:33%;
+    margin: 0;
+    text-align: center;
+    font-size: 17px;
+    line-height: 44px;
+    font-weight: 500;
+    z-index: -1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+overflow: hidden;
+}
+
+.navbar input.h1 {
+position: absolute;
+top: 0;
+left: 33%;
+right: 33%;
+margin: 0;
+text-align: center;
+font-size: 17px;
+line-height: 44px;
+font-weight: 500;
+z-index: -1;
+text-overflow: ellipsis;
+width: 34%;
+padding: 0;
+border: none;
+outline: none;
+-webkit-appearance: none;
+background-color: transparent;
+}
+
+
+
+/* Menu bar */
+
+/* A bar with text buttons like the nav bar but that can appear anywhere */
+ .menubar button {
+    display: inline-block;
+    color: #007aff;
+    background: transparent;
+    border: none;
+    padding: 0 10px;
+    line-height: 44px;
+    height: 44px;
+    margin: 0;
+    font-size: inherit;
+}
+.menubar button.active {
+    background: transparent;
+    opacity: 0.3;
+}
+/* tabbar */
+ .tabbar {
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    text-align: center;
+    z-index: 10;
+    background-color: #f7f7f8;
+    background-color: rgba(248, 248, 248, 0.9);
+    border-top: 1px solid #c4c4c4;
+    padding-top: 10px;
+}
+
+ .cjs-scrolling-window .tabbar {
+position: fixed;
+ }
+
+ .cjs-scrolling-window.haskeyboard .tabbar {
+visibility: hidden;
+ }
+
+
+.tabbar button {
+    background: transparent;
+    border: none;
+    color: rgb(111, 111, 116);
+    height: auto;
+    display: inline-block;
+    padding: 0 15px;
+    margin: 0;
+}
+.tabbar button.active, .tabbar button.selected {
+    color: rgb(21, 125, 251);
+    text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+}
+/* vertical tab bar */
+ .tabbar.left {
+    top: 40px;
+    left:0;
+    right:auto;
+    bottom:0;
+    width:80px;
+    border-top: none;
+    border-right: 1px solid #c4c4c4;
+}
+.hasstatusbar .tabbar.left {
+    top:60px;
+}
+.tabbar.left button {
+    margin: 10px auto;
+}
+
+
+}
