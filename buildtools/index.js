@@ -54,7 +54,7 @@
         console.log("Test function");
     };
 
-    tools.buildVariation = function(variation, env, watch) {
+    tools.buildVariation = function(variation, env, watch, destFolder) {
         var debugMode = env != "prod"; //true;
         if (options.debug !== undefined) debugMode = options.debug;
         if (options[env] && options[env].debug !== undefined) debugMode = options[env].debug;
@@ -68,6 +68,7 @@
         var varFolder = path.resolve(buildfolder, env, variation);
         if (!fs.existsSync(varFolder)) fs.mkdirSync(varFolder);
 
+        if (destFolder) varFolder = path.resolve(cwd, destFolder);
 
         var hostSettings = {};
         extend(hostSettings, options.hostSettings);

@@ -125,7 +125,38 @@ export class App {
 
         }
     }
+    transitionComponents(fromRoute, toRoute, progress) {
+        if (!toRoute) return;
 
+        var fromStates = app.componentStatesForRoutes[fromRoute] || {};
+        var toStates = app.componentStatesForRoutes[toRoute] || {};
+
+        for (var k in app.sharedUiComponents) {
+            var component = app.sharedUiComponents[k];
+            var fromState = fromStates[k] || {
+                route: fromRoute,
+                active: false,
+                available: false,
+                data: {}
+            };
+            var toState = toStates[k] || {
+                route: toRoute,
+                active: false,
+                available: false,
+                data: {}
+            };
+            if (component.setStatePartial) {
+                component.setStatePartial(component, fromState, toState, progress);
+            } else {
+                if (progress > 0.5) {
+                    component.setState(component, toState.route, toState.active, toState.available, toState.data);
+                } else if (fromState.route) {
+                    component.setState(component, fromState.route, fromState.active, fromState.available, fromState.data);
+                }
+            }
+        }
+
+    }
     changePage(p, transition, originElement) {
         console.log("Changing page to " + p);
         var app = this;
@@ -169,7 +200,7 @@ export class App {
             window.setTimeout(function() {
                 $scope.route = r;
                 $scope.$apply();
-                transitionComponents(fromRoute, toRoute, 1);
+                app.transitionComponents(fromRoute, toRoute, 1);
                 $scope.$apply();
             }, 10);
 
@@ -203,7 +234,7 @@ export class App {
                     app.loadView(r);
                     $scope.route = r;
                     $scope.$apply();
-                    transitionComponents(fromRoute, toRoute, 1);
+                    app.transitionComponents(fromRoute, toRoute, 1);
                     $scope.$apply();
                     window.NativeNav.finishNativeTransition();
                     if (window.jstimer) window.jstimer.finish("transitioningTimeout3");
@@ -388,44 +419,13 @@ export class App {
 
             }
 
-            function transitionComponents(fromRoute, toRoute, progress) {
-                if (!toRoute) return;
 
-                var fromStates = app.componentStatesForRoutes[fromRoute] || {};
-                var toStates = app.componentStatesForRoutes[toRoute] || {};
-
-                for (var k in app.sharedUiComponents) {
-                    var component = app.sharedUiComponents[k];
-                    var fromState = fromStates[k] || {
-                        route: fromRoute,
-                        active: false,
-                        available: false,
-                        data: {}
-                    };
-                    var toState = toStates[k] || {
-                        route: toRoute,
-                        active: false,
-                        available: false,
-                        data: {}
-                    };
-                    if (component.setStatePartial) {
-                        component.setStatePartial(component, fromState, toState, progress);
-                    } else {
-                        if (progress > 0.5) {
-                            component.setState(component, toState.route, toState.active, toState.available, toState.data);
-                        } else if (fromState.route) {
-                            component.setState(component, fromState.route, fromState.active, fromState.available, fromState.data);
-                        }
-                    }
-                }
-
-            }
 
             $scope.$watch("transition", function(transition) {
                 if (!transition) return;
                 if (!transition.to) return;
 
-                transitionComponents(transition.from, transition.to, transition.progress);
+                app.transitionComponents(transition.from, transition.to, transition.progress);
 
 
             }, true);
@@ -469,6 +469,44 @@ export class App {
 
     init() {
         console.log("App Init");
+
+        var app = this;
+        if (window.NativeNav) {
+            app.transitionMode = "native";
+            window.NativeNav.handleAction = function(route, action) {
+                var routeScope = app.scopesForRoutes[route];
+                if (routeScope) {
+                    routeScope.$apply(action);
+                }
+            };
+            var gestureOpenedComponent = null;
+            window.NativeNav.updateViewWithComponent = function(componentId) {
+                // fill the frame with a side panel
+                console.log("NativeNav requested component " + componentId);
+                gestureOpenedComponent = app.sharedUiComponents[componentId];
+                if (gestureOpenedComponent.forceShow) gestureOpenedComponent.forceShow(gestureOpenedComponent);
+                window.NativeNav.setCloseModalCallback(gestureOpenedComponent.scope.hideModal);
+                app.scope.$apply();
+
+            };
+
+            window.NativeNav.updateViewWithRoute = function(newRoute) {
+                // move to the next route
+                console.log("NativeNav requested route " + newRoute);
+            };
+
+            window.NativeNav.cancelGesture = function() {
+                console.log("Gesture canceled");
+                if (gestureOpenedComponent) {
+                    if (gestureOpenedComponent.forceHide) gestureOpenedComponent.forceHide(gestureOpenedComponent);
+                    app.scope.$apply();
+                }
+            };
+
+
+        }
+
+
         this.customInit();
     }
     appCtrl($scope, $http) {
@@ -501,8 +539,11 @@ export class App {
     }
     start() {
         var app = this;
+
+
+
+
         this.initController();
-        // TODO: wait for cordova before bootstrap if necessary
         angular.element(document).ready(function() {
             angular.bootstrap(document, [app.moduleName]);
         });
