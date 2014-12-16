@@ -195,14 +195,16 @@ export class App {
         }
 
 
-        if (app.transitionMode == "none") {
+        if (app.transitionMode == "none" || transition == "none") {
             app.loadView(r);
-            window.setTimeout(function() {
+            app.$timeout(function() {
                 $scope.route = r;
-                $scope.$apply();
+                //$scope.$apply();
+                app.$timeout(function() {
                 app.transitionComponents(fromRoute, toRoute, 1);
-                $scope.$apply();
-            }, 10);
+               // $scope.$apply();
+            },0);
+                },0);
 
         } else if (app.transitionMode == "native") {
             // disable pointer events for 300ms to prevent ghost clicks.
@@ -278,11 +280,12 @@ export class App {
     initController() {
         console.log("initController");
         var app = this;
-        var inj = ["$scope", "$location", "$element", "$attrs", "$rootScope"].concat(this.additionalInjections);
-        var appCtrl = function($scope, $location, $element, $attrs, $rootScope, a, b, c, d, e) {
+        var inj = ["$scope", "$location", "$element", "$attrs", "$rootScope", "$timeout"].concat(this.additionalInjections);
+        var appCtrl = function($scope, $location, $element, $attrs, $rootScope, $timeout, a, b, c, d, e) {
             console.log("running app module controller");
             app.scope = $scope;
             app.rootScope = $rootScope;
+            app.$timeout = $timeout;
 
             if ($attrs.startPage) {
                 app.startPageFromHtml = $attrs.startPage;
@@ -534,7 +537,7 @@ export class App {
     loadStartPage(route) {
         route = this.getStartPage(route);
 
-        this.changePage(route);
+        this.changePage(route, "none");
 
     }
     start() {
