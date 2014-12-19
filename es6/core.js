@@ -24,7 +24,8 @@ export class App {
 
         this.module.directive('cjsSharedComponent', require("./directives/cjs-shared-component.js").cjsSharedComponent);
         this.module.directive('chondricPage', require("./directives/chondric-page.js").chondricPage);
-        this.module.directive('chondricViewport', require("./directives/chondric-viewport.js").chondricViewport);
+
+        this.registerOptionalDirective(require("./directives/chondric-viewport"));
 
 
         this.module.factory('sharedUi', require("./sharedui/shareduiprovider.js").default);
@@ -64,6 +65,14 @@ export class App {
         this.sharedUiComponents[component.componentId] = component;
     }
 
+    registerOptionalDirective(options) {
+        this.knownOptionalDirectives = this.knownOptionalDirectives || [];
+        if (options.default) options = options.default;
+        if (this.knownOptionalDirectives.indexOf(options.name) >= 0) return;
+        var arr = options.injections || [];
+        arr = arr.concat([options.fn]);
+        this.module.directive(options.name, arr);
+    }
 
     updateOpenViewArray(parentObject, parentArray) {
         parentArray.splice(0, parentArray.length);
