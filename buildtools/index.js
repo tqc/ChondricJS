@@ -179,7 +179,7 @@
                 console.log(""+data);
             });
             p.on("close", function(code) {
-                console.log("Done sass build with code " + code);
+                console.log("Done sass build of "+inputFile+" with code " + code);
             });
 
         }
@@ -187,7 +187,7 @@
         function buildCss() {
             var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
 
-            var iesrc = '$browserType: "ie";\n@import "' + cssEntryPoint + '";';
+            var iesrc = '$browserType: "ie";\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig,"/")) + '";';
 
             var ieCssFile = path.resolve(tempFolder, "index-ie.scss");
             fs.writeFileSync(ieCssFile, iesrc);
