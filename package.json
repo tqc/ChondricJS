@@ -15,7 +15,6 @@
     "autoprefixer": "~1.1.20140523",
     "body-parser": "^1.0.1",
     "browserify": "^6.3.3",
-    "browserify-shim": "^3.8.0",
     "chokidar": "^0.11.1",
     "cookie-parser": "^1.0.1",
     "es6ify": "^1.5.1",
@@ -48,7 +47,6 @@
   },
   "browserify": {
     "transform": [
-      "browserify-shim"
     ]
   },
   "browserify-shim": {
