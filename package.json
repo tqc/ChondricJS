@@ -14,7 +14,7 @@
     "authstarter": "*",
     "autoprefixer": "~1.1.20140523",
     "body-parser": "^1.0.1",
-    "browserify": "^6.3.3",
+    "browserify": "=6.3.3",
     "chokidar": "^0.11.1",
     "cookie-parser": "^1.0.1",
     "es6ify": "^1.5.1",
@@ -27,7 +27,7 @@
     "minifyify": "^4.4.0",
     "mkdirp": "*",
     "node-sass": "~0.9.3",
-    "remapify": "^1.3.0",
+    "remapify": "=1.3.0",
     "serve-static": "^1.0.4",
     "stringify": "^3.0.0",
     "uglify": "^0.1.0",
@@ -48,9 +48,6 @@
   "browserify": {
     "transform": [
     ]
-  },
-  "browserify-shim": {
-    "angular": "global:angular"
   },
   "optionalDependencies": {},
   "license": "MIT",
