@@ -11,7 +11,7 @@ export default class cjsLeftPanel extends cjsRightPanel {
     }
     controller($scope) {
         var self = $scope.componentDefinition;
-        super($scope);
+        super.controller($scope);
 
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];

@@ -131,7 +131,7 @@
                     if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
                 });
             if (debugMode) {
-                b = b.pipe(exorcist(path.resolve(varFolder, "app.js.map")));
+                //b = b.pipe(exorcist(path.resolve(varFolder, "app.js.map")));
                 b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")));
             } else {
                 b.pipe(source('app.js')) // gives streaming vinyl file object

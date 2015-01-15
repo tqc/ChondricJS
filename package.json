@@ -17,7 +17,7 @@
     "browserify": "=6.3.3",
     "chokidar": "^0.11.1",
     "cookie-parser": "^1.0.1",
-    "es6ify": "^1.5.1",
+    "es6ify": "^1.6.0",
     "exorcist": "^0.1.6",
     "express": "^4.0.0",
     "express-session": "^1.0.2",
@@ -46,8 +46,7 @@
     "grunt-contrib-uglify": "~0.4.0"
   },
   "browserify": {
-    "transform": [
-    ]
+    "transform": []
   },
   "optionalDependencies": {},
   "license": "MIT",

@@ -37,7 +37,7 @@ export default class cjsNavigationBar extends MultistateComponent {
         }
     }
     controller($scope) {
-    	super($scope);
+    	super.controller($scope);
         var self = $scope.componentDefinition;
         self.scope = $scope;
         $scope.globalHeaderOptions = self.globalHeaderOptions = {};
