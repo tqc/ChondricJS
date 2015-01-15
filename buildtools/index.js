@@ -123,7 +123,7 @@
                 .on('error', function(err) {
                     console.log("Browserify error");
                     console.log(err.message);
-                    console.log(err);
+//                    console.log(err);
                     this.end();
                 })
                 .on("end", function() {
