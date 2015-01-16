@@ -16,7 +16,7 @@ $useFlexbox: true !global;
 $supportMobile: true !global;
 }
 
-@import "../../node_modules/bourbon/dist/_bourbon.scss";
+@import "../../bourbon/_bourbon.scss";
 
 @import "mixins.scss";
 
