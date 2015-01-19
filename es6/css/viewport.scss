@@ -100,3 +100,24 @@ $pageMargins: () !default;
 }
 
 */
+
+
+.chondric-page.popup-page {
+ position: absolute;
+    background-color: #fff;
+    width: 630px;
+    height: 630px;
+    left: 50%;
+    top: 50%;
+    margin-left: -315px;
+    margin-top: -315px;
+    z-index: 1100;
+    
+}
+
+.chondric-page.active-popup {
+    display: block;
+    opacity: 1;
+    z-index: 100;
+}
+

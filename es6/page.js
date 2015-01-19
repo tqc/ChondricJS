@@ -41,7 +41,7 @@ export class Page {
 
 
 
-        page.pageCtrl = ["$scope","sharedUi", "loadStatus",  function($scope, sharedUi, loadStatus) {
+        page.pageCtrl = ["$scope", "sharedUi", "loadStatus", function($scope, sharedUi, loadStatus) {
             for (var k in params) {
                 $scope[k] = params[k];
             }
@@ -68,11 +68,14 @@ export class Page {
 
             $scope.$watch("route", function(newVal, oldVal) {
                 //console.log("Watch for " + $scope.pageRoute + " - Changed from " + oldVal + " to " + newVal);
-                if (newVal == $scope.pageRoute) {
+                var newRoutes = (newVal || "").split(";");
+                var oldRoutes = (oldVal || "").split(";");
+
+                if (newRoutes.indexOf($scope.pageRoute) >= 0 && oldRoutes.indexOf($scope.pageRoute) < 0) {
                     // activated
                     page.activated($scope);
                     page.deactivationHandled = false;
-                } else if (oldVal == $scope.pageRoute) {
+                } else if (newRoutes.indexOf($scope.pageRoute) < 0 && oldRoutes.indexOf($scope.pageRoute) >= 0) {
                     // deactivated
                     if (!page.deactivationHandled) {
                         page.deactivated($scope);

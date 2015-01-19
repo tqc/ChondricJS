@@ -166,27 +166,96 @@ export class App {
         }
 
     }
+    pushPopup(p) {
+        if (!p) return;
+        var r;
+        if (p instanceof Array) {
+            r = "";
+            for (let i = 0; i < p.length; i++) {
+                r += "/" + p[i];
+            }
+        }
+        else {
+            r = p;
+        }
+
+        this.changePage(this.scope.route+";"+r);
+    }
+    closePopup() {
+        let ss = this.scope.route.split(";");
+        this.changePageInternal(ss[0], ss[0], []);
+    }
+    popPopup() {
+        // todo: remove last item from route
+    }
     changePage(p, transition, originElement) {
         console.log("Changing page to " + p);
         var app = this;
         var $scope = this.scope;
         var r;
+        var lastRoute, mainRoute, lastPopup, currentPopup;
+        var popups = [];
+
         if (p instanceof Array) {
-            r = "";
-            for (var i = 0; i < p.length; i++) {
-                r += "/" + p[i];
+            if (p[0] instanceof Array) {
+                // parameter is [["main"], ["popup"]]
+                mainRoute = "";
+                for (let i = 0; i < p[0].length; i++) {
+                    mainRoute += "/" + p[0][i];
+                }
+                for (let j = 1; j < p.length; j++) {
+                    popups[j] = "";
+                    for (let i = 0; i < p[j].length; i++) {
+                        popups[j - 1] += "/" + p[j][i];
+                    }
+                }
+            } else if (p[0].indexOf("/") === 0) {
+                // parameter is ["/main", "/popup"]
+                mainRoute = p[0];
+                for (let j = 1; j < p.length; j++) {
+                    if (p[j]) popups[j - 1] = p[j];
+                }
+            } else {
+                // old syntax - single route with array of path components
+                mainRoute = "";
+                for (let i = 0; i < p.length; i++) {
+                    mainRoute += "/" + p[i];
+                }
             }
         } else {
-            r = p;
+            // parameter is /main;/popup
+            let ss = p.split(';');
+            mainRoute = ss[0];
+            for (let j = 1; j < ss.length; j++) {
+                if (ss[j]) popups[j - 1] = ss[j];
+            }
         }
-        if (!r || r.indexOf("/") < 0) {
-            throw new Error("changePage syntax has changed - the first parameter is a route url or an array of route url segments instead of an id");
-        }
-        if ($scope.route == r) return;
-        if ($scope.lastRoute == r) $scope.lastRoute = null;
 
-        var fromRoute = $scope.route;
-        var toRoute = r;
+        if ($scope.route) {
+            let ss = $scope.route.split(";");
+            lastRoute = ss[0];
+        }
+
+        this.changePageInternal(lastRoute, mainRoute, popups, transition, originElement);
+
+    }
+
+    changePageInternal(lastPageRoute, currentPageRoute, popups, transition, originElement) {
+        console.log("changePageInternal");
+        console.log(popups);
+        console.log(currentPageRoute);
+        var fullRoute = currentPageRoute + ";" + popups.join(";");
+        //        if ($scope.route == r) return;
+        //        if ($scope.lastRoute == r) $scope.lastRoute = null;
+
+        var app = this;
+        var $scope = this.scope;
+        var r = currentPageRoute;
+
+        var fromRoute = lastPageRoute;
+        var toRoute = currentPageRoute;
+
+
         var fromRect = null;
 
         if (fromRoute) {
@@ -206,14 +275,16 @@ export class App {
 
         if (app.transitionMode == "none" || transition == "none") {
             app.loadView(r);
+            if (popups[popups.length - 1]) app.loadView(popups[popups.length - 1]);
             app.$timeout(function() {
-                $scope.route = r;
+                $scope.route = fullRoute;
+                $scope.activePopups = popups;
                 //$scope.$apply();
                 app.$timeout(function() {
-                app.transitionComponents(fromRoute, toRoute, 1);
-               // $scope.$apply();
-            },0);
-                },0);
+                    app.transitionComponents(fromRoute, toRoute, 1);
+                    // $scope.$apply();
+                }, 0);
+            }, 0);
 
         } else if (app.transitionMode == "native") {
             // disable pointer events for 300ms to prevent ghost clicks.
@@ -243,7 +314,10 @@ export class App {
                     if (window.jstimer) window.jstimer.finish("transitioningTimeout2");
                     if (window.jstimer) window.jstimer.start("transitioningTimeout3");
                     app.loadView(r);
-                    $scope.route = r;
+                    if (popups[popups.length - 1]) app.loadView(popups[popups.length - 1]);
+                    $scope.route = fullRoute;
+                    $scope.activePopups = popups;
+
                     $scope.$apply();
                     app.transitionComponents(fromRoute, toRoute, 1);
                     $scope.$apply();
@@ -257,6 +331,7 @@ export class App {
             $scope.transition.type = transition || "crossfade";
             $scope.noTransition = true;
             app.loadView(r);
+            if (popups[popups.length - 1]) app.loadView(popups[popups.length - 1]);
             $scope.nextRoute = r;
             $scope.transition.progress = 0;
             $scope.transition.from = $scope.route;
@@ -275,7 +350,8 @@ export class App {
             };
             window.setTimeout(function() {
                 $scope.noTransition = false;
-                $scope.route = r;
+                $scope.route = fullRoute;
+                $scope.activePopups = popups;
                 $scope.transition.progress = 1;
                 $scope.$apply();
             }, 100);
@@ -389,6 +465,19 @@ export class App {
                 app.changePage(a, b, c);
             };
 
+            $scope.pushPopup = function(a, b, c) {
+                app.pushPopup(a, b, c);
+            };
+
+            $scope.closePopup = function(a, b, c) {
+                app.closePopup(a, b, c);
+            };
+
+            $scope.popPopup = function(a, b, c) {
+                app.popPopup(a, b, c);
+            };
+
+
             $rootScope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
                 if (!oldUrl || !newUrl || oldUrl == newUrl) return;
                 var ind = newUrl.indexOf("#");
@@ -444,6 +533,7 @@ export class App {
 
 
             $scope.$watch("route", function(url, oldVal) {
+                console.log("route watch: " + oldVal + " -> " + url);
                 if (!url) return;
                 if (document.activeElement && app.transitionMode != "native" && document.activeElement.tagName != "BODY") {
                     if ($(document.activeElement).closest(".body").length > 0) {
@@ -455,7 +545,7 @@ export class App {
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();
                 app.loadView(url);
-                viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute].concat(app.preloadedRoutes || []));
+                viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute].concat($scope.activePopups).concat(app.preloadedRoutes || []));
                 if (window.NativeNav) {
                     window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
                 }
@@ -533,7 +623,8 @@ export class App {
 
         if (route) return route;
         if (this.options.useLocationHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
-            var parts = location.hash.substr(2).split("/");
+            var allpaths = location.hash.substr(2).split(";");
+            var parts = allpaths[0].split("/");
             for (var i = 0; i < parts.length; i++) {
                 parts[i] = decodeURIComponent(parts[i]);
             }
