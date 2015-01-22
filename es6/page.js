@@ -68,6 +68,13 @@ export class Page {
 
             $scope.$watch("route", function(newVal, oldVal) {
                 //console.log("Watch for " + $scope.pageRoute + " - Changed from " + oldVal + " to " + newVal);
+
+                if (newVal == oldVal) {
+                    // this can only happen when the watch is first created - i.e. activating the page triggered
+                    // page creation and loading this controller.
+                    oldVal = null;
+                }
+
                 var newRoutes = (newVal || "").split(";");
                 var oldRoutes = (oldVal || "").split(";");
 
