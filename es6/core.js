@@ -544,7 +544,7 @@ export class App {
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();
-                app.loadView(url);
+                app.loadView(url.split(";")[0]);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute].concat($scope.activePopups).concat(app.preloadedRoutes || []));
                 if (window.NativeNav) {
                     window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
