@@ -423,6 +423,8 @@ export class App {
 
 
             $scope.setSharedUiComponentState = app.setSharedUiComponentState = function(routeScope, componentId, active, available, data) {
+                console.log("setSharedUiComponentState");
+                console.log(data);
                 var cs = app.getSharedUiComponentState(routeScope, componentId);
                 // if parameters are undefined, the previous value will be used
                 if (active === true || active === false) cs.active = active;
@@ -442,7 +444,7 @@ export class App {
 
                 //if (component.getSwipeNav) app.updateSwipeNav(routeScope, component.getSwipeNav(component, cs.active, cs.available));
 
-                if ($scope.route == routeScope.pageRoute) {
+                if ($scope.route.split(";")[0] == routeScope.pageRoute) {
                     component.setState(component, routeScope.pageRoute, cs.active, cs.available, cs.data);
                 }
 

@@ -9,7 +9,7 @@ export default class cjsNavigationBar extends MultistateComponent {
         return (window.NativeNav && true) || false;
     }
     updateTransitionSettings(self, thisState, otherState, position, isActivating) {
-       //  console.log("navbar updateTransitionSettings - " + position+ " - "+ isActivating);
+         console.log("navbar updateTransitionSettings - " + position+ " - "+ isActivating);
         //        console.log(thisState);
         // set fields for individual components
         // position will be 0 for active, -1 or +1 for inactive depending on transition direction
@@ -30,7 +30,9 @@ export default class cjsNavigationBar extends MultistateComponent {
             thisState.opacity = 0;
         }
     }
-    updateCurrentState(self, state, active, available, data) {}
+    updateCurrentState(self, state, active, available, data) {
+        console.log("navbar updateCurrentState");
+    }
     setNativeState(self, route, active, available, data) {
         if (window.NativeNav) {
             window.NativeNav.showNavbar(route, active, data.leftButtons, data.title, data.rightButtons, data.titleChanged);

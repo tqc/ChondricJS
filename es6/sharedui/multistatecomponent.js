@@ -14,6 +14,7 @@ export class MultistateComponent extends SharedUiComponent {
 
     }
     chooseState(self, route, active, available, data) {
+        console.log("chooseState");
         var i;
         for (i = 0; i < self.states.length; i++) {
             if (self.states[i].route == route) return self.states[i];
@@ -39,8 +40,8 @@ export class MultistateComponent extends SharedUiComponent {
         self.activeState = null;
     }
     setState(self, route, active, available, data, direction) {
-        // console.log(self.componentId + ".setState(" + route + "," + active + "," + available + "," + data + "," + direction + ")");
-        // console.log(data);
+         console.log(self.componentId + ".setState(" + route + "," + active + "," + available + "," + data + "," + direction + ")");
+         console.log(data);
 
         if (!data || !Object.keys(data).length) {
             //   console.log("navbar setState - no data");
