@@ -25,7 +25,13 @@ export class App {
         this.module.directive('cjsSharedComponent', require("./directives/cjs-shared-component.js").cjsSharedComponent);
         this.module.directive('chondricPage', require("./directives/chondric-page.js").chondricPage);
 
+
+
         this.registerOptionalDirective(require("./directives/chondric-viewport"));
+
+        this.registerOptionalDirective(require("./loadstatus/cjs-loading-overlay"));
+        this.registerOptionalDirective(require("./loadstatus/cjs-show-after-load"));
+
 
 
         this.module.factory('sharedUi', require("./sharedui/shareduiprovider.js").default);
