@@ -1,5 +1,7 @@
-export default ["$templateCache", "$compile", function($templateCache, $compile) {
-    return {
+export default {
+    name: "cjsLoadingOverlay",
+    injections: ["$compile"],
+    fn: ($compile) => ({
         restrict: 'A',
         scope: true,
         link: function(scope, element, attrs) {
@@ -14,11 +16,11 @@ export default ["$templateCache", "$compile", function($templateCache, $compile)
             // get the contents of the element. If there is a single element, use it directly. if not, wrap it.
             var overlay;
             if (attrs.overlayType == "compact") {
-                overlay = angular.element($templateCache.get("cjs-loading-overlay-compact.html"));
+                overlay = angular.element(require("./cjs-loading-overlay-compact.html"));
             } else if (attrs.overlayType == "simple") {
-                overlay = angular.element($templateCache.get("cjs-loading-overlay-simple.html"));
+                overlay = angular.element(require("./cjs-loading-overlay-simple.html"));
             } else {
-                overlay = angular.element($templateCache.get("cjs-loading-overlay.html"));
+                overlay = angular.element(require("./cjs-loading-overlay.html"));
             }
 
             element.append(overlay);
@@ -53,5 +55,5 @@ export default ["$templateCache", "$compile", function($templateCache, $compile)
             });
 
         }
-    };
-}];
+    })
+};

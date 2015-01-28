@@ -1,5 +1,7 @@
-export default function() {
-    return {
+export default {
+    name: "cjsShowAfterLoad",
+    injections: ["$compile"],
+    fn: ($compile) => ({
         link: function(scope, element, attrs) {
 
             scope.loadStatus.onUpdate(scope.$eval(attrs.cjsShowAfterLoad), function(taskGroup) {
@@ -10,6 +12,6 @@ export default function() {
                 }
             });
         }
-    };
-}
+    })
+};
 
