@@ -36,6 +36,7 @@
 
         },
         sourceFolder: "./src",
+        libFolder: "./lib",
         cssEntryPoint: "./css/index.scss",
         moduleMappings: {},
         customBrowserifyTransforms: [],
@@ -97,6 +98,7 @@
         console.log(moduleMappings);
 
         var sourceFolder = path.resolve(cwd, options.sourceFolder);
+        var libFolder = path.resolve(cwd, options.libFolder);
 
         function buildClientJs() {
             var b = browserify({
@@ -144,6 +146,11 @@
         function copyHtml() {
             gulp.src(sourceFolder + '/*.html')
                 .pipe(gulp.dest(varFolder));
+        }
+
+        function copyLib() {
+            gulp.src(libFolder + '/*.js')
+                .pipe(gulp.dest(varFolder+"/lib"));
         }
 
 
@@ -198,6 +205,7 @@
 
         copyHtml();
         copyImages();
+        copyLib();
         buildClientJs();
         buildCss();
 
