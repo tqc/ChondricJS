@@ -75,10 +75,22 @@ export class App {
         this.knownOptionalDirectives = this.knownOptionalDirectives || [];
         if (options.default) options = options.default;
         if (this.knownOptionalDirectives.indexOf(options.name) >= 0) return;
+        this.knownOptionalDirectives.push(options.name);
         var arr = options.injections || [];
         arr = arr.concat([options.fn]);
         this.module.directive(options.name, arr);
     }
+
+    registerOptionalFilter(options) {
+        this.knownOptionalFilters = this.knownOptionalFilters || [];
+        if (options.default) options = options.default;
+        if (this.knownOptionalFilters.indexOf(options.name) >= 0) return;
+        this.knownOptionalFilters.push(options.name);
+        var arr = options.injections || [];
+        arr = arr.concat([options.fn]);
+        this.module.filter(options.name, arr);
+    }
+
 
     updateOpenViewArray(parentObject, parentArray) {
         parentArray.splice(0, parentArray.length);
