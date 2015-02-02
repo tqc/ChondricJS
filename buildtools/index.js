@@ -42,6 +42,9 @@
         customBrowserifyTransforms: [],
         additionalWatchPaths: [],
         buildfolder: "./build",
+        cssVariations: {
+            "ie": '$browserType: "ie";'
+        }
     };
 
     tools.init = function(opt) {
@@ -194,13 +197,16 @@
         function buildCss() {
             var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
 
-            var iesrc = '$browserType: "ie";\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig,"/")) + '";';
-
-            var ieCssFile = path.resolve(tempFolder, "index-ie.scss");
-            fs.writeFileSync(ieCssFile, iesrc);
-
             buildCssFile(cssEntryPoint, "app.css");
-            buildCssFile(ieCssFile, "app-ie.css");           
+
+            for (var k in options.cssVariations) {
+                var iesrc = options.cssVariations[k]+'\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig,"/")) + '";';
+                var ieCssFile = path.resolve(tempFolder, "index-"+k+".scss");
+                fs.writeFileSync(ieCssFile, iesrc);
+                buildCssFile(ieCssFile, "app-"+k+".css");           
+
+            }
+
         }
 
         copyHtml();
