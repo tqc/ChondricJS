@@ -1,6 +1,7 @@
-Chondric.directive("cjsPopover", function() {
-    return {
-
+export default {
+    name: "cjsPopover",
+    injections: [],
+    fn: () => ({
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var useOverlay = attrs.noOverlay === undefined;
@@ -192,5 +193,5 @@ Chondric.directive("cjsPopover", function() {
                 }
             });
         }
-    };
-});
+    })
+};

@@ -26,6 +26,8 @@ export class App {
         this.module.directive('chondricPage', require("./directives/chondric-page.js").chondricPage);
 
 
+        this.registerOptionalDirective(require("./directives/cjs-popover"));
+
 
         this.registerOptionalDirective(require("./directives/chondric-viewport"));
 
