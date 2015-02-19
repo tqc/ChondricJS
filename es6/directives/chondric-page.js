@@ -30,6 +30,7 @@ export var chondricPage = ["$compile", function($compile) {
 
             var template = page.template || "<span>Template not set</span>";
 
+
             if (page.requiredTask) {
                 template = "<div ng-if=\"!loadStatus." + page.requiredTask + ".completed\" class=\"page-loading\">" + page.preloadContent + "</div><div ng-if=\"loadStatus." + page.requiredTask + ".completed\">" + template + "</div>";
 
@@ -57,6 +58,14 @@ export var chondricPage = ["$compile", function($compile) {
                 // todo: don't add this if the template already includes a page-content element
                 // custom nav components may need to be outside the scrolling area.
                 template = "<div class=\"page-content\">" + template + "</div>";
+
+                if (page.fixedTemplate) {
+                    template = "<div class=\"scrollcontainer\"><div class=\"scrollheader\">" + page.fixedTemplate + "</div>" + template+ "</div>";
+                }
+                else {
+                    element.addClass("scrollcontainer");
+                }
+
                 // add any popups etc here
                 // modal overlay will be active if the route is not complete
                 // but need to distinguish between popups and accordion sections.

@@ -14,6 +14,7 @@ export class Page {
         this.options = options;
         this.isBlockPage = true;
         if (options.template) this.template = options.template;
+        if (options.fixedTemplate) this.fixedTemplate = options.fixedTemplate;
 
         this.preloadContent = options.preloadContent || require("./preload.html");
 
