@@ -207,6 +207,10 @@ export class App {
     }
     popPopup() {
         // todo: remove last item from route
+        let ss = this.scope.route.split(";");
+        var l = ss.length-1;
+        while (l > 1 && !ss[l]) l--;
+        this.changePageInternal(ss[0], ss[0], ss.slice(1,l));        
     }
     changePage(p, transition, originElement) {
         console.log("Changing page to " + p);
