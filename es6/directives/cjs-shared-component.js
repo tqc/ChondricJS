@@ -25,4 +25,4 @@ export var cjsSharedComponent = ["$compile", function ($compile) {
             element.append(newElement);
         }
     };
-}]
+}];

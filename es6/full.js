@@ -1,4 +1,4 @@
-import * as core from './core'
+import * as core from './core';
 
 export class App extends core.App {
 	constructor(options) {

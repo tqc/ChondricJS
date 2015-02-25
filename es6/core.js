@@ -172,6 +172,7 @@ export class App {
     }
     transitionComponents(fromRoute, toRoute, progress) {
         if (!toRoute) return;
+        var app = this;
 
         var fromStates = app.componentStatesForRoutes[fromRoute] || {};
         var toStates = app.componentStatesForRoutes[toRoute] || {};
@@ -230,10 +231,8 @@ export class App {
     }
     changePage(p, transition, originElement) {
         console.log("Changing page to " + p);
-        var app = this;
         var $scope = this.scope;
-        var r;
-        var lastRoute, mainRoute, lastPopup, currentPopup;
+        var lastRoute, mainRoute;
         var popups = [];
 
         if (p instanceof Array) {

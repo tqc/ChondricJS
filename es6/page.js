@@ -20,7 +20,7 @@ export class Page {
 
         var page = this;
 
-        for (var k in options.sharedUi) {
+        for (let k in options.sharedUi) {
             var componentId = options.sharedUi[k];
             var component = app.sharedUiComponents[componentId];
             if (!component) {
@@ -30,7 +30,7 @@ export class Page {
             }
 
             var csfr = app.componentStatesForRoutes[route] = app.componentStatesForRoutes[route] || {};
-            var cs = csfr[componentId] = csfr[componentId] || {
+            csfr[componentId] = csfr[componentId] || {
                 route: route,
                 active: false,
                 available: true,
@@ -43,7 +43,7 @@ export class Page {
 
 
         page.pageCtrl = ["$scope", "sharedUi", "loadStatus", function($scope, sharedUi, loadStatus) {
-            for (var k in params) {
+            for (let k in params) {
                 $scope[k] = params[k];
             }
             var xloadStatus = loadStatus.init($scope);
@@ -58,7 +58,7 @@ export class Page {
             page.params = page.params || {};
 
             // add route parameters directly to the scope
-            for (var k in page.params) {
+            for (let k in page.params) {
                 $scope[k] = page.params[k];
             }
             $scope.pageRoute = page.route;

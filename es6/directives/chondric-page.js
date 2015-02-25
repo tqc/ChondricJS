@@ -119,4 +119,4 @@ export var chondricPage = ["$compile", function($compile) {
             });
         }
     };
-}]
+}];
