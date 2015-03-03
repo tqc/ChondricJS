@@ -143,7 +143,7 @@ export class App {
             matchingRoutes.push(r);
         }
         matchingRoutes.sort(function(a, b) {
-            return a.length - b.length;
+            return a.split("/").length - b.split("/").length;
         });
 
         // matching routes list should be section heirarchy
