@@ -483,7 +483,7 @@ export class App {
 
                 //if (component.getSwipeNav) app.updateSwipeNav(routeScope, component.getSwipeNav(component, cs.active, cs.available));
 
-                if ($scope.route.split(";")[0] == routeScope.pageRoute) {
+                if ($scope.route && $scope.route.split(";")[0] == routeScope.pageRoute) {
                     component.setState(component, routeScope.pageRoute, cs.active, cs.available, cs.data);
                 }
 
