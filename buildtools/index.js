@@ -44,7 +44,8 @@
         buildfolder: "./build",
         cssVariations: {
             "ie": '$browserType: "ie";'
-        }
+        },
+        imageFolders: ["./src/images"]
     };
 
     tools.init = function(opt) {
@@ -158,8 +159,20 @@
 
 
         function copyImages() {
-            gulp.src(sourceFolder + '/images/**/*')
+            var flatten = require('gulp-flatten');
+            console.log("Copying images");
+            var globs = [];
+            for (var i = 0; i < options.imageFolders.length; i++) {
+                var imgf = options.imageFolders[i];
+                globs.push(imgf+"/**");
+            }
+
+            console.log(globs);
+            gulp.src(globs)
+            .pipe(flatten())
                 .pipe(gulp.dest(varFolder + "/images"));
+
+
         }
 
 
@@ -227,6 +240,13 @@
             var cssFolder = path.dirname(path.resolve(cwd, options.cssEntryPoint));
             if (cssFolder.indexOf(sourceFolder) !== 0) paths.push(cssFolder);
 
+            // watch image folders 
+            for (var i = 0; i < options.imageFolders.length; i++) {
+                var imgf = options.imageFolders[i];
+                if (imgf.indexOf(sourceFolder) !== 0) paths.push(imgf);
+            }
+            
+
             var watcher = chokidar.watch(paths, {
                 ignored: /[\/\\]\./, 
                 persistent: true,
@@ -245,7 +265,9 @@
                     buildClientJs();
                 }
                 else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") {
-                    console.log("Todo: Image changed - should copy it to the build folder");
+                    console.log("Updating images");
+                    copyImages();
+
                 }
             // if the changed file is .js or .html, need to run browserify
             // copy html only copies a single file, so maybe just include that in the browserify process
