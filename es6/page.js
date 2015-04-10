@@ -1,8 +1,8 @@
 export class Page {
     constructor(route, params, options) {
-        options = options || {
-            sharedUi: {}
+        options = options || {            
         };
+        options.sharedUi = options.sharedUi || {};
         if (!route) {
             throw new Error("Error creating page - route missing");
         }
