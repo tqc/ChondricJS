@@ -17,6 +17,7 @@
     //    var sourcemaps = require('gulp-sourcemaps');
 
     var remapify = require("remapify");
+    var filterTransform = require("filter-transform");
     //    var uglifyify = require('uglifyify');
     var exorcist = require("exorcist");
     var uglify = require('gulp-uglify');
@@ -104,21 +105,41 @@
         var sourceFolder = path.resolve(cwd, options.sourceFolder);
         var libFolder = path.resolve(cwd, options.libFolder);
 
-        function buildClientJs() {
+
+        var filteredEs6ify = filterTransform(
+            function(file) {
+                // todo: This will probably fall over if chondric is not installed with npm link
+                // however browserify needs transforms to be global, and compiling es5 modules 
+                // breaks stuff.
+                // probably need to check against the paths included in moduleMappings.
+                if (file.indexOf("node_modules") >= 0) return false;
+                return path.extname(file) === '.js'
+            },
+            es6ify
+        )
+
+        function buildClientJs(onComplete) {
             var b = browserify({
                     debug: debugMode,
-                    extensions: [".txt", ".html"]
+                    extensions: [".txt", ".html"],
+                    //paths: [path.resolve(__dirname,"../es6")]
                 })
                 .add(es6ify.runtime)
                 .plugin(remapify, moduleMappings)
                 .transform(stringify({
                     extensions: ['.txt', '.html'],
                     minify: true
-                }));
+                }), {
+                    global: true
+                });
+
             for (var i = 0; i < options.customBrowserifyTransforms.length; i++) {
                 b = b.transform(options.customBrowserifyTransforms[i]());
             }
-            b = b.transform(es6ify);
+
+            b = b.transform(filteredEs6ify, {
+                global: true
+            });
             //            if (!debugMode) {
             //               b = b.transform({global: true}, "uglifyify");
             //            }
@@ -129,22 +150,28 @@
                 .on('error', function(err) {
                     console.log("Browserify error");
                     console.log(err.message);
-//                    console.log(err);
-                    this.end();
+                    console.log(err);
+                    //  this.emit("end");
                 })
-                .on("end", function() {
-                    console.log("Done browserify");
-                    if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
-                });
+            b.on("end", function() {
+                console.log("Done browserify");
+                if (onComplete) onComplete();
+                if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
+            });
             if (debugMode) {
                 //b = b.pipe(exorcist(path.resolve(varFolder, "app.js.map")));
-                b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")));
+                b = b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")))
             } else {
-                b.pipe(source('app.js')) // gives streaming vinyl file object
+                b = b.pipe(source('app.js')) // gives streaming vinyl file object
                     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
-                    .pipe(uglify())
+                    .pipe(uglify({
+                        mangle:true,
+                        compress: false
+                    }))
                     .pipe(gulp.dest(varFolder));
             }
+
+
         }
 
         function copyHtml() {
@@ -154,7 +181,7 @@
 
         function copyLib() {
             gulp.src(libFolder + '/*.js')
-                .pipe(gulp.dest(varFolder+"/lib"));
+                .pipe(gulp.dest(varFolder + "/lib"));
         }
 
 
@@ -164,12 +191,12 @@
             var globs = [];
             for (var i = 0; i < options.imageFolders.length; i++) {
                 var imgf = options.imageFolders[i];
-                globs.push(imgf+"/**");
+                globs.push(imgf + "/**");
             }
 
             console.log(globs);
             gulp.src(globs)
-            .pipe(flatten())
+                .pipe(flatten())
                 .pipe(gulp.dest(varFolder + "/images"));
 
 
@@ -187,7 +214,7 @@
 
         function buildCssFile(inputFile, outputFile) {
             var params = (debugMode ? ["--sourcemap", "--style", "nested"] : ["--style", "compressed"])
-            .concat(["-I", ".", inputFile, varFolder + "/"+outputFile]);
+                .concat(["-I", ".", inputFile, varFolder + "/" + outputFile]);
             // using spawn because libsass sourcemaps are buggy
 
             var spawn = require("child_process").spawn;
@@ -195,14 +222,14 @@
                 cwd: cwd
             });
             p.stdout.on('data', function(data) {
-                console.log(""+data);
+                console.log("" + data);
             });
 
             p.stderr.on('data', function(data) {
-                console.log(""+data);
+                console.log("" + data);
             });
             p.on("close", function(code) {
-                console.log("Done sass build of "+inputFile+" with code " + code);
+                console.log("Done sass build of " + inputFile + " with code " + code);
             });
 
         }
@@ -213,28 +240,29 @@
             buildCssFile(cssEntryPoint, "app.css");
 
             for (var k in options.cssVariations) {
-                var iesrc = options.cssVariations[k]+'\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig,"/")) + '";';
-                var ieCssFile = path.resolve(tempFolder, "index-"+k+".scss");
+                var iesrc = options.cssVariations[k] + '\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig, "/")) + '";';
+                var ieCssFile = path.resolve(tempFolder, "index-" + k + ".scss");
                 fs.writeFileSync(ieCssFile, iesrc);
-                buildCssFile(ieCssFile, "app-"+k+".css");           
+                buildCssFile(ieCssFile, "app-" + k + ".css");
 
             }
 
         }
 
-        copyHtml();
-        copyImages();
-        copyLib();
-        buildClientJs();
-        buildCss();
+        buildClientJs(function() {
+            copyHtml();
+            copyImages();
+            copyLib();
+            buildCss();
+        });
 
         if (watch) {
 
             var paths = [
-                path.resolve(__dirname, "../es6"),
-                sourceFolder
-            ]
-            .concat(options.additionalWatchPaths);
+                    path.resolve(__dirname, "../es6"),
+                    sourceFolder
+                ]
+                .concat(options.additionalWatchPaths);
 
             // watch the css folder if it isn't already watched as part of the source folder
             var cssFolder = path.dirname(path.resolve(cwd, options.cssEntryPoint));
@@ -245,34 +273,32 @@
                 var imgf = options.imageFolders[i];
                 if (imgf.indexOf(sourceFolder) !== 0) paths.push(imgf);
             }
-            
+
 
             var watcher = chokidar.watch(paths, {
-                ignored: /[\/\\]\./, 
+                ignored: /[\/\\]\./,
                 persistent: true,
                 ignoreInitial: true
             });
 
             watcher.on("all", function(type, file) {
-                console.log(type+" event for "+file);
+                console.log(type + " event for " + file);
                 var ext = path.extname(file);
                 if (ext == ".scss") {
                     console.log("CSS needs rebuild");
                     buildCss();
-                }
-                else if (ext == ".js" || ext == ".html") {
+                } else if (ext == ".js" || ext == ".html") {
                     console.log("Browserify package needs rebuild");
                     buildClientJs();
-                }
-                else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") {
+                } else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") {
                     console.log("Updating images");
                     copyImages();
 
                 }
-            // if the changed file is .js or .html, need to run browserify
-            // copy html only copies a single file, so maybe just include that in the browserify process
+                // if the changed file is .js or .html, need to run browserify
+                // copy html only copies a single file, so maybe just include that in the browserify process
 
-            // src/images just needs to be copied if anything changes, and it can't contain anything used by browserify
+                // src/images just needs to be copied if anything changes, and it can't contain anything used by browserify
 
             });
 
