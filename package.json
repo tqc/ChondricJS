@@ -33,6 +33,7 @@
     "remapify": "^2.0.0",
     "serve-static": "^1.0.4",
     "stringify": "^3.0.0",
+    "stripify": "^3.0.0",
     "through": "^2.3.7",
     "through2": "^0.6.5",
     "vinyl-buffer": "^1.0.0",

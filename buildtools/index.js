@@ -25,6 +25,8 @@
     var source = require('vinyl-source-stream');
     var extend = require("extend");
 
+    var stripify = require("stripify");
+
     var chokidar = require('chokidar');
 
     var tools = module.exports;
@@ -140,9 +142,10 @@
             b = b.transform(filteredEs6ify, {
                 global: true
             });
-            //            if (!debugMode) {
+                        if (!debugMode) {
+                            b=b.transform({global:true},stripify);
             //               b = b.transform({global: true}, "uglifyify");
-            //            }
+                        }
             b = b.require(require.resolve(path.resolve(sourceFolder, variation + ".js")), {
                     entry: true
                 })
