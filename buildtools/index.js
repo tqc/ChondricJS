@@ -216,7 +216,7 @@
         //        }
 
         function buildCssFile(inputFile, outputFile) {
-            var params = (debugMode ? ["--sourcemap", "--style", "nested"] : ["--style", "compressed"])
+            var params = (debugMode ? ["--style", "nested"] : ["--style", "compressed"])
                 .concat(["-I", ".", inputFile, varFolder + "/" + outputFile]);
             // using spawn because libsass sourcemaps are buggy
 

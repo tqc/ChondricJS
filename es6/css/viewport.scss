@@ -28,7 +28,7 @@ $pageMargins: () !default;
 
 @if $viewportType == "expanding" {
     .chondric-viewport.embedded {
-        position: static;
+        position: relative;
     }
     .chondric-viewport.fullscreen {
         position: absolute;
