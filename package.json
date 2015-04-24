@@ -1,60 +1,31 @@
 {
   "author": "Tom Clarkson ",
-  "name": "chondric-tools",
-  "description": "Tools for setting up a ChondricJS client app",
-  "version": "0.6.3",
+  "name": "chondric",
+  "description": "ChondricJS App Framework",
+  "version": "2.0.0",
   "repository": {
     "url": "http://github.com/tqc/ChondricJS"
   },
-  "main": "./chondric-tools",
-  "bin": {
-    "chondric": "chondric-bin.js"
-  },
+  "main": "./es6/full.js",
   "dependencies": {
-    "authstarter": "*",
-    "autoprefixer": "~1.1.20140523",
-    "body-parser": "^1.0.1",
     "browserify": "^9.0.8",
     "chokidar": "^0.11.1",
-    "cookie-parser": "^1.0.1",
     "es6ify": "^1.6.0",
-    "exorcist": "^0.1.6",
-    "express": "^4.0.0",
-    "express-session": "^1.0.2",
     "extend": "^2.0.0",
     "filter-transform": "^0.1.1",
     "gulp": "^3.8.10",
     "gulp-flatten": "0.0.4",
     "gulp-uglify": "^1.2.0",
-    "html-minifier": "^0.7.2",
-    "minifyify": "^4.4.0",
-    "mkdirp": "*",
-    "node-sass": "~0.9.3",
     "remapify": "^2.0.0",
-    "serve-static": "^1.0.4",
     "stringify": "^3.0.0",
     "stripify": "^3.0.0",
-    "through": "^2.3.7",
-    "through2": "^0.6.5",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.0.0"
   },
-  "devDependencies": {
-    "grunt": "~0.4.4",
-    "grunt-angular-templates": "~0.5.4",
-    "grunt-autoprefixer": "~0.7.3",
-    "grunt-contrib-concat": "~0.3.0",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-cssmin": "~0.9.0",
-    "grunt-contrib-sass": "~0.7.3",
-    "grunt-contrib-uglify": "~0.4.0"
-  },
-  "browserify": {
-    "transform": []
-  },
+  "devDependencies": {},
   "optionalDependencies": {},
   "license": "MIT",
   "engines": {
-    "node": ">=0.8"
+    "node": ">=0.10"
   }
 }

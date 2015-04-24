@@ -4,22 +4,15 @@
 
     "use strict";
     var gulp = require('gulp');
-    //    var server = require('gulp-develop-server');
     var fs = require("fs");
     var path = require("path");
-    //   var gaze = require('gaze');
 
     var browserify = require("browserify");
     var es6ify = require("es6ify");
     var stringify = require('stringify');
 
-    //    var gulptraceur = require("gulp-traceur");
-    //    var sourcemaps = require('gulp-sourcemaps');
-
     var remapify = require("remapify");
     var filterTransform = require("filter-transform");
-    //    var uglifyify = require('uglifyify');
-    var exorcist = require("exorcist");
     var uglify = require('gulp-uglify');
     var buffer = require('vinyl-buffer');
     var source = require('vinyl-source-stream');
@@ -162,7 +155,6 @@
                 if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
             });
             if (debugMode) {
-                //b = b.pipe(exorcist(path.resolve(varFolder, "app.js.map")));
                 b = b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")))
             } else {
                 b = b.pipe(source('app.js')) // gives streaming vinyl file object
@@ -322,12 +314,4 @@
         tools.buildVariation(variation, env);
     };
 
-    /*
-        tools.startDevServer = function(callback) {
-            server.listen({
-                path: 'server'
-            });
-            if (callback) callback();
-        };
-    */
 })();

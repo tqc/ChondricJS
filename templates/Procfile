@@ -1,1 +1,0 @@
-web: node __APPHOST_NAME__.js
