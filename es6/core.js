@@ -400,6 +400,7 @@ export class App {
 
     customInit() {
         console.log("Base custom init");
+        this.loadStartPage();
     }
     initController() {
         console.log("initController");
@@ -672,7 +673,7 @@ export class App {
             return parts;
         }
         if (this.startPageFromHtml) return this.startPageFromHtml;
-        if (this.options.defaultStartPage) return this.defaultStartPage;
+        if (this.options.defaultStartPage) return this.options.defaultStartPage;
         return "/start";
     }
     loadStartPage(route) {
@@ -683,9 +684,6 @@ export class App {
     }
     start() {
         var app = this;
-
-
-
 
         this.initController();
         angular.element(document).ready(function() {
