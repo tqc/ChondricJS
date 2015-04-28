@@ -79,11 +79,20 @@ export class Page {
                 var newRoutes = (newVal || "").split(";");
                 var oldRoutes = (oldVal || "").split(";");
 
-                if (newRoutes.indexOf($scope.pageRoute) >= 0 && oldRoutes.indexOf($scope.pageRoute) < 0) {
+                var matchRoute = function(val) {
+                    if (val && val.indexOf($scope.pageRoute) === 0) return true;
+                    return false;
+                };
+
+                var wasActive = oldRoutes.filter(matchRoute).length > 0;
+                var isActive = newRoutes.filter(matchRoute).length > 0;
+
+
+                if (isActive && !wasActive) {
                     // activated
                     page.activated($scope);
                     page.deactivationHandled = false;
-                } else if (newRoutes.indexOf($scope.pageRoute) < 0 && oldRoutes.indexOf($scope.pageRoute) >= 0) {
+                } else if (wasActive && !isActive) {
                     // deactivated
                     if (!page.deactivationHandled) {
                         page.deactivated($scope);
