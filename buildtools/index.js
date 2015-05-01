@@ -103,12 +103,22 @@
 
         var filteredEs6ify = filterTransform(
             function(file) {
-                // todo: This will probably fall over if chondric is not installed with npm link
-                // however browserify needs transforms to be global, and compiling es5 modules 
-                // breaks stuff.
-                // probably need to check against the paths included in moduleMappings.
-                if (file.indexOf("node_modules") >= 0) return false;
+                // browserify needs transforms to be global, and compiling es5 modules 
+                // breaks stuff, so only compile the bits we know are es6
+                if (file.indexOf("node_modules") >= 0) {
+                    // files under node_modules are only compiled as es6 if they are included in 
+                    // moduleMappings - i.e. if chondric was loaded with npm install rather than npm link 
+                    for (var i = 0; i < moduleMappings.length; i++) {
+                        var pn = moduleMappings[i].cwd;
+                        if (file.indexOf(pn) === 0 && file.lastIndexOf("node_modules") < pn.length) {
+                            return path.extname(file) === '.js'
+                        }
+                    }
+                    return false;
+                }
                 return path.extname(file) === '.js'
+
+
             },
             es6ify
         )
