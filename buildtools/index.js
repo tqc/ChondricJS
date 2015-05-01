@@ -135,14 +135,24 @@
             b = b.transform(filteredEs6ify, {
                 global: true
             });
-                        if (!debugMode) {
-                            b=b.transform({global:true},stripify);
-            //               b = b.transform({global: true}, "uglifyify");
-                        }
-            b = b.require(require.resolve(path.resolve(sourceFolder, variation + ".js")), {
+            if (!debugMode) {
+                // remove console.log calls
+                b = b.transform({
+                    global: true
+                }, stripify);
+            }
+            b.require(require.resolve(path.resolve(sourceFolder, variation + ".js")), {
+                entry: true
+            });
+            if (debugMode && options.browserTests) {
+                // inject tests
+                b.require(require.resolve(path.resolve(cwd, options.browserTests)), {
+                    expose: "test",
                     entry: true
-                })
-                .bundle()
+                });
+            }
+
+            b = b.bundle()
                 .on('error', function(err) {
                     console.log("Browserify error");
                     console.log(err.message);
@@ -160,7 +170,7 @@
                 b = b.pipe(source('app.js')) // gives streaming vinyl file object
                     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
                     .pipe(uglify({
-                        mangle:true,
+                        mangle: true,
                         compress: false
                     }))
                     .pipe(gulp.dest(varFolder));
@@ -269,6 +279,10 @@
                 if (imgf.indexOf(sourceFolder) !== 0) paths.push(imgf);
             }
 
+            // watch tests 
+            if (options.browserTests) {
+                paths.push(path.dirname(path.resolve(options.browserTests)));
+            }
 
             var watcher = chokidar.watch(paths, {
                 ignored: /[\/\\]\./,
