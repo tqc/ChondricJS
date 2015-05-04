@@ -3,6 +3,7 @@ import {SharedUiComponent} from "./shareduicomponent";
 export default class cjsSharedPopup extends SharedUiComponent {
     constructor() {
         super();
+        this.componentId = "cjsSharedPopup";
         this.template=require("./cjs-shared-popup.html");
     }
     isNative() {

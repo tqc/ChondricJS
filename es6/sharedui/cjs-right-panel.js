@@ -3,6 +3,7 @@ import {SharedUiComponent} from "./shareduicomponent";
 export class cjsRightPanel extends SharedUiComponent {
     constructor() {
         super();
+        this.componentId = "cjsRightPanel";
         this.template=require("./cjs-right-panel.html");
     this.handledSwipeState= "rightBorder";
     this.transition= "coverRight";

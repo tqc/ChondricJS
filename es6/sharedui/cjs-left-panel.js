@@ -3,6 +3,7 @@ import {cjsRightPanel} from "./cjs-right-panel";
 export default class cjsLeftPanel extends cjsRightPanel {
     constructor() {
         super();
+        this.componentId = "cjsLeftPanel";
         this.template=require("./cjs-left-panel.html");
     this.handledSwipeState= "leftBorder";
     this.transition= "coverLeft";

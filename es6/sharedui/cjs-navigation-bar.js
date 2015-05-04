@@ -3,6 +3,7 @@ import {MultistateComponent} from "./multistatecomponent";
 export default class cjsNavigationBar extends MultistateComponent {
 	constructor() {
 		super();
+        this.componentId = "cjsNavigationBar";
 		this.template=require("./cjs-navigation-bar.html");
 	}
     isNative() {

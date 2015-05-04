@@ -3,6 +3,7 @@ import {SharedUiComponent} from "./shareduicomponent";
 export default class cjsActionSheet extends SharedUiComponent {
     constructor() {
         super();
+        this.componentId = "cjsActionSheet";
         this.template=require("./cjs-action-sheet.html");
     }
     isNative() {
