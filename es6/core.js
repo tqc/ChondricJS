@@ -680,7 +680,10 @@ export class App {
         route = this.getStartPage(route);
 
         this.changePage(route, "none");
-
+        this.ready = true;
+        var event = new Event("chondric.appready");
+        document.dispatchEvent(event);
+        
     }
     start() {
         var app = this;
