@@ -22,6 +22,8 @@
 
     var chokidar = require('chokidar');
 
+    var async = require("async");
+
     var tools = module.exports;
     var cwd = process.cwd();
 
@@ -55,7 +57,7 @@
         console.log("Test function");
     };
 
-    tools.buildVariation = function(variation, env, watch, destFolder) {
+    tools.buildVariation = function(variation, env, watch, destFolder, onBuildComplete) {
         var debugMode = env != "prod"; //true;
         if (options.debug !== undefined) debugMode = options.debug;
         if (options[env] && options[env].debug !== undefined) debugMode = options[env].debug;
@@ -111,19 +113,20 @@
                     for (var i = 0; i < moduleMappings.length; i++) {
                         var pn = moduleMappings[i].cwd;
                         if (file.indexOf(pn) === 0 && file.lastIndexOf("node_modules") < pn.length) {
-                            return path.extname(file) === '.js'
+                            return path.extname(file) === '.js';
                         }
                     }
                     return false;
                 }
-                return path.extname(file) === '.js'
+                return path.extname(file) === '.js';
 
 
             },
             es6ify
-        )
+        );
 
         function buildClientJs(onComplete) {
+            var jsBuildError = null;
             var b = browserify({
                     debug: debugMode,
                     extensions: [".txt", ".html"],
@@ -163,10 +166,9 @@
             }
 
             b = b.bundle()
-                .on('error', function(err) {                    
+                .on('error', function(err) {
                     console.log("Browserify error");
                     console.log(err.message);
-
                     var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
                     var msg = err.message;
                     var source = "";
@@ -177,32 +179,39 @@
                         msg = m[4];
                         var fn = m[1];
                         var errorLine = parseInt(m[2]);
-                        source = m[1]+":"+m[2]+":"+m[3];
+                        source = m[1] + ":" + m[2] + ":" + m[3];
                         detail = "";
 
                         var sc = fs.readFileSync(fn, "utf-8").split("\n");
-                        for (var i = errorLine-4; i < errorLine+3; i++) {
+                        for (var i = errorLine - 4; i < errorLine + 3; i++) {
                             var l = sc[i];
                             if (l === undefined) continue;
-                            detail += l+"\n";
+                            detail += l + "\n";
                         }
 
-                        }
+                    }
+
+                    jsBuildError = {
+                        message: msg,
+                        source: source,
+                        detail: detail
+                    };
+
 
                     errorReporter = errorReporter.replace("\"[MESSAGE]\"", JSON.stringify(msg));
                     errorReporter = errorReporter.replace("\"[SOURCE]\"", JSON.stringify(source));
                     errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(detail));
                     fs.writeFileSync(path.resolve(varFolder, "app.js"), errorReporter);
-                    //console.log(err);
-                    //  this.emit("end");
-                })
+                    if (onComplete) onComplete(jsBuildError);
+                });
+
             b.on("end", function() {
                 console.log("Done browserify");
                 if (onComplete) onComplete();
                 if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
             });
             if (debugMode) {
-                b = b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")))
+                b = b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")));
             } else {
                 b = b.pipe(source('app.js')) // gives streaming vinyl file object
                     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
@@ -254,7 +263,7 @@
         //                });
         //        }
 
-        function buildCssFile(inputFile, outputFile) {
+        function buildCssFile(inputFile, outputFile, fileBuilt) {
             var params = (debugMode ? ["--style", "nested"] : ["--style", "compressed"])
                 .concat(["-I", ".", inputFile, varFolder + "/" + outputFile]);
             // using spawn because libsass sourcemaps are buggy
@@ -272,30 +281,47 @@
             });
             p.on("close", function(code) {
                 console.log("Done sass build of " + inputFile + " with code " + code);
+                if (fileBuilt) fileBuilt(code === 0 ? null : ("SASS Error " + code));
             });
 
         }
 
-        function buildCss() {
+        function buildCss(onCssBuilt) {
             var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
 
-            buildCssFile(cssEntryPoint, "app.css");
 
-            for (var k in options.cssVariations) {
-                var iesrc = options.cssVariations[k] + '\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig, "/")) + '";';
-                var ieCssFile = path.resolve(tempFolder, "index-" + k + ".scss");
-                fs.writeFileSync(ieCssFile, iesrc);
-                buildCssFile(ieCssFile, "app-" + k + ".css");
+            buildCssFile(cssEntryPoint, "app.css", function(err) {
+                if (err) return onCssBuilt && onCssBuilt();
 
-            }
+                var variations = [];
+                for (var k in options.cssVariations) {
+                    variations.push({
+                        key: k,
+                        settings: options.cssVariations[k]
+                    });
+                }
+
+                async.eachSeries(options.cssVariations, function(v, next) {
+                    var iesrc = v.settings + '\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig, "/")) + '";';
+                    var ieCssFile = path.resolve(tempFolder, "index-" + v.key + ".scss");
+                    fs.writeFileSync(ieCssFile, iesrc);
+                    buildCssFile(ieCssFile, "app-" + v.key + ".css", next);
+                }, onCssBuilt);
+
+
+            });
+
 
         }
 
-        buildClientJs(function() {
-            copyHtml();
-            copyImages();
-            copyLib();
-            buildCss();
+        buildClientJs(function(err) {
+            if (err) return onBuildComplete && onBuildComplete(err);
+            buildCss(function(err) {
+                if (err) return onBuildComplete && onBuildComplete(err);
+                copyHtml();
+                copyImages();
+                copyLib();
+            });
         });
 
         if (watch) {
