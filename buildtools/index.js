@@ -166,7 +166,7 @@
             }
 
             b = b.bundle()
-                .on('error', function(err) {
+                .once('error', function(err) {
                     console.log("Browserify error");
                     console.log(err.message);
                     var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
@@ -203,12 +203,17 @@
                     errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(detail));
                     fs.writeFileSync(path.resolve(varFolder, "app.js"), errorReporter);
                     if (onComplete) onComplete(jsBuildError);
+                    this.emit("end");
                 });
-
+            b.on('error', function(err) {
+                // Ignore any errors after the first so onComplete is only called once
+            });
             b.on("end", function() {
-                console.log("Done browserify");
-                if (onComplete) onComplete();
-                if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
+                if (!jsBuildError) {
+                    console.log("Done browserify");
+                    if (onComplete) onComplete();
+                    if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
+                }
             });
             if (debugMode) {
                 b = b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")));
