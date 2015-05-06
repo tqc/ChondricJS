@@ -1,0 +1,21 @@
+.viewport-error {
+    padding: 10px;
+    h1 {}
+    .message {
+        font-weight: bold;
+        font-size: 12pt;
+    }
+    .source {
+        font-family: monospace;
+        margin: 10px 0;
+    }
+    .detail {
+        white-space: pre;
+        border: 1px solid #ccc;
+        background-color: #eee;
+        margin: 10px 0;
+        font-family: monospace;
+        padding: 10px;
+        font-size: 12pt;
+    }
+}

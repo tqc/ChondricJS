@@ -163,10 +163,37 @@
             }
 
             b = b.bundle()
-                .on('error', function(err) {
+                .on('error', function(err) {                    
                     console.log("Browserify error");
                     console.log(err.message);
-                    console.log(err);
+
+                    var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
+                    var msg = err.message;
+                    var source = "";
+                    var detail = "";
+
+                    var m = /(.*):(\d+):(\d+): (.*)/.exec(msg);
+                    if (m && m.length >= 5) {
+                        msg = m[4];
+                        var fn = m[1];
+                        var errorLine = parseInt(m[2]);
+                        source = m[1]+":"+m[2]+":"+m[3];
+                        detail = "";
+
+                        var sc = fs.readFileSync(fn, "utf-8").split("\n");
+                        for (var i = errorLine-4; i < errorLine+3; i++) {
+                            var l = sc[i];
+                            if (l === undefined) continue;
+                            detail += l+"\n";
+                        }
+
+                        }
+
+                    errorReporter = errorReporter.replace("\"[MESSAGE]\"", JSON.stringify(msg));
+                    errorReporter = errorReporter.replace("\"[SOURCE]\"", JSON.stringify(source));
+                    errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(detail));
+                    fs.writeFileSync(path.resolve(varFolder, "app.js"), errorReporter);
+                    //console.log(err);
                     //  this.emit("end");
                 })
             b.on("end", function() {
