@@ -10,6 +10,9 @@
         margin: 10px 0;
     }
     .detail {
+        &:empty {
+            display: none;
+        }
         white-space: pre;
         border: 1px solid #ccc;
         background-color: #eee;

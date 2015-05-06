@@ -198,6 +198,7 @@
                     };
 
 
+                    errorReporter = errorReporter.replace("\"[TITLE]\"", JSON.stringify("Build Error"));
                     errorReporter = errorReporter.replace("\"[MESSAGE]\"", JSON.stringify(msg));
                     errorReporter = errorReporter.replace("\"[SOURCE]\"", JSON.stringify(source));
                     errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(detail));
@@ -215,8 +216,25 @@
                     if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
                 }
             });
+
             if (debugMode) {
-                b = b.pipe(fs.createWriteStream(path.resolve(varFolder, "app.js")));
+                var appFile = path.resolve(varFolder, "app.js");
+                var appFileTemp = path.resolve(varFolder, "app (building).js");
+                var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
+                errorReporter = errorReporter.replace("\"[TITLE]\"", JSON.stringify("Build Incomplete"));
+                errorReporter = errorReporter.replace("\"[MESSAGE]\"", JSON.stringify("Browserify build in progress - try again in a few seconds."));
+                errorReporter = errorReporter.replace("\"[SOURCE]\"", JSON.stringify(""));
+                errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(""));
+                fs.writeFileSync(appFile, errorReporter);
+
+                b.on("end", function() {
+                    if (!jsBuildError) {
+                        fs.unlinkSync(appFile);
+                        fs.renameSync(appFileTemp, appFile);
+                    }
+                });
+
+                b = b.pipe(fs.createWriteStream(appFileTemp));
             } else {
                 b = b.pipe(source('app.js')) // gives streaming vinyl file object
                     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object

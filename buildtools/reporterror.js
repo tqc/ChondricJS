@@ -8,6 +8,7 @@ $(document).ready(function() {
         var src = $("<div>").addClass("source").appendTo(vp);
         var detail = $("<div>").addClass("detail").appendTo(vp);
 
+        title.text("[TITLE]");
         msg.text("[MESSAGE]");
         src.text("[SOURCE]");
         detail.text("[DETAIL]");
