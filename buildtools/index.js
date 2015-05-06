@@ -228,8 +228,8 @@
                 fs.writeFileSync(appFile, errorReporter);
 
                 b.on("end", function() {
-                    if (!jsBuildError) {
-                        fs.unlinkSync(appFile);
+                    if (!jsBuildError && fs.existsSync(appFileTemp)) {
+                        if (fs.existsSync(appFile)) fs.unlinkSync(appFile);
                         fs.renameSync(appFileTemp, appFile);
                     }
                 });
