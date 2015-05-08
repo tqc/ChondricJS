@@ -1,43 +1,43 @@
 export function ngTap() {
     var lastTapLocation;
-console.log("init tap");
+    console.log("init tap");
 
 
-//    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+    //    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
     // set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
     // triggers ng-tap on the button behind it.
-window.useMouse = true;
+    window.useMouse = true;
 
-if (window.document.addEventListener) {
-// no addEventListener means IE8, so definitely no touch or ghost click issues
+    if (window.document.addEventListener) {
+        // no addEventListener means IE8, so definitely no touch or ghost click issues
 
-    var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
-    $(document.body).append(ghostClickCatcher);
-    var showGhostClickCatcher = function () {
+        var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
+        $(document.body).append(ghostClickCatcher);
+        var showGhostClickCatcher = function () {
         // todo: probably should also adjust position to align with tap location
         // otherwise tapping elsewhere on the page is disabled unnecessarily.
-         ghostClickCatcher.css( "display", "block" );
+        ghostClickCatcher.css( "display", "block" );
     };
 
-    var hideGhostClickCatcher = function() {
+        var hideGhostClickCatcher = function() {
         ghostClickCatcher.css( "display", "none" );
     };
 
-    ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
+        ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
 
-    // todo: turn useMouse back on if a genuine mouse event shows up
-    window.document.addEventListener('touchstart', function(event) {
+        // todo: turn useMouse back on if a genuine mouse event shows up
+        window.document.addEventListener('touchstart', function(event) {
         window.useMouse = false;
     }, true);
 
-    window.document.addEventListener('mouseup', function(event) {
+        window.document.addEventListener('mouseup', function(event) {
         hideGhostClickCatcher();
     }, true);
-    window.document.addEventListener('mousedown', function(event) {
+        window.document.addEventListener('mousedown', function(event) {
         hideGhostClickCatcher();
     }, true);
-    window.document.addEventListener('click', function(event) {
+        window.document.addEventListener('click', function(event) {
         hideGhostClickCatcher();
         if (window.jstimer) window.jstimer.finish("ghostclick");
     }, true);
@@ -45,7 +45,7 @@ if (window.document.addEventListener) {
 
 
 
-}
+    }
 
     return function(scope, element, attrs) {
         element.addClass('tappable');
@@ -106,23 +106,23 @@ if (window.document.addEventListener) {
                 x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientX : e.clientX,
                 y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientY : e.clientY
             };
-/*
+            /*
 
-            // ie8 fix
-            if (!e.originalEvent.stopPropagation) {
-                e.originalEvent.stopPropagation = function() {
-                    e.originalEvent.cancelBubble = true; //ie
-                };
-            }
+                        // ie8 fix
+                        if (!e.originalEvent.stopPropagation) {
+                            e.originalEvent.stopPropagation = function() {
+                                e.originalEvent.cancelBubble = true; //ie
+                            };
+                        }
 
-            if (!e.originalEvent.preventDefault) {
-                e.originalEvent.preventDefault = function() {
-                    e.originalEvent.returnValue = false; //ie
-                };
-            }
+                        if (!e.originalEvent.preventDefault) {
+                            e.originalEvent.preventDefault = function() {
+                                e.originalEvent.returnValue = false; //ie
+                            };
+                        }
 
-            e.originalEvent.stopPropagation();
-            e.originalEvent.preventDefault();
+                        e.originalEvent.stopPropagation();
+                        e.originalEvent.preventDefault();
 */
             if (!window.useMouse) {
                 element.unbind('touchmove', move);

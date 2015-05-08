@@ -8,9 +8,9 @@ export class SharedUiComponent {
 
     }
     setState() {
-    	console.log("Base shared component set state");
+        console.log("Base shared component set state");
     }
     controller() {
-    	console.log("Base shared component controller");
+        console.log("Base shared component controller");
     }
 }

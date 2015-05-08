@@ -2,15 +2,15 @@ import {MultistateComponent} from "./multistatecomponent";
 
 export default class cjsNavigationBar extends MultistateComponent {
 	constructor() {
-		super();
-        this.componentId = "cjsNavigationBar";
-		this.template=require("./cjs-navigation-bar.html");
+    super();
+    this.componentId = "cjsNavigationBar";
+    this.template=require("./cjs-navigation-bar.html");
 	}
     isNative() {
         return (window.NativeNav && true) || false;
     }
     updateTransitionSettings(self, thisState, otherState, position, isActivating) {
-         console.log("navbar updateTransitionSettings - " + position+ " - "+ isActivating);
+        console.log("navbar updateTransitionSettings - " + position+ " - "+ isActivating);
         //        console.log(thisState);
         // set fields for individual components
         // position will be 0 for active, -1 or +1 for inactive depending on transition direction
@@ -40,7 +40,7 @@ export default class cjsNavigationBar extends MultistateComponent {
         }
     }
     controller($scope) {
-    	super.controller($scope);
+        super.controller($scope);
         var self = $scope.componentDefinition;
         self.scope = $scope;
         $scope.globalHeaderOptions = self.globalHeaderOptions = {};

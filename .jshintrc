@@ -1,9 +1,8 @@
 {
-  "browser": false,
   "node": true,
-  "esnext": true,
+  "devel": true,
   "globals": {},
-  "globalstrict": true,
+  "globalstrict": false,
   "quotmark": false,
   "smarttabs": true,
   "trailing": true,

@@ -352,7 +352,7 @@
                 copyHtml();
                 copyImages();
                 copyLib();
-                console.log("Build completed successfully")
+                console.log("Build completed successfully");
                 return onBuildComplete && onBuildComplete(err);
             });
         });

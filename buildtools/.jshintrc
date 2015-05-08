@@ -1,12 +1,6 @@
 {
+  "extends": "../.jshintrc",
   "browser": false,
   "node": true,
-  "esnext": true,
-  "globals": {},
-  "globalstrict": true,
-  "quotmark": false,
-  "smarttabs": true,
-  "trailing": true,
-  "undef": true,
-  "unused": "vars"
+  "esnext": false
 }

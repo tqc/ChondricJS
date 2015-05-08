@@ -5,10 +5,10 @@ export class cjsRightPanel extends SharedUiComponent {
         super();
         this.componentId = "cjsRightPanel";
         this.template=require("./cjs-right-panel.html");
-    this.handledSwipeState= "rightBorder";
-    this.transition= "coverRight";
-    this.nativeShowTransition= "showrightpanel";
-    this.nativeHideTransition= "hiderightpanel";
+        this.handledSwipeState= "rightBorder";
+        this.transition= "coverRight";
+        this.nativeShowTransition= "showrightpanel";
+        this.nativeHideTransition= "hiderightpanel";
     }
     isNative() {
         return false;

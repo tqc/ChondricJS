@@ -23,7 +23,11 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-jscs": "^1.6.0",
+    "gulp-jshint": "^1.10.0"
+  },
   "optionalDependencies": {},
   "license": "MIT",
   "engines": {

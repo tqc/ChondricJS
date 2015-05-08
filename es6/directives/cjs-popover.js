@@ -121,7 +121,7 @@ export default {
                         idealX = (val.x || 0) - document.body.scrollLeft;
                         idealY = (val.y || 0) - document.body.scrollTop;
                     }
-                                        console.log(idealY);
+                    console.log(idealY);
 
 
                     var actualX = idealX;
