@@ -155,9 +155,6 @@
                     global: true
                 }, stripify);
             }
-            b.require(require.resolve(path.resolve(sourceFolder, variation + ".js")), {
-                entry: true
-            });
             if (debugMode && options.browserTests) {
                 // inject tests
                 b.require(require.resolve(path.resolve(cwd, options.browserTests)), {
@@ -165,6 +162,9 @@
                     entry: true
                 });
             }
+            b.require(require.resolve(path.resolve(sourceFolder, variation + ".js")), {
+                entry: true
+            });
 
             function reportError(title, msg, source, detail) {
                     var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
