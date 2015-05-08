@@ -681,7 +681,8 @@ export class App {
 
         this.changePage(route, "none");
         this.ready = true;
-        var event = new Event("chondric.appready");
+        var event = document.createEvent("HTMLEvents"); 
+        event.initEvent("chondric.appready", true, true);
         document.dispatchEvent(event);
         
     }
