@@ -57,10 +57,11 @@
     };
 
     tools.buildVariation = function(variation, env, watch, destFolder, onBuildComplete) {
+        console.log(options);
         var debugMode = env != "prod"; //true;
         if (options.debug !== undefined) debugMode = options.debug;
         if (options[env] && options[env].debug !== undefined) debugMode = options[env].debug;
-
+        console.log("Debug: " + debugMode);
         console.log("building " + variation + " for " + env);
         var buildfolder = path.resolve(cwd, options.buildfolder);
         if (!fs.existsSync(buildfolder)) fs.mkdirSync(buildfolder);
@@ -167,13 +168,13 @@
             });
 
             function reportError(title, msg, source, detail) {
-                    var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
+                var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
 
-                    errorReporter = errorReporter.replace("\"[TITLE]\"", JSON.stringify(title || "Error"));
-                    errorReporter = errorReporter.replace("\"[MESSAGE]\"", JSON.stringify(msg || "Something went wrong"));
-                    errorReporter = errorReporter.replace("\"[SOURCE]\"", JSON.stringify(source || ""));
-                    errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(detail || ""));
-                    return errorReporter;
+                errorReporter = errorReporter.replace("\"[TITLE]\"", JSON.stringify(title || "Error"));
+                errorReporter = errorReporter.replace("\"[MESSAGE]\"", JSON.stringify(msg || "Something went wrong"));
+                errorReporter = errorReporter.replace("\"[SOURCE]\"", JSON.stringify(source || ""));
+                errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(detail || ""));
+                return errorReporter;
             }
 
 
@@ -222,7 +223,7 @@
                     if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
                 }
             });
-    
+
             var appFile = path.resolve(varFolder, "app.js");
             var appFileTemp = path.resolve(varFolder, "app (building).js");
             var appFileEs3 = path.resolve(varFolder, "app-es3.js");
@@ -332,7 +333,7 @@
                     });
                 }
 
-                async.eachSeries(options.cssVariations, function(v, next) {
+                async.eachSeries(variations, function(v, next) {
                     var iesrc = v.settings + '\n@import "' + (path.relative(tempFolder, cssEntryPoint).replace(/\\/ig, "/")) + '";';
                     var ieCssFile = path.resolve(tempFolder, "index-" + v.key + ".scss");
                     fs.writeFileSync(ieCssFile, iesrc);
