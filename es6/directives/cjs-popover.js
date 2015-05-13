@@ -45,13 +45,13 @@ export default {
 
                 if (!val) {
                     if (lastFocused) {
-                        lastFocused.focus();
-                        lastFocused = null;
-                    } else {
-                        if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") {
+                        if (lastFocused.tagName == "BODY") {
                             document.activeElement.blur();
+                        } else {
+                            lastFocused.focus();
                         }
-                    }
+                        lastFocused = null;
+                    } 
                     if (useOverlay) {
                         overlay.removeClass("active");
                     }
@@ -59,10 +59,12 @@ export default {
                     window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                     window.document.body.removeEventListener('keydown', closeWithKey, true);
                 } else {
-                    if (document.activeElement && useOverlay && !window.NativeNav && document.activeElement.tagName != "BODY") {
-                        lastFocused = document.activeElement;
+                    if (document.activeElement) {
+                        if (document.activeElement.tagName != "BODY") {
+                            lastFocused = document.activeElement;
+                        }
+                        element.focus();
                     }
-                    element.focus();
 
 
                     window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
