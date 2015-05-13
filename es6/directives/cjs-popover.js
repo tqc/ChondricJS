@@ -44,14 +44,16 @@ export default {
                 var overlay = ensureOverlay(element, useOverlay);
 
                 if (!val) {
-                    if (lastFocused) {
+
+                    if (lastFocused && document.activeElement === element[0]) {
                         if (lastFocused.tagName == "BODY") {
                             document.activeElement.blur();
                         } else {
                             lastFocused.focus();
                         }
                         lastFocused = null;
-                    } 
+                    }
+
                     if (useOverlay) {
                         overlay.removeClass("active");
                     }
@@ -59,13 +61,13 @@ export default {
                     window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                     window.document.body.removeEventListener('keydown', closeWithKey, true);
                 } else {
-                    if (document.activeElement) {
-                        if (document.activeElement.tagName != "BODY") {
+                    if (window.useMouse) {
+                        // giving the popup focus doesn't really work on iOS, so leace focus where it is
+                        if (document.activeElement && document.activeElement.tagName != "BODY") {
                             lastFocused = document.activeElement;
                         }
                         element.focus();
                     }
-
 
                     window.document.body.addEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
                     window.document.body.addEventListener('keydown', closeWithKey, true);
