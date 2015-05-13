@@ -85,9 +85,6 @@ export default {
                     var sw = $(window).width();
                     var sh = $(window).height();
 
-                    console.log(val.y);
-                    console.log(parentRect.top);
-
                     var horizontalCutoff = sw / 2;
                     var verticalCutoff = sh / 2;
                     var idealX = 0;
@@ -122,10 +119,9 @@ export default {
                     } else {
                         // the values usually come from mouse events which use document coordinates. 
                         // convert to viewport coordinates to match getBoundingClientRect
-                        idealX = (val.x || 0) - document.body.scrollLeft;
-                        idealY = (val.y || 0) - document.body.scrollTop;
+                        idealX = (val.x || 0) - window.scrollX;
+                        idealY = (val.y || 0) - window.scrollY;
                     }
-                    console.log(idealY);
 
 
                     var actualX = idealX;
