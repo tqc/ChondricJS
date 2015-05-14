@@ -139,6 +139,8 @@ export function ngTap() {
             element.addClass('deactivated');
 
             window.setTimeout(function() {
+                // add a final check for disabled elements in case we have a race condition
+                if (element.hasClass('disabled')) return;
                 scope.$apply(attrs.ngTap, element);
             }, 0);
         };
