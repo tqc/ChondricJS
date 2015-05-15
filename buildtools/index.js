@@ -220,7 +220,6 @@
                 if (!jsBuildError) {
                     console.log("Done browserify");
                     if (onComplete) onComplete();
-                    if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
                 }
             });
 
@@ -353,6 +352,7 @@
                 copyHtml();
                 copyImages();
                 copyLib();
+                if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
                 console.log("Build completed successfully");
                 return onBuildComplete && onBuildComplete(err);
             });
@@ -395,7 +395,9 @@
                     buildCss();
                 } else if (ext == ".js" || ext == ".html") {
                     console.log("Browserify package needs rebuild");
-                    buildClientJs();
+                    buildClientJs(function(err) {                        
+                        if (!err && options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
+                    });
                 } else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") {
                     console.log("Updating images");
                     copyImages();
