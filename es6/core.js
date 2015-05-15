@@ -591,7 +591,8 @@ export class App {
                 if (window.NativeNav) {
                     window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
                 }
-
+                // this doesn't make sense in embedded mode
+                if (!$element.hasClass("embedded")) {
                 window.setTimeout(function() {
                     var sp = app.scrollPosForRoutes[url];
                     if (sp) {
@@ -600,6 +601,7 @@ export class App {
                         window.scrollTo(0, 0);
                     }
                 }, 10);
+            }
             });
             app.attrs = $attrs;
             app.element = $element;
