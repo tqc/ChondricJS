@@ -1,5 +1,9 @@
+if (!window.$) {
+    // jquery needs to be global for angular to see it.
+    window.$ = window.jQuery = require('jquery');
+}
 var angular = require('angular');
-
+if (!window.angular) window.angular = angular;
 
 
 //import {ngTap} from "./directives/ng-tap.js";
@@ -21,7 +25,9 @@ if (!(function f() {}).name) {
             var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
             // For better performance only parse once, and then cache the
             // result through a new accessor for repeated access.
-            Object.defineProperty(this, 'name', { value: name });
+            Object.defineProperty(this, 'name', {
+                value: name
+            });
             return name;
         }
     });
@@ -213,12 +219,11 @@ export class App {
             for (let i = 0; i < p.length; i++) {
                 r += "/" + p[i];
             }
-        }
-        else {
+        } else {
             r = p;
         }
 
-        this.changePage(this.scope.route+";"+r);
+        this.changePage(this.scope.route + ";" + r);
     }
     closePopup() {
         let ss = this.scope.route.split(";");
@@ -227,9 +232,9 @@ export class App {
     popPopup() {
         // todo: remove last item from route
         let ss = this.scope.route.split(";");
-        var l = ss.length-1;
+        var l = ss.length - 1;
         while (l > 1 && !ss[l]) l--;
-        this.changePageInternal(ss[0], ss[0], ss.slice(1,l));        
+        this.changePageInternal(ss[0], ss[0], ss.slice(1, l));
     }
     changePage(p, transition, originElement) {
         console.log("Changing page to " + p);
@@ -595,15 +600,15 @@ export class App {
                 }
                 // this doesn't make sense in embedded mode
                 if (!$element.hasClass("embedded")) {
-                window.setTimeout(function() {
-                    var sp = app.scrollPosForRoutes[url];
-                    if (sp) {
-                        window.scrollTo(sp.x, sp.y);
-                    } else {
-                        window.scrollTo(0, 0);
-                    }
-                }, 10);
-            }
+                    window.setTimeout(function() {
+                        var sp = app.scrollPosForRoutes[url];
+                        if (sp) {
+                            window.scrollTo(sp.x, sp.y);
+                        } else {
+                            window.scrollTo(0, 0);
+                        }
+                    }, 10);
+                }
             });
             app.attrs = $attrs;
             app.element = $element;
@@ -685,10 +690,10 @@ export class App {
 
         this.changePage(route, "none");
         this.ready = true;
-        var event = document.createEvent("HTMLEvents"); 
+        var event = document.createEvent("HTMLEvents");
         event.initEvent("chondric.appready", true, true);
         document.dispatchEvent(event);
-        
+
     }
     start() {
         var app = this;
