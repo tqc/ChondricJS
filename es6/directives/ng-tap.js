@@ -1,3 +1,5 @@
+var angular = require('angular');
+
 export function ngTap() {
     var lastTapLocation;
     console.log("init tap");
@@ -12,8 +14,8 @@ export function ngTap() {
     if (window.document.addEventListener) {
         // no addEventListener means IE8, so definitely no touch or ghost click issues
 
-        var ghostClickCatcher = $('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
-        $(document.body).append(ghostClickCatcher);
+        var ghostClickCatcher = angular.element('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
+        angular.element(document.body).append(ghostClickCatcher);
         var showGhostClickCatcher = function () {
         // todo: probably should also adjust position to align with tap location
         // otherwise tapping elsewhere on the page is disabled unnecessarily.

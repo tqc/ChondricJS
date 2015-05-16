@@ -1,3 +1,5 @@
+var angular = require('angular');
+
 import {SharedUiComponent} from "./shareduicomponent";
 
 export class cjsRightPanel extends SharedUiComponent {
@@ -73,7 +75,7 @@ export class cjsRightPanel extends SharedUiComponent {
                     self.originRect = data.element[0].getBoundingClientRect();
                 }
                 window.NativeNav.startNativeTransition(self.nativeShowTransition, null, function() {
-                        $("body").addClass("cjs-shared-popup-active");
+                        angular.element("body").addClass("cjs-shared-popup-active");
                         document.getElementById("viewport").setAttribute("content", "width=260, initial-scale=1, maximum-scale=1, user-scalable=0");
                         self.active = active;
                         window.scrollTo(0, 0);
@@ -84,7 +86,7 @@ export class cjsRightPanel extends SharedUiComponent {
                 );
             } else if (!active && self.active) {
                 window.NativeNav.startNativeTransition(self.nativeHideTransition, null, function() {
-                    $("body").removeClass("cjs-shared-popup-active");
+                    angular.element("body").removeClass("cjs-shared-popup-active");
                     document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
                     self.active = active;
                     self.app.scopesForRoutes[self.route].$apply();

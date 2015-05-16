@@ -29,6 +29,10 @@
     var sassPath = process.platform === "win32" ? "sass.bat" : "sass";
 
     var options = {
+        globals: {
+            angular: "angular",
+            jquery: "$"
+        },
         serverapp: {
 
         },
@@ -127,6 +131,7 @@
 
         function buildClientJs(onComplete) {
             var jsBuildError = null;
+            var globalShim = require('browserify-global-shim').configure(options.globals);
             var b = browserify({
                     debug: debugMode,
                     extensions: [".txt", ".html"],
@@ -143,6 +148,7 @@
                     global: true
                 });
 
+
             for (var i = 0; i < options.customBrowserifyTransforms.length; i++) {
                 b = b.transform(options.customBrowserifyTransforms[i]());
             }
@@ -150,6 +156,11 @@
             b = b.transform(filteredEs6ify, {
                 global: true
             });
+
+            b = b.transform(globalShim, {
+                global: true
+            });
+
             if (!debugMode) {
                 // remove console.log calls
                 b = b.transform({
@@ -395,7 +406,7 @@
                     buildCss();
                 } else if (ext == ".js" || ext == ".html") {
                     console.log("Browserify package needs rebuild");
-                    buildClientJs(function(err) {                        
+                    buildClientJs(function(err) {
                         if (!err && options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
                     });
                 } else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") {

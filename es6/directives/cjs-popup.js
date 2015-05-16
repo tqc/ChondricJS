@@ -1,6 +1,9 @@
-Chondric.directive("cjsPopup", function() {
+var angular = require('angular');
 
-    return {
+export default {
+    name: "cjsPopup",
+    injections: [],
+    fn: () => ({
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var previousAdditionalClasses;
@@ -26,12 +29,12 @@ Chondric.directive("cjsPopup", function() {
                     e.preventDefault();
                     clickOutsidePopup(e);
                 } else if (keyCode === 9) {
-                    var te = $(tabbableElements, element);
-                    var ae = $(":focus", element);
+                    var te = angular.element(tabbableElements, element);
+                    var ae = angular.element(":focus", element);
                     if (e.shiftKey) {
                         if (document.activeElement == te[0] || ae.length === 0) {
                             e.preventDefault();
-                            te[te.length-1].focus();
+                            te[te.length - 1].focus();
                         }
                     } else {
                         if (document.activeElement == te[te.length - 1] || ae.length === 0) {
@@ -48,7 +51,7 @@ Chondric.directive("cjsPopup", function() {
             var parentPageElement = element.closest(".chondric-page");
             if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
             if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
-            var overlay = $(".modal-overlay", parentPageElement);
+            var overlay = angular.element(".modal-overlay", parentPageElement);
             if (overlay.length === 0) {
                 overlay = angular.element('<div class="modal-overlay"></div>');
                 parentPageElement.append(overlay);
@@ -86,7 +89,7 @@ Chondric.directive("cjsPopup", function() {
                             lastFocused = document.activeElement;
                         }
                         element.focus();
-                        var te = $(tabbableElements, element);
+                        var te = angular.element(tabbableElements, element);
                         if (te.length > 0) te[0].focus();
 
 
@@ -105,5 +108,5 @@ Chondric.directive("cjsPopup", function() {
                 }
             });
         }
-    };
-});
+    })
+};

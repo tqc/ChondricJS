@@ -1,3 +1,5 @@
+var angular = require('angular');
+
 import {SharedUiComponent} from "./shareduicomponent";
 
 export default class cjsSharedPopup extends SharedUiComponent {
@@ -52,7 +54,7 @@ export default class cjsSharedPopup extends SharedUiComponent {
                     self.originRect = data.element[0].getBoundingClientRect();
                 }
                 window.NativeNav.startNativeTransition("popup", self.originRect, function() {
-                        $("body").addClass("cjs-shared-popup-active");
+                        angular.element("body").addClass("cjs-shared-popup-active");
                         if (screen.width < 600) {
                             document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
                         } else {
@@ -68,7 +70,7 @@ export default class cjsSharedPopup extends SharedUiComponent {
                 );
             } else if (!active && self.popuptrigger) {
                 window.NativeNav.startNativeTransition("closepopup", self.originRect, function() {
-                    $("body").removeClass("cjs-shared-popup-active");
+                    angular.element("body").removeClass("cjs-shared-popup-active");
                     document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
                     self.popuptrigger = null;
                     self.app.scopesForRoutes[self.route].$apply();

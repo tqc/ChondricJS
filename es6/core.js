@@ -1,4 +1,5 @@
-//var angular = require('angular');
+var angular = require('angular');
+
 
 
 //import {ngTap} from "./directives/ng-tap.js";
@@ -80,12 +81,12 @@ export class App {
         this.registerPage(pageclass, route, options);
     }
 
-    registerSharedUiComponent(pageclass) {
-        if (pageclass["default"]) pageclass = pageclass["default"];
-        console.log("Registering shared UI component " + pageclass.name);
-        var component = new pageclass();
+    registerSharedUiComponent(componentClass) {
+        if (componentClass["default"]) componentClass = componentClass["default"];
+        console.log("Registering shared UI component " + componentClass.name);
+        var component = new componentClass();
         component.app = this;
-        component.componentId = component.componentId || component.componentName || pageclass.componentName || pageclass.name;
+        component.componentId = component.componentId || component.componentName || componentClass.componentName || componentClass.name;
         this.sharedUiComponents[component.componentId] = component;
     }
 
@@ -162,6 +163,7 @@ export class App {
             var page = openViews[ar];
             if (!page) {
                 openViews[ar] = page = new template.pageclass(ar, params, template.options);
+                page.initSharedUiComponents(app);
             }
             if (page.subsections) openViews = page.subsections;
             if (position) page.position = position;
@@ -329,10 +331,10 @@ export class App {
             // disable pointer events for 300ms to prevent ghost clicks.
             if (window.jstimer) window.jstimer.start("transitioningTimeout");
 
-            $(document.body).addClass("cjs-transitioning");
+            angular.element(document.body).addClass("cjs-transitioning");
             window.setTimeout(function() {
                 if (window.jstimer) window.jstimer.finish("transitioningTimeout");
-                $(document.body).removeClass("cjs-transitioning");
+                angular.element(document.body).removeClass("cjs-transitioning");
             }, 300);
             var actualTransition = "crossfade";
             var originRect = null;
@@ -346,7 +348,7 @@ export class App {
             }
 
             window.NativeNav.startNativeTransition(actualTransition, originRect, function() {
-                //                        $(".chondric-page.active").removeClass("active");
+                //                        angular.element(".chondric-page.active").removeClass("active");
                 if (window.jstimer) window.jstimer.finish("transitioningCallback1");
                 if (window.jstimer) window.jstimer.start("transitioningTimeout2");
                 window.setTimeout(function() {
@@ -578,7 +580,7 @@ export class App {
                 console.log("route watch: " + oldVal + " -> " + url);
                 if (!url) return;
                 if (document.activeElement && app.transitionMode != "native" && document.activeElement.tagName != "BODY") {
-                    if ($(document.activeElement).closest(".body").length > 0) {
+                    if (angular.element(document.activeElement).closest(".body").length > 0) {
                         // only blur if the active element was inside a page body - page headers etc can remain focused.
                         document.activeElement.blur();
                     }

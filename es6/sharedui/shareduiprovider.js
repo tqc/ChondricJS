@@ -1,3 +1,5 @@
+var angular = require('angular');
+
 export default function sharedUiFactory() {
     // A simplified interface for the shared ui components
 
@@ -29,7 +31,7 @@ export default function sharedUiFactory() {
                     },
                     extendData: function(update) {
                         var state = app.getSharedUiComponentState($scope, componentKey);
-                        var newData = $.extend(state.data || {}, update);
+                        var newData = angular.extend(state.data || {}, update);
                         app.setSharedUiComponentState($scope, componentKey, state.active, state.available, newData);
                     },
                     updateState: function(fn) {

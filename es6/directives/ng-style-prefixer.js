@@ -1,4 +1,3 @@
-
 export default function() {
 
     var style = document.body.style;

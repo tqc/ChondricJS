@@ -1,3 +1,5 @@
+var angular = require('angular');
+
 export default ["$timeout",function loadStatusFactory($timeout) {
     // simple UI to track loading status
     return {
@@ -5,7 +7,7 @@ export default ["$timeout",function loadStatusFactory($timeout) {
             var service = {};
             var existing = $scope.loadStatus;
             if (existing) {
-                $.extend(service, existing);
+                angular.extend(service, existing);
                 service.allTasks = [].concat(existing.allTasks);
 
             } else {
@@ -53,7 +55,7 @@ export default ["$timeout",function loadStatusFactory($timeout) {
                         });
                     }
                 };
-                $.extend(task, taskOptions);
+                angular.extend(task, taskOptions);
                 service[key] = task;
                 service.allTasks.push(task);
             };

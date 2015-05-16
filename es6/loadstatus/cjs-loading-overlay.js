@@ -1,3 +1,5 @@
+var angular = require('angular');
+
 export default {
     name: "cjsLoadingOverlay",
     injections: ["$compile"],

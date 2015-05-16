@@ -2,7 +2,6 @@ export class Page {
     constructor(route, params, options) {
         options = options || {            
         };
-        options.sharedUi = options.sharedUi || {};
         if (!route) {
             throw new Error("Error creating page - route missing");
         }
@@ -19,27 +18,6 @@ export class Page {
         this.preloadContent = options.preloadContent || require("./preload.html");
 
         var page = this;
-
-        for (let k in options.sharedUi) {
-            var componentId = options.sharedUi[k];
-            var component = app.sharedUiComponents[componentId];
-            if (!component) {
-                throw new Error(
-                    "Shared UI Component " + componentId + " not found"
-                );
-            }
-
-            var csfr = app.componentStatesForRoutes[route] = app.componentStatesForRoutes[route] || {};
-            csfr[componentId] = csfr[componentId] || {
-                route: route,
-                active: false,
-                available: true,
-                data: {}
-            };
-
-        }
-
-
 
 
         page.pageCtrl = ["$scope", "sharedUi", "loadStatus", function($scope, sharedUi, loadStatus) {
@@ -110,6 +88,27 @@ export class Page {
                 }
             });
         }];
+    }
+    initSharedUiComponents(app, sharedUiOptions) {
+            sharedUiOptions = sharedUiOptions || {};
+            for (let k in sharedUiOptions) {
+            var componentId = sharedUiOptions[k];
+            var component = app.sharedUiComponents[componentId];
+            if (!component) {
+                throw new Error(
+                    "Shared UI Component " + componentId + " not found"
+                );
+            }
+
+            var csfr = app.componentStatesForRoutes[this.route] = app.componentStatesForRoutes[this.route] || {};
+            csfr[componentId] = csfr[componentId] || {
+                route: this.route,
+                active: false,
+                available: true,
+                data: {}
+            };
+
+        }
     }
     controller($scope) {
         $scope.testValue1 = "Test value from base";
