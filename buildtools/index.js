@@ -129,9 +129,18 @@
             es6ify
         );
 
+        var globalShim = filterTransform(
+            function(file) {
+                return path.extname(file) === ".js";
+            },
+            require('browserify-global-shim').configure(options.globals)
+        );
+
+
         function buildClientJs(onComplete) {
             var jsBuildError = null;
-            var globalShim = require('browserify-global-shim').configure(options.globals);
+
+
             var b = browserify({
                     debug: debugMode,
                     extensions: [".txt", ".html"],
