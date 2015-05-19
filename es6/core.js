@@ -237,6 +237,7 @@ export class App {
         this.changePageInternal(ss[0], ss[0], ss.slice(1, l));
     }
     changePage(p, transition, originElement) {
+
         console.log("Changing page to " + p);
         var $scope = this.scope;
         var lastRoute, mainRoute;
@@ -255,7 +256,7 @@ export class App {
                         popups[j - 1] += "/" + p[j][i];
                     }
                 }
-            } else if (p[0].indexOf("/") === 0) {
+            } else if (p[0].indexOf("/") >= 0) {
                 // parameter is ["/main", "/popup"]
                 mainRoute = p[0];
                 for (let j = 1; j < p.length; j++) {
@@ -287,6 +288,16 @@ export class App {
     }
 
     changePageInternal(lastPageRoute, currentPageRoute, popups, transition, originElement) {
+
+        if (lastPageRoute) {
+            var path = require("path");
+            currentPageRoute = path.resolve(lastPageRoute, currentPageRoute);
+            for (let i = 0; i < popups.length; i++) {
+                if (!popups[i]) continue;
+                popups[i] = path.resolve(lastPageRoute, popups[i]);
+            }
+        }
+
         console.log("changePageInternal");
         console.log(popups);
         console.log(currentPageRoute);
