@@ -90,6 +90,7 @@ export class Page {
         }];
     }
     initSharedUiComponents(app, sharedUiOptions) {
+            this.app = app;
             sharedUiOptions = sharedUiOptions || {};
             for (let k in sharedUiOptions) {
             var componentId = sharedUiOptions[k];
