@@ -2,7 +2,7 @@
 /* global $: false */
 
 $(document).ready(function() {
-    var vp = $(".chondric-viewport");
+    var vp = $(".chondric-viewport,[chondric-viewport]");
     vp.addClass("viewport-error").removeClass("viewport-preload");
 
     var title = "[TITLE]";
