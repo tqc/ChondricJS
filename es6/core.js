@@ -302,6 +302,8 @@ export class App {
         console.log(popups);
         console.log(currentPageRoute);
         var fullRoute = currentPageRoute + ";" + popups.join(";");
+        if (fullRoute[fullRoute.length-1] == ";") fullRoute = fullRoute.substr(0, fullRoute.length-1);
+
         //        if ($scope.route == r) return;
         //        if ($scope.lastRoute == r) $scope.lastRoute = null;
 
@@ -604,7 +606,9 @@ export class App {
                 $scope.nextRoute = null;
                 $scope.lastRoute = oldVal;
                 $location.path(url).replace();
-                app.loadView(url.split(";")[0]);
+                $scope.activeRoutes = url.split(";");
+                $scope.activePageRoute = $scope.activeRoutes[0];
+                app.loadView($scope.activeRoutes[0]);
                 viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute].concat($scope.activePopups).concat(app.preloadedRoutes || []));
                 if (window.NativeNav) {
                     window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
