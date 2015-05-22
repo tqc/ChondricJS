@@ -94,11 +94,16 @@ export var chondricPage = ["$compile", "$injector", function($compile, $injector
                 // just ignore popups for now
                 var mainRoute = splitRoute[0];
 
+                var tc = scope.transition && scope.transition.type;
+
                 if (!isActive && mainRoute == page.route || mainRoute.indexOf(page.route + "/") === 0) {
                     // set active for main page and parent sections
                     isActive = true;
                     if ($animate) {
-                        $animate.addClass(element, "active").then(function() {});
+                        element.addClass(tc);
+                        $animate.addClass(element, "active").then(function() {
+                            element.removeClass(tc);
+                        });
                     } else {
                         $element.addClass("active");
                     }
@@ -106,7 +111,11 @@ export var chondricPage = ["$compile", "$injector", function($compile, $injector
                     // deactivate others, only applying change if page was previously active
                     isActive = false;
                     if ($animate) {
-                        $animate.removeClass(element, "active").then(function() {});
+                        element.addClass(tc);
+
+                        $animate.removeClass(element, "active").then(function() {
+                            element.removeClass(tc);
+                        });
                     } else {
                         $element.removeClass("active");
                     }
