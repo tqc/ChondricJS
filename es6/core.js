@@ -39,8 +39,15 @@ export class App {
         this.options = options;
         this.title = options.title;
         this.moduleName = options.moduleName || "chondric";
+        var deps = [];
+        try {
+            angular.module("ngAnimate");
+            deps.push("ngAnimate")
+        } catch (err) {
+            console.log("ngAnimate not loaded");
+        }
 
-        this.module = angular.module(this.moduleName, []);
+        this.module = angular.module(this.moduleName, deps);
 
         this.module.directive('ngTap', require("./directives/ng-tap.js").ngTap);
         this.module.directive('ngStylePrefixer', require("./directives/ng-style-prefixer.js").default);
@@ -302,7 +309,7 @@ export class App {
         console.log(popups);
         console.log(currentPageRoute);
         var fullRoute = currentPageRoute + ";" + popups.join(";");
-        if (fullRoute[fullRoute.length-1] == ";") fullRoute = fullRoute.substr(0, fullRoute.length-1);
+        if (fullRoute[fullRoute.length - 1] == ";") fullRoute = fullRoute.substr(0, fullRoute.length - 1);
 
         //        if ($scope.route == r) return;
         //        if ($scope.lastRoute == r) $scope.lastRoute = null;

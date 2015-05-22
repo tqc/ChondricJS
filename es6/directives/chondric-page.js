@@ -1,9 +1,13 @@
-export var chondricPage = ["$compile", function($compile) {
+export var chondricPage = ["$compile", "$injector", function($compile, $injector) {
+    var $animate;
+    if ($injector.has("$animate")) {
+        $animate = $injector.get("$animate");
+    }
+
     return {
         scope: true,
         controller: "page.pageCtrl",
         link: function(scope, element, attrs) {
-
 
             // clean up the generated html a little
             element.removeAttr("ng-repeat");
@@ -60,9 +64,8 @@ export var chondricPage = ["$compile", function($compile) {
                 template = "<div class=\"page-content\">" + template + "</div>";
 
                 if (page.fixedTemplate) {
-                    template = "<div class=\"scrollcontainer\"><div class=\"scrollheader\">" + page.fixedTemplate + "</div>" + template+ "</div>";
-                }
-                else {
+                    template = "<div class=\"scrollcontainer\"><div class=\"scrollheader\">" + page.fixedTemplate + "</div>" + template + "</div>";
+                } else {
                     element.addClass("scrollcontainer");
                 }
 
@@ -94,22 +97,26 @@ export var chondricPage = ["$compile", function($compile) {
                 if (!isActive && mainRoute == page.route || mainRoute.indexOf(page.route + "/") === 0) {
                     // set active for main page and parent sections
                     isActive = true;
-                    element.addClass("active");
-                }
-                else if (isActive && mainRoute != page.route && mainRoute.indexOf(page.route + "/") !== 0) {
+                    if ($animate) {
+                        $animate.addClass(element, "active").then(function() {});
+                    } else {
+                        $element.addClass("active");
+                    }
+                } else if (isActive && mainRoute != page.route && mainRoute.indexOf(page.route + "/") !== 0) {
                     // deactivate others, only applying change if page was previously active
                     isActive = false;
-                    element.removeClass("active");
-                }
-                else if (scope.activePopups[scope.activePopups.length-1] && scope.activePopups[scope.activePopups.length-1] == page.route) {
+                    if ($animate) {
+                        $animate.removeClass(element, "active").then(function() {});
+                    } else {
+                        $element.removeClass("active");
+                    }
+                } else if (scope.activePopups[scope.activePopups.length - 1] && scope.activePopups[scope.activePopups.length - 1] == page.route) {
                     element.removeClass("prev-popup");
                     element.addClass("active-popup");
-                }
-                else if (scope.activePopups[scope.activePopups.length-2] && scope.activePopups[scope.activePopups.length-2] == page.route) {
+                } else if (scope.activePopups[scope.activePopups.length - 2] && scope.activePopups[scope.activePopups.length - 2] == page.route) {
                     element.removeClass("active-popup");
                     element.addClass("prev-popup");
-                }
-                else {
+                } else {
                     element.removeClass("active-popup");
                     element.removeClass("prev-popup");
                 }
