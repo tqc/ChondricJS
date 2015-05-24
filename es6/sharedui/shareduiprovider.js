@@ -7,7 +7,10 @@ export default function sharedUiFactory() {
         init: function($scope, componentAliases) {
             var service = {};
             var app = $scope.app;
-            service.route = $scope.page.route;
+            if ($scope.page) {
+                // this will break with viewport2, but it's deprecated anyway.
+                service.route = $scope.page.route;
+            }
             $scope.sharedUi = service;
             service.addComponent = function(alias, componentKey) {
                 service[alias] = {

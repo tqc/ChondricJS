@@ -8,10 +8,10 @@ if (!window.angular) window.angular = angular;
 
 //import {ngTap} from "./directives/ng-tap.js";
 
-import {
-    Page
-}
-from "./page.js";
+import {Page} from "./page.js";
+import {RouteCollection} from "./routecollection.js";
+
+
 export {
     Page
 };
@@ -64,6 +64,9 @@ export class App {
 
         this.registerOptionalDirective(require("./directives/chondric-viewport"));
 
+        this.registerOptionalDirective(require("./directives/viewport2"));
+
+
         this.registerOptionalDirective(require("./loadstatus/cjs-loading-overlay"));
         this.registerOptionalDirective(require("./loadstatus/cjs-show-after-load"));
 
@@ -81,16 +84,40 @@ export class App {
 
         this.noop = function() {};
         this.hostSettings = require("build/hostsettings");
-    }
 
+        this.topLevelRoutes = new RouteCollection();
+    }
     registerPage(pageclass, route, options) {
         if (pageclass["default"]) pageclass = pageclass["default"];
         route = route || pageclass.routeTemplate;
         console.log("Registering page " + pageclass.name + " on route " + route);
-        this.allRoutes[route] = {
-            pageclass: pageclass,
-            options: options || {}
-        };
+
+        // move options into annotations so that constructor 
+        if (!pageclass.annotations || !pageclass.annotations.length) {
+            // in new model, classes are not reusable across multiple routes, so create a new subclass.
+
+            class pc extends pageclass {
+                constructor(a, b, c) {
+                    super(a, b, c);
+                }
+            }
+
+            pc.annotations = new Route({
+                route: route,
+                options: options
+            });
+            this.allRoutes[route] = {
+                pageclass: pc,
+                options: options || {}
+            };
+
+        } else {
+            this.allRoutes[route] = {
+                pageclass: pageclass,
+                options: options || {}
+            };
+        }
+
     }
 
     registerSection(pageclass, route, options) {
@@ -107,6 +134,7 @@ export class App {
     }
 
     registerOptionalDirective(options) {
+        var app = this;
         this.knownOptionalDirectives = this.knownOptionalDirectives || [];
         if (options.default) options = options.default;
 
@@ -114,19 +142,20 @@ export class App {
 
         if (typeof options == "function") {
             // annotated class
-            console.log("Got annotated class");
             // todo: find annotation with type Directive properly
             var annotation = options.annotations[0];
             name = annotation.selector;
             injections = annotation.injections;
             fn = function(a, b, c, d, e, f, g) {
-                        console.log("vp2 init");
+                console.log("vp2 init");
                 return {
                     template: annotation.template,
                     scope: true,
                     link: function(scope, element, attrs) {
                         console.log("vp2 link");
-                        var obj = new options(scope, element, attrs, a, b, c, d, e, f, g);                    
+                        var obj = new options(scope, element, attrs, a, b, c, d, e, f, g);
+                        obj.scope = scope;
+                        obj.app = app;
                         scope[name] = scope.directive = obj;
                     }
                 };

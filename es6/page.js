@@ -1,7 +1,17 @@
+import {RouteCollection} from "./routecollection.js";
+
 export class Page {
     constructor(route, params, options) {
-        options = options || {            
-        };
+        console.log("page constructor");
+        var annotation = this.constructor.annotations ? this.constructor.annotations[0]: {}; 
+        console.log(annotation);
+        options = options || annotation.options || {};
+
+        this.scopeName = annotation.scopeName;
+
+        if (!route) route = annotation.route;
+        if (!params) params = annotation.params;
+
         if (!route) {
             throw new Error("Error creating page - route missing");
         }
@@ -17,13 +27,18 @@ export class Page {
 
         this.preloadContent = options.preloadContent || require("./preload.html");
 
+        this.childRoutes=new RouteCollection();
+
         var page = this;
+            page.parentSections = [];
 
 
         page.pageCtrl = ["$scope", "sharedUi", "loadStatus", function($scope, sharedUi, loadStatus) {
             for (let k in params) {
                 $scope[k] = params[k];
             }
+            $scope.page = page;
+
             var xloadStatus = loadStatus.init($scope);
 
             var xsharedUi = sharedUi.init($scope, options.sharedUi);
@@ -41,7 +56,7 @@ export class Page {
             }
             $scope.pageRoute = page.route;
 
-
+            if (page.scopeName) $scope[page.scopeName] = page;
 
             page.controller($scope, xsharedUi, xloadStatus);
 
@@ -110,6 +125,27 @@ export class Page {
             };
 
         }
+    }
+    getPageForRoute(route) {
+        console.log("Getting page for "+route);
+        if (!route.length && !this.defaultRoute) {
+            // exact match and no redirection set up
+            return this;
+        }        
+        if (!route.length && this.defaultRoute) {
+            // redirect
+            route = this.defaultRoute;
+        }
+
+        // find matching child routes    
+        var page = this.childRoutes.getPageForRoute(route);
+        if (page && this.scopeName) {
+            page[this.scopeName] = this;
+        }
+        if (page) {
+            page.parentSections.push(this);
+        }
+        return page;
     }
     controller($scope) {
         $scope.testValue1 = "Test value from base";
