@@ -13,14 +13,15 @@ import {RouteCollection} from "./routecollection.js";
 
 
 export {
-    Page
+Page
 };
 
 require("./annotations");
 
 // Fix Function#name on browsers that do not support it (IE):
 // http://stackoverflow.com/a/17056530/101970
-if (!(function f() {}).name) {
+// todo: pretty sure this is no longer needed unless there are pages without a properly defined name.
+if (!(function f() { }).name) {
     Object.defineProperty(Function.prototype, 'name', {
         get: function() {
             var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
@@ -45,7 +46,7 @@ export class App {
         var deps = [];
         try {
             angular.module("ngAnimate");
-            deps.push("ngAnimate")
+            deps.push("ngAnimate");
         } catch (err) {
             console.log("ngAnimate not loaded");
         }
@@ -82,17 +83,17 @@ export class App {
 
         this.allRoutes = {};
 
-        this.noop = function() {};
+        this.noop = function() { };
         this.hostSettings = require("build/hostsettings");
 
         this.topLevelRoutes = new RouteCollection();
     }
     registerPage(pageclass, route, options) {
-        if (pageclass["default"]) pageclass = pageclass["default"];
+        if (pageclass.default) pageclass = pageclass.default;
         route = route || pageclass.routeTemplate;
         console.log("Registering page " + pageclass.name + " on route " + route);
 
-        // move options into annotations so that constructor 
+        // move options into annotations so that constructor
         if (!pageclass.annotations || !pageclass.annotations.length) {
             // in new model, classes are not reusable across multiple routes, so create a new subclass.
 
@@ -125,7 +126,7 @@ export class App {
     }
 
     registerSharedUiComponent(componentClass) {
-        if (componentClass["default"]) componentClass = componentClass["default"];
+        if (componentClass.default) componentClass = componentClass.default;
         console.log("Registering shared UI component " + componentClass.name);
         var component = new componentClass();
         component.app = this;
@@ -538,7 +539,7 @@ export class App {
                 if (!component) {
                     throw new Error(
                         "Shared UI Component " + componentId + " not found"
-                    );
+                        );
                 }
 
                 var csfr = app.componentStatesForRoutes[routeScope.pageRoute] = app.componentStatesForRoutes[routeScope.pageRoute] || {};
@@ -592,22 +593,22 @@ export class App {
 
 
 
-            $scope.changePage = function(a, b, c) {
+            $scope.changePage = function(a1, b1, c1) {
                 // because angular expressions can pass in lastTap but not lastTap.element in angular 1.3
-                if (c && c.element) c = c.element;
-                app.changePage(a, b, c);
+                if (c1 && c1.element) c1 = c1.element;
+                app.changePage(a1, b1, c1);
             };
 
-            $scope.pushPopup = function(a, b, c) {
-                app.pushPopup(a, b, c);
+            $scope.pushPopup = function(a1, b1, c1) {
+                app.pushPopup(a1, b1, c1);
             };
 
-            $scope.closePopup = function(a, b, c) {
-                app.closePopup(a, b, c);
+            $scope.closePopup = function(a1, b1, c1) {
+                app.closePopup(a1, b1, c1);
             };
 
-            $scope.popPopup = function(a, b, c) {
-                app.popPopup(a, b, c);
+            $scope.popPopup = function(a1, b1, c1) {
+                app.popPopup(a1, b1, c1);
             };
 
 

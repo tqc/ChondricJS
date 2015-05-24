@@ -2,6 +2,6 @@
 	"esnext": true,
 	"requireSemicolons": true,
 	"disallowMixedSpacesAndTabs": true,
-	"validateIndentation": 5,
+	"validateIndentation": 4,
 	"excludeFiles": ["node_modules"]
 }

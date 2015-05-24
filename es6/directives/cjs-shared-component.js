@@ -1,6 +1,6 @@
 var angular = require('angular');
 
-export var cjsSharedComponent = ["$compile", function ($compile) {
+export var cjsSharedComponent = ["$compile", function($compile) {
     return {
         scope: true,
         link: function(scope, element) {

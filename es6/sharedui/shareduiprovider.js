@@ -46,7 +46,7 @@ export default function sharedUiFactory() {
                 };
             };
 
-            for (var alias in componentAliases) {
+            for (let alias in componentAliases) {
                 service.addComponent(alias, componentAliases[alias]);
             }
             return service;

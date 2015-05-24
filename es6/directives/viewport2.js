@@ -1,3 +1,4 @@
+var $ = require("jquery");
 
 @Directive({
     template: require("./viewport2.html"),
@@ -23,12 +24,12 @@ export default class Viewport2 {
             // ignore first character, assuming it is always a slash
             route = route.split("/").slice(1);
         }
-        console.log("going to "+route);
-       
-        var page = app.topLevelRoutes.getPageForRoute(route);
+        console.log("going to " + route);
+
+        var page = this.app.topLevelRoutes.getPageForRoute(route);
 
         if (!page) {
-            alert("Invalid route "+route);
+            alert("Invalid route " + route);
             return;
         }
 
@@ -40,18 +41,18 @@ export default class Viewport2 {
 
 
         // render
-        var pageEl = $("<div>New Page</div>")
+        var pageEl = $("<div>New Page</div>");
 
         pageEl.html(page.template);
 
         this.element.append(pageEl);
 
         var newScope = this.scope.$new();
-        var ctrl = page.pageCtrl[page.pageCtrl.length-1];
+        var ctrl = page.pageCtrl[page.pageCtrl.length - 1];
         newScope.ctrl = page;
         // for backward compatibility only
-        var sharedUi = this.$injector.get("sharedUi")
-        var loadStatus = this.$injector.get("loadStatus")
+        var sharedUi = this.$injector.get("sharedUi");
+        var loadStatus = this.$injector.get("loadStatus");
 
         ctrl(newScope, sharedUi, loadStatus);
 

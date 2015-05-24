@@ -1,9 +1,9 @@
 export class RouteCollection {
     constructor() {
-        this.routeClasses = {};        
+        this.routeClasses = {};
     }
     register(routeClass) {
-        if (routeClass["default"]) routeClass = routeClass["default"];
+        if (routeClass.default) routeClass = routeClass.default;
         // todo: find annotation with type Route properly
         var annotation = routeClass.annotations[0];
         this.routeClasses[annotation.route] = routeClass;
@@ -44,7 +44,7 @@ export class RouteCollection {
                     section[pn] = params[pn];
                 }
                 var newPage = section.getPageForRoute(subroute);
-                
+
                 return newPage;
             }
         }

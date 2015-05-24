@@ -1,4 +1,3 @@
-
 class Directive {
     constructor(options) {
         this.template = options.template;
@@ -16,20 +15,18 @@ class Route {
         // todo: parse route to extract parameters
         this.routeArray = options.route.split("/");
         for (let i = 0; i < this.routeArray.length; i++) {
-        	var n = this.routeArray[i];
-        	if (n[0] == "$") {
-        		this.parameterNames.push(n.substr(1));
-        	}
-        	else {
-	        	this.parameterNames.push(undefined);
-        	}
+            var n = this.routeArray[i];
+            if (n[0] == "$") {
+                this.parameterNames.push(n.substr(1));
+            } else {
+                this.parameterNames.push(undefined);
+            }
         }
     }
 }
 
 class TestAnnotation {
-    constructor(options) {
-    }
+    constructor(options) { }
 }
 
 // make annotations global so we don't need to import in every single file.

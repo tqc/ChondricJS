@@ -6,11 +6,11 @@ export class cjsRightPanel extends SharedUiComponent {
     constructor() {
         super();
         this.componentId = "cjsRightPanel";
-        this.template=require("./cjs-right-panel.html");
-        this.handledSwipeState= "rightBorder";
-        this.transition= "coverRight";
-        this.nativeShowTransition= "showrightpanel";
-        this.nativeHideTransition= "hiderightpanel";
+        this.template = require("./cjs-right-panel.html");
+        this.handledSwipeState = "rightBorder";
+        this.transition = "coverRight";
+        this.nativeShowTransition = "showrightpanel";
+        this.nativeHideTransition = "hiderightpanel";
     }
     isNative() {
         return false;
@@ -19,7 +19,7 @@ export class cjsRightPanel extends SharedUiComponent {
         var self = $scope.componentDefinition;
         self.scope = $scope;
         $scope.componentId = self.id;
-        self.defaultController = function() {};
+        self.defaultController = function() { };
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
             if (self.data.closeCallback) {
@@ -75,15 +75,15 @@ export class cjsRightPanel extends SharedUiComponent {
                     self.originRect = data.element[0].getBoundingClientRect();
                 }
                 window.NativeNav.startNativeTransition(self.nativeShowTransition, null, function() {
-                        angular.element("body").addClass("cjs-shared-popup-active");
-                        document.getElementById("viewport").setAttribute("content", "width=260, initial-scale=1, maximum-scale=1, user-scalable=0");
-                        self.active = active;
-                        window.scrollTo(0, 0);
-                        self.app.scopesForRoutes[self.route].$apply();
-                        window.NativeNav.finishNativeTransition();
-                    },
+                    angular.element("body").addClass("cjs-shared-popup-active");
+                    document.getElementById("viewport").setAttribute("content", "width=260, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    self.active = active;
+                    window.scrollTo(0, 0);
+                    self.app.scopesForRoutes[self.route].$apply();
+                    window.NativeNav.finishNativeTransition();
+                },
                     self.scope.hideModal
-                );
+                    );
             } else if (!active && self.active) {
                 window.NativeNav.startNativeTransition(self.nativeHideTransition, null, function() {
                     angular.element("body").removeClass("cjs-shared-popup-active");

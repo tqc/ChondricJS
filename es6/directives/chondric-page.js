@@ -105,7 +105,7 @@ export var chondricPage = ["$compile", "$injector", function($compile, $injector
                             element.removeClass(tc);
                         });
                     } else {
-                        $element.addClass("active");
+                        element.addClass("active");
                     }
                 } else if (isActive && mainRoute != page.route && mainRoute.indexOf(page.route + "/") !== 0) {
                     // deactivate others, only applying change if page was previously active
@@ -117,7 +117,7 @@ export var chondricPage = ["$compile", "$injector", function($compile, $injector
                             element.removeClass(tc);
                         });
                     } else {
-                        $element.removeClass("active");
+                        element.removeClass("active");
                     }
                 } else if (scope.activePopups[scope.activePopups.length - 1] && scope.activePopups[scope.activePopups.length - 1] == page.route) {
                     element.removeClass("prev-popup");

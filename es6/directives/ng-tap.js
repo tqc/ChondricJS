@@ -16,33 +16,33 @@ export function ngTap() {
 
         var ghostClickCatcher = angular.element('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
         angular.element(document.body).append(ghostClickCatcher);
-        var showGhostClickCatcher = function () {
-        // todo: probably should also adjust position to align with tap location
-        // otherwise tapping elsewhere on the page is disabled unnecessarily.
-        ghostClickCatcher.css( "display", "block" );
-    };
+        var showGhostClickCatcher = function() {
+            // todo: probably should also adjust position to align with tap location
+            // otherwise tapping elsewhere on the page is disabled unnecessarily.
+            ghostClickCatcher.css("display", "block");
+        };
 
         var hideGhostClickCatcher = function() {
-        ghostClickCatcher.css( "display", "none" );
-    };
+            ghostClickCatcher.css("display", "none");
+        };
 
         ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
 
         // todo: turn useMouse back on if a genuine mouse event shows up
         window.document.addEventListener('touchstart', function(event) {
-        window.useMouse = false;
-    }, true);
+            window.useMouse = false;
+        }, true);
 
         window.document.addEventListener('mouseup', function(event) {
-        hideGhostClickCatcher();
-    }, true);
+            hideGhostClickCatcher();
+        }, true);
         window.document.addEventListener('mousedown', function(event) {
-        hideGhostClickCatcher();
-    }, true);
+            hideGhostClickCatcher();
+        }, true);
         window.document.addEventListener('click', function(event) {
-        hideGhostClickCatcher();
-        if (window.jstimer) window.jstimer.finish("ghostclick");
-    }, true);
+            hideGhostClickCatcher();
+            if (window.jstimer) window.jstimer.finish("ghostclick");
+        }, true);
 
 
 
@@ -71,7 +71,7 @@ export function ngTap() {
 
         // called if the mouse moves too much or leaves the element
         var cancel = function() {
-           
+
             if (touchTimeout) window.clearTimeout(touchTimeout);
 
             if (!window.useMouse) {

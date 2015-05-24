@@ -3,7 +3,7 @@ import {RouteCollection} from "./routecollection.js";
 export class Page {
     constructor(route, params, options) {
         console.log("page constructor");
-        var annotation = this.constructor.annotations ? this.constructor.annotations[0]: {}; 
+        var annotation = this.constructor.annotations ? this.constructor.annotations[0] : {};
         console.log(annotation);
         options = options || annotation.options || {};
 
@@ -27,10 +27,10 @@ export class Page {
 
         this.preloadContent = options.preloadContent || require("./preload.html");
 
-        this.childRoutes=new RouteCollection();
+        this.childRoutes = new RouteCollection();
 
         var page = this;
-            page.parentSections = [];
+        page.parentSections = [];
 
 
         page.pageCtrl = ["$scope", "sharedUi", "loadStatus", function($scope, sharedUi, loadStatus) {
@@ -105,15 +105,15 @@ export class Page {
         }];
     }
     initSharedUiComponents(app, sharedUiOptions) {
-            this.app = app;
-            sharedUiOptions = sharedUiOptions || {};
-            for (let k in sharedUiOptions) {
+        this.app = app;
+        sharedUiOptions = sharedUiOptions || {};
+        for (let k in sharedUiOptions) {
             var componentId = sharedUiOptions[k];
             var component = app.sharedUiComponents[componentId];
             if (!component) {
                 throw new Error(
                     "Shared UI Component " + componentId + " not found"
-                );
+                    );
             }
 
             var csfr = app.componentStatesForRoutes[this.route] = app.componentStatesForRoutes[this.route] || {};
@@ -127,17 +127,17 @@ export class Page {
         }
     }
     getPageForRoute(route) {
-        console.log("Getting page for "+route);
+        console.log("Getting page for " + route);
         if (!route.length && !this.defaultRoute) {
             // exact match and no redirection set up
             return this;
-        }        
+        }
         if (!route.length && this.defaultRoute) {
             // redirect
             route = this.defaultRoute;
         }
 
-        // find matching child routes    
+        // find matching child routes
         var page = this.childRoutes.getPageForRoute(route);
         if (page && this.scopeName) {
             page[this.scopeName] = this;

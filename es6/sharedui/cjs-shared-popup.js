@@ -6,7 +6,7 @@ export default class cjsSharedPopup extends SharedUiComponent {
     constructor() {
         super();
         this.componentId = "cjsSharedPopup";
-        this.template=require("./cjs-shared-popup.html");
+        this.template = require("./cjs-shared-popup.html");
     }
     isNative() {
         return false;
@@ -15,7 +15,7 @@ export default class cjsSharedPopup extends SharedUiComponent {
     controller($scope) {
         var self = $scope.componentDefinition;
         self.scope = $scope;
-        self.defaultController = function() {};
+        self.defaultController = function() { };
 
         $scope.hideModal = function() {
             var routeScope = self.app.scopesForRoutes[self.route];
@@ -54,20 +54,20 @@ export default class cjsSharedPopup extends SharedUiComponent {
                     self.originRect = data.element[0].getBoundingClientRect();
                 }
                 window.NativeNav.startNativeTransition("popup", self.originRect, function() {
-                        angular.element("body").addClass("cjs-shared-popup-active");
-                        if (screen.width < 600) {
-                            document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
-                        } else {
-                            document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
-                        }
-                        window.scrollTo(0, 0);
-                        self.popuptrigger = {};
-                        self.nativeTransition = true;
-                        self.app.scopesForRoutes[self.route].$apply();
-                        window.NativeNav.finishNativeTransition();
-                    },
+                    angular.element("body").addClass("cjs-shared-popup-active");
+                    if (screen.width < 600) {
+                        document.getElementById("viewport").setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    } else {
+                        document.getElementById("viewport").setAttribute("content", "width=500, height=500, initial-scale=1, maximum-scale=1, user-scalable=0");
+                    }
+                    window.scrollTo(0, 0);
+                    self.popuptrigger = {};
+                    self.nativeTransition = true;
+                    self.app.scopesForRoutes[self.route].$apply();
+                    window.NativeNav.finishNativeTransition();
+                },
                     self.scope.hideModal
-                );
+                    );
             } else if (!active && self.popuptrigger) {
                 window.NativeNav.startNativeTransition("closepopup", self.originRect, function() {
                     angular.element("body").removeClass("cjs-shared-popup-active");

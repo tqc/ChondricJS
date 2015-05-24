@@ -4,7 +4,7 @@ export default class cjsTabFooter extends SharedUiComponent {
     constructor() {
         super();
         this.componentId = "cjsTabFooter";
-        this.template=require("./cjs-tab-footer.html");
+        this.template = require("./cjs-tab-footer.html");
     }
     isNative() {
         return window.NativeNav && true || false;

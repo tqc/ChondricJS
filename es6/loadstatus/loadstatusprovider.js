@@ -1,6 +1,6 @@
 var angular = require('angular');
 
-export default ["$timeout",function loadStatusFactory($timeout) {
+export default["$timeout", function loadStatusFactory($timeout) {
     // simple UI to track loading status
     return {
         init: function($scope, tasks) {

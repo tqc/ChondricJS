@@ -1,5 +1,5 @@
 import {
-    SharedUiComponent
+SharedUiComponent
 }
 from "./shareduicomponent";
 
@@ -32,11 +32,11 @@ export class MultistateComponent extends SharedUiComponent {
             active: false,
             data: null
         }, {
-            route: null,
-            available: false,
-            active: false,
-            data: null
-        }];
+                route: null,
+                available: false,
+                active: false,
+                data: null
+            }];
         self.activeState = null;
     }
     setState(self, route, active, available, data, direction) {
