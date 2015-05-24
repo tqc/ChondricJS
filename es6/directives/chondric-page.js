@@ -99,26 +99,17 @@ export var chondricPage = ["$compile", "$injector", function($compile, $injector
                 if (!isActive && mainRoute == page.route || mainRoute.indexOf(page.route + "/") === 0) {
                     // set active for main page and parent sections
                     isActive = true;
-                    if ($animate) {
-                        element.addClass(tc);
-                        $animate.addClass(element, "active").then(function() {
-                            element.removeClass(tc);
-                        });
-                    } else {
-                        element.addClass("active");
-                    }
+                    element.addClass(tc);
+                    $animate.addClass(element, "active").then(function() {
+                        element.removeClass(tc);
+                    });
                 } else if (isActive && mainRoute != page.route && mainRoute.indexOf(page.route + "/") !== 0) {
                     // deactivate others, only applying change if page was previously active
                     isActive = false;
-                    if ($animate) {
-                        element.addClass(tc);
-
-                        $animate.removeClass(element, "active").then(function() {
-                            element.removeClass(tc);
-                        });
-                    } else {
-                        element.removeClass("active");
-                    }
+                    element.addClass(tc);
+                    $animate.removeClass(element, "active").then(function() {
+                        element.removeClass(tc);
+                    });
                 } else if (scope.activePopups[scope.activePopups.length - 1] && scope.activePopups[scope.activePopups.length - 1] == page.route) {
                     element.removeClass("prev-popup");
                     element.addClass("active-popup");
