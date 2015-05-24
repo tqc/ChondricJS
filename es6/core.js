@@ -103,10 +103,10 @@ export class App {
                 }
             }
 
-            pc.annotations = new Route({
+            pc.annotations = [new Route({
                 route: route,
                 options: options
-            });
+            })];
             this.allRoutes[route] = {
                 pageclass: pc,
                 options: options || {}
