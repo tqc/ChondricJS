@@ -43,10 +43,6 @@ export class MultistateComponent extends SharedUiComponent {
         console.log(self.componentId + ".setState(" + route + "," + active + "," + available + "," + data + "," + direction + ")");
         console.log(data);
 
-        if (!data || !Object.keys(data).length) {
-            //   console.log("navbar setState - no data");
-        }
-
 
         if (!self.initialTransitionTimeout && !active && !available && (!data || !Object.keys(data).length)) {
             self.initialTransitionTimeout = window.setTimeout(function() {

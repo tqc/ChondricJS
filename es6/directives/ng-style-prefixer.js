@@ -29,6 +29,7 @@ export default function() {
                             k = transformStyle;
                         }
                         if (k == "transition") {
+                            k = transitionStyle;
                             if (v) v = v.replace("transform", transformStyle);
                         }
 

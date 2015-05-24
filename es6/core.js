@@ -396,7 +396,7 @@ export class App {
             };
 
             if (originElement && originElement.length) {
-                // todo: find parent element if necessary and set appropriate origin rect                   
+                // todo: find parent element if necessary and set appropriate origin rect
                 fromRect = app.transitionOriginForRoutes[fromRoute] = originElement[0].getBoundingClientRect();
             } else {
                 fromRect = app.transitionOriginForRoutes[fromRoute] = null;

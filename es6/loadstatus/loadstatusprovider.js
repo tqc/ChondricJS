@@ -3,7 +3,7 @@ var angular = require('angular');
 export default["$timeout", function loadStatusFactory($timeout) {
     // simple UI to track loading status
     return {
-        init: function($scope, tasks) {
+        init: function($scope, initialTasks) {
             var service = {};
             var existing = $scope.loadStatus;
             if (existing) {
@@ -64,7 +64,7 @@ export default["$timeout", function loadStatusFactory($timeout) {
                 // if no task array specified, include all tasks in the current scope
                 tasksOrKeys = tasksOrKeys || service.allTasks;
                 var watchedKeys = [];
-                for (var i = 0; i < tasksOrKeys.length; i++) {
+                for (let i = 0; i < tasksOrKeys.length; i++) {
                     var t = tasksOrKeys[i];
                     if (typeof t == "string") watchedKeys.push(t);
                     else if (t.key) watchedKeys.push(t.key);
@@ -74,17 +74,17 @@ export default["$timeout", function loadStatusFactory($timeout) {
                     completed: true
                 });
 
-                $scope.$watch("[loadStatus." + watchedKeys.join(",loadStatus.") + "]", function(tasks) {
+                $scope.$watch("[loadStatus." + watchedKeys.join(",loadStatus.") + "]", function(newTasks) {
                     // check all tasks, see if there are any outstanding
-                    if (!tasks) return;
+                    if (!newTasks) return;
 
                     var result = {
-                        tasks: tasks
+                        tasks: newTasks
                     };
 
                     result.currentTask = undefined;
-                    for (var i = 0; i < tasks.length; i++) {
-                        var task = tasks[i];
+                    for (var i = 0; i < newTasks.length; i++) {
+                        var task = newTasks[i];
                         if (task.error) {
                             result.currentTask = task;
                             break;
@@ -100,7 +100,7 @@ export default["$timeout", function loadStatusFactory($timeout) {
                         }
                     }
                     if (!result.currentTask) {
-                        // finished                    
+                        // finished
                         result.message = "finished";
                         result.completed = true;
                     } else {
@@ -122,9 +122,9 @@ export default["$timeout", function loadStatusFactory($timeout) {
                 });
             };
 
-            if (tasks) {
-                for (var tk in tasks) {
-                    service.registerTask(tk, tasks[tk]);
+            if (initialTasks) {
+                for (var tk in initialTasks) {
+                    service.registerTask(tk, initialTasks[tk]);
                 }
             }
             return service;

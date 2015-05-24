@@ -27,7 +27,7 @@ export default {
                 clickOutsidePopup(e);
             }
 
-            function ensureOverlay(element, useOverlay) {
+            function ensureOverlay() {
                 var parentPageElement = element.closest(".chondric-page");
                 if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-section");
                 if (parentPageElement.length === 0) parentPageElement = element.closest(".chondric-viewport");
@@ -43,7 +43,7 @@ export default {
             var lastFocused = null;
             scope.$watch(attrs.cjsPopover, function(val) {
 
-                var overlay = ensureOverlay(element, useOverlay);
+                var overlay = ensureOverlay();
 
                 if (!val) {
 
@@ -119,7 +119,7 @@ export default {
                         }
 
                     } else {
-                        // the values usually come from mouse events which use document coordinates. 
+                        // the values usually come from mouse events which use document coordinates.
                         // convert to viewport coordinates to match getBoundingClientRect
                         idealX = (val.x || 0) - window.scrollX;
                         idealY = (val.y || 0) - window.scrollY;
@@ -160,22 +160,6 @@ export default {
                         }
                         menupos.left = (actualX - menuwidth / 2 - parentRect.left) + "px";
                     }
-
-                    /* 
-
-                        if (cr.bottom > sh / 2) {
-                            menupos.bottom = (sh - cr.top + 12) + "px";
-                            menupos.top = "auto";
-                            
-                        } else {
-                            menupos.top = (cr.bottom + 12) + "px";
-                            menupos.bottom = "auto";
-                            element.addClass("down").removeClass("up");
-                        }
-                        var left = ((button.offsetLeft + button.offsetWidth / 2) - menuwidth / 2);
-                        var arrowleft = (cr.left + cr.width / 2) - 13 - left;
-
-*/
 
                     var indel = angular.element(".poparrow", element);
                     if (indel.length > 0) {

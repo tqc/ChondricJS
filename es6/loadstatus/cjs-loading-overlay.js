@@ -34,7 +34,7 @@ export default {
                 scope.taskGroup = taskGroup;
                 scope.currentTask = taskGroup.currentTask;
                 if (taskGroup.completed) {
-                    // finished                    
+                    // finished
                     scope.message = "finished";
                     if (attrs.showUnloaded === undefined)
                         contentElement.addClass("ui-show").removeClass("ui-hide");
