@@ -107,6 +107,14 @@
         var libFolder = path.resolve(cwd, options.libFolder);
 
 
+        es6ify.traceurOverrides = {
+            annotations: true,
+            types: true,
+            memberVariables: true
+        };
+
+
+
         var filteredEs6ify = filterTransform(
             function(file) {
                 // browserify needs transforms to be global, and compiling es5 modules 

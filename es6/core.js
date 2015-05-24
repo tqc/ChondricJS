@@ -16,6 +16,7 @@ export {
     Page
 };
 
+require("./annotations");
 
 // Fix Function#name on browsers that do not support it (IE):
 // http://stackoverflow.com/a/17056530/101970
@@ -32,6 +33,8 @@ if (!(function f() {}).name) {
         }
     });
 }
+
+
 
 
 export class App {
@@ -106,11 +109,43 @@ export class App {
     registerOptionalDirective(options) {
         this.knownOptionalDirectives = this.knownOptionalDirectives || [];
         if (options.default) options = options.default;
-        if (this.knownOptionalDirectives.indexOf(options.name) >= 0) return;
-        this.knownOptionalDirectives.push(options.name);
-        var arr = options.injections || [];
-        arr = arr.concat([options.fn]);
-        this.module.directive(options.name, arr);
+
+        var name, injections, fn;
+
+        if (typeof options == "function") {
+            // annotated class
+            console.log("Got annotated class");
+            // todo: find annotation with type Directive properly
+            var annotation = options.annotations[0];
+            name = annotation.selector;
+            injections = annotation.injections;
+            fn = function(a, b, c, d, e, f, g) {
+                        console.log("vp2 init");
+                return {
+                    template: annotation.template,
+                    scope: true,
+                    link: function(scope, element, attrs) {
+                        console.log("vp2 link");
+                        var obj = new options(scope, element, attrs, a, b, c, d, e, f, g);                    
+                        scope[name] = scope.directive = obj;
+                    }
+                };
+            };
+
+
+        } else if (typeof options == "object") {
+            // object with name, injector and fn properties
+            name = options.name;
+            injections = options.injections || [];
+            fn = options.fn;
+        }
+
+        if (this.knownOptionalDirectives.indexOf(name) >= 0) return;
+        this.knownOptionalDirectives.push(name);
+
+        var arr = injections || [];
+        arr = arr.concat([fn]);
+        this.module.directive(name, arr);
     }
 
     registerOptionalFilter(options) {
