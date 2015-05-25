@@ -11,5 +11,9 @@ export default class Viewport {
 
         element.removeClass("viewport-preload");
         element.addClass("chondric-viewport");
+
+
+        scope.go = scope.changePage;
+
     }
 }

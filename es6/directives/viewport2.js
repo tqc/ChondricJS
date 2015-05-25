@@ -2,18 +2,23 @@ var $ = require("jquery");
 
 @Directive({
     template: require("./viewport2.html"),
-    selector: "viewport2",
+    selector: "viewport",
     injections: ["$compile", "$injector"]
 })
 export default class Viewport2 {
     constructor(scope, element, attrs, $compile, $injector) {
-        console.log("vp2 constructor");
         this.$compile = $compile;
         this.$injector = $injector;
         this.element = element;
         this.scope = scope;
         element.removeClass("viewport-preload");
         element.addClass("viewport2");
+
+        var self = this;
+        scope.go = function(a, b, c) { self.go(a, b, c); };
+
+        scope.changePage = scope.go;
+
 
         //this.go("/start");
 

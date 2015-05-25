@@ -612,6 +612,7 @@ export class App {
             };
 
 
+
             $rootScope.$on('$locationChangeStart', function(event, newUrl, oldUrl) {
                 if (!oldUrl || !newUrl || oldUrl == newUrl) return;
                 var ind = newUrl.indexOf("#");

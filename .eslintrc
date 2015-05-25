@@ -1,5 +1,8 @@
 {
     "parser": "babel-eslint",
+    "plugins": [
+//        "chondric",
+    ],
     "rules":{
         "eqeqeq": false,
         "no-unused-vars": [2, {"vars": "all", "args":"none"}],
