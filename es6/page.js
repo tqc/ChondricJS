@@ -72,10 +72,22 @@ export class Page {
                 var newRoutes = (newVal || "").split(";");
                 var oldRoutes = (oldVal || "").split(";");
 
-                var matchRoute = function(val) {
-                    if (val && val.indexOf($scope.pageRoute) === 0) return true;
+
+                var matchRoute = function(val) {                    
+                    if (!val) return false;
+                    var pr = $scope.pageRoute;
+                    var iopr = val.indexOf(pr);
+                    if (iopr !== 0) return false;
+                    // exact match
+                    if (val.length == pr.length) return true;
+                    // pr is section
+                    if (val[pr.length] == "/") return true;
+                    // matched first of multiple routes
+                    if (val[pr.length] == ";") return true;
+                    // anything else means a sibling page with a similar name
                     return false;
                 };
+
 
                 var wasActive = oldRoutes.filter(matchRoute).length > 0;
                 var isActive = newRoutes.filter(matchRoute).length > 0;
