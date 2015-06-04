@@ -65,6 +65,7 @@ $pageMargins: () !default;
         > .page-content {
             box-sizing:border-box;
             min-height: 100%;
+            position: relative;
         }
         @each $sel, $val in $pageMargins {
             &#{$sel} > .page-content {
