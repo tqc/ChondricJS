@@ -297,6 +297,24 @@ export class App {
 
         this.changePage(this.scope.route + ";" + r);
     }
+    changePopup(p) {
+        if (!p) return;
+        var r;
+        if (p instanceof Array) {
+            r = "";
+            for (let i = 0; i < p.length; i++) {
+                r += "/" + p[i];
+            }
+        } else {
+            r = p;
+        }
+
+        let ss = this.scope.route.split(";");
+        this.changePage(ss[0] + ";" + r);
+
+        this.changePage(this.scope.route + ";" + r);
+    }
+
     closePopup() {
         let ss = this.scope.route.split(";");
         this.changePageInternal(ss[0], ss[0], []);
