@@ -31,7 +31,8 @@
     var options = {
         globals: {
             angular: "angular",
-            jquery: "$"
+            jquery: "$",
+            d3: "d3"
         },
         serverapp: {
 
