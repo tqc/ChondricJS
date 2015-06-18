@@ -16,7 +16,12 @@ export function ngTap() {
 
         var ghostClickCatcher = angular.element('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
         angular.element(document.body).append(ghostClickCatcher);
+        var ghostClickTimer = 0;
         var showGhostClickCatcher = function() {
+            // hide the ghost click catcher after half a second, since ios 8 only sometimes sends ghost clicks.
+            // note that this isn't ideal in native mode - a heavy transition can delay simulated clicks for almost a second.
+            if (ghostClickTimer) window.clearTimeout(ghostClickTimer);
+            ghostClickTimer = window.setTimeout(hideGhostClickCatcher, 400);
             // todo: probably should also adjust position to align with tap location
             // otherwise tapping elsewhere on the page is disabled unnecessarily.
             ghostClickCatcher.css("display", "block");
@@ -27,6 +32,10 @@ export function ngTap() {
         };
 
         ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
+        ghostClickCatcher.on("mouseup", hideGhostClickCatcher);
+        ghostClickCatcher.on("mouseenter", hideGhostClickCatcher);
+        ghostClickCatcher.on("mouseleave", hideGhostClickCatcher);
+        ghostClickCatcher.on("mousemove", hideGhostClickCatcher);
 
         // todo: turn useMouse back on if a genuine mouse event shows up
         window.document.addEventListener('touchstart', function(event) {
