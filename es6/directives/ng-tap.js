@@ -64,7 +64,7 @@ export function ngTap() {
         var move = function(e) {
             var x = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.clientX;
             var y = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.clientY;
-            if (Math.abs(x - startX) > 10 || Math.abs(y - startY) > 10) {
+            if (Math.abs(x - startX) > 20 || Math.abs(y - startY) > 20) {
                 cancel(e);
             }
         };
