@@ -121,8 +121,8 @@ export default {
                     } else {
                         // the values usually come from mouse events which use document coordinates.
                         // convert to viewport coordinates to match getBoundingClientRect
-                        idealX = (val.x || 0) - window.scrollX;
-                        idealY = (val.y || 0) - window.scrollY;
+                        idealX = (val.x || 0) - (window.pageXOffset || 0);
+                        idealY = (val.y || 0) - (window.pageYOffset || 0);
                     }
 
 
@@ -179,6 +179,8 @@ export default {
                     if (useOverlay) {
                         overlay.addClass("active");
                     }
+                    console.log("Updating popover");
+                    console.log(menupos);
                     element.addClass("active");
                     element.css(menupos);
                 }
