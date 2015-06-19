@@ -179,8 +179,6 @@ export default {
                     if (useOverlay) {
                         overlay.addClass("active");
                     }
-                    console.log("Updating popover");
-                    console.log(menupos);
                     element.addClass("active");
                     element.css(menupos);
                 }
