@@ -47,7 +47,11 @@
         cssVariations: {
             "ie": '$browserType: "ie";'
         },
-        imageFolders: ["./src/images"]
+        imageFolders: ["./src/images"],
+        legacyBrowserError: {
+            title: "App Error",
+            message: "This app is designed for use in modern browsers."
+        }
     };
 
     tools.init = function(opt) {
@@ -257,7 +261,7 @@
             var appFileEs3 = path.resolve(varFolder, "app-es3.js");
 
             // For use with <script>$.getScript(window.atob ? "app.js" : "app-es3.js");</script>
-            fs.writeFileSync(appFileEs3, reportError("App error", "This app is designed for use in modern browsers."));
+            fs.writeFileSync(appFileEs3, reportError(options.legacyBrowserError.title, options.legacyBrowserError.message));
 
 
             if (debugMode) {
