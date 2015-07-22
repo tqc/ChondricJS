@@ -30,6 +30,7 @@ export default["$timeout", function loadStatusFactory($timeout) {
                             task.active = true;
                             task.error = null;
                             task.progressCurrent = 0;
+                            task.completed = false;
                         });
                     },
                     finish: function(message) {
@@ -44,6 +45,7 @@ export default["$timeout", function loadStatusFactory($timeout) {
                         $timeout(function() {
                             task.active = false;
                             task.error = message;
+                            task.completed = false;
                         });
                     },
                     progress: function(progress, total, message) {
