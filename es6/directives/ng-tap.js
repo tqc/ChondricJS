@@ -17,6 +17,11 @@ export function ngTap() {
         var ghostClickCatcher = angular.element('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
         angular.element(document.body).append(ghostClickCatcher);
         var ghostClickTimer = 0;
+
+        var hideGhostClickCatcher = function() {
+            ghostClickCatcher.css("display", "none");
+        };
+
         var showGhostClickCatcher = function() {
             // hide the ghost click catcher after half a second, since ios 8 only sometimes sends ghost clicks.
             // note that this isn't ideal in native mode - a heavy transition can delay simulated clicks for almost a second.
@@ -27,9 +32,6 @@ export function ngTap() {
             ghostClickCatcher.css("display", "block");
         };
 
-        var hideGhostClickCatcher = function() {
-            ghostClickCatcher.css("display", "none");
-        };
 
         ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
         ghostClickCatcher.on("mouseup", hideGhostClickCatcher);
@@ -69,6 +71,8 @@ export function ngTap() {
 
         var touchTimeout = 0;
 
+        var cancel, action;
+
         // detect move and cancel tap if drag started
         var move = function(e) {
             var x = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.clientX;
@@ -79,7 +83,7 @@ export function ngTap() {
         };
 
         // called if the mouse moves too much or leaves the element
-        var cancel = function() {
+        cancel = function() {
 
             if (touchTimeout) window.clearTimeout(touchTimeout);
 
@@ -101,7 +105,7 @@ export function ngTap() {
         };
 
         // called when a tap is completed
-        var action = function(e) {
+        action = function(e) {
             if (touchTimeout) window.clearTimeout(touchTimeout);
 
             if (e.originalEvent.handled) return;

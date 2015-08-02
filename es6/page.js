@@ -73,7 +73,7 @@ export class Page {
                 var oldRoutes = (oldVal || "").split(";");
 
 
-                var matchRoute = function(val) {                    
+                var matchRoute = function(val) {
                     if (!val) return false;
                     var pr = $scope.pageRoute;
                     var iopr = val.indexOf(pr);

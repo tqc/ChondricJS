@@ -14,7 +14,7 @@
     var filterTransform = require("filter-transform");
     var uglify = require('gulp-uglify');
     var buffer = require('vinyl-buffer');
-    var source = require('vinyl-source-stream');
+    var vinylSourceStream = require('vinyl-source-stream');
     var extend = require("extend");
 
     var stripify = require("stripify");
@@ -122,11 +122,11 @@
 
         var filteredEs6ify = filterTransform(
             function(file) {
-                // browserify needs transforms to be global, and compiling es5 modules 
+                // browserify needs transforms to be global, and compiling es5 modules
                 // breaks stuff, so only compile the bits we know are es6
                 if (file.indexOf("node_modules") >= 0) {
-                    // files under node_modules are only compiled as es6 if they are included in 
-                    // moduleMappings - i.e. if chondric was loaded with npm install rather than npm link 
+                    // files under node_modules are only compiled as es6 if they are included in
+                    // moduleMappings - i.e. if chondric was loaded with npm install rather than npm link
                     for (var i = 0; i < moduleMappings.length; i++) {
                         var pn = moduleMappings[i].cwd;
                         if (file.indexOf(pn) === 0 && file.lastIndexOf("node_modules") < pn.length) {
@@ -228,8 +228,8 @@
                         detail = "";
 
                         var sc = fs.readFileSync(fn, "utf-8").split("\n");
-                        for (var i = errorLine - 4; i < errorLine + 3; i++) {
-                            var l = sc[i];
+                        for (var i2 = errorLine - 4; i2 < errorLine + 3; i2++) {
+                            var l = sc[i2];
                             if (l === undefined) continue;
                             detail += l + "\n";
                         }
@@ -277,7 +277,7 @@
                 b = b.pipe(fs.createWriteStream(appFileTemp));
             } else {
                 b = b
-                    .pipe(source('app.js')) // gives streaming vinyl file object
+                    .pipe(vinylSourceStream('app.js')) // gives streaming vinyl file object
                     .pipe(buffer()) // <----- convert from streaming to buffered vinyl file object
                     .pipe(uglify({
                         mangle: true,
@@ -358,10 +358,10 @@
                 if (err) return onCssBuilt && onCssBuilt();
 
                 var variations = [];
-                for (var k in options.cssVariations) {
+                for (var k2 in options.cssVariations) {
                     variations.push({
-                        key: k,
-                        settings: options.cssVariations[k]
+                        key: k2,
+                        settings: options.cssVariations[k2]
                     });
                 }
 
@@ -380,8 +380,8 @@
 
         buildClientJs(function(err) {
             if (err) return onBuildComplete && onBuildComplete(err);
-            buildCss(function(err) {
-                if (err) return onBuildComplete && onBuildComplete(err);
+            buildCss(function(err2) {
+                if (err2) return onBuildComplete && onBuildComplete(err2);
                 copyHtml();
                 copyImages();
                 copyLib();
@@ -403,13 +403,13 @@
             var cssFolder = path.dirname(path.resolve(cwd, options.cssEntryPoint));
             if (cssFolder.indexOf(sourceFolder) !== 0) paths.push(cssFolder);
 
-            // watch image folders 
+            // watch image folders
             for (var i = 0; i < options.imageFolders.length; i++) {
                 var imgf = options.imageFolders[i];
                 if (imgf.indexOf(sourceFolder) !== 0) paths.push(imgf);
             }
 
-            // watch tests 
+            // watch tests
             if (options.browserTests) {
                 paths.push(path.dirname(path.resolve(options.browserTests)));
             }

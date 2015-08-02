@@ -34,7 +34,7 @@ export default class Viewport2 {
         var page = this.app.topLevelRoutes.getPageForRoute(route);
 
         if (!page) {
-            alert("Invalid route " + route);
+            console.error("Invalid route " + route);
             return;
         }
 
