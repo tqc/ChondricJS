@@ -5,7 +5,7 @@ var jshint = require('gulp-jshint');
 gulp.task('jscs', function() {
     gulp.src('./es6/index.js')
         .pipe(jscs({
-        	"validateIndentation": 5
+            "validateIndentation": 5
         }));
 });
 

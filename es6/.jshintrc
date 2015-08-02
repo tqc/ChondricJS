@@ -1,9 +1,0 @@
-{
-    "extends": "../.jshintrc",
-    "node": false,
-    "browser": true,
-    "browserify": true,
-    "esnext": true,
-    "globals": {
-    }
-}
