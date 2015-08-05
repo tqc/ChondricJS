@@ -1,0 +1,19 @@
+{
+    "extends": "../.eslintrc",
+    "rules": {
+    },
+    "globals": {
+        // stuff that is only valid in tests
+        "Mocha": true,
+        "should": true,
+        "mocha": true,
+        "chai": true,
+        "callPhantom": true,
+        "describe": true,
+        "it": true,
+        "before": true,
+        "after": true,
+        "setStep": true,
+        "checkScreenshot": true
+    }
+}

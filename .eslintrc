@@ -22,16 +22,8 @@
     "globals": {
         "Directive": true,
         "Route": true,
-        "should": true,
         "angular": true,
-        "mocha": true,
-        "chai": true,
-        "$": true,
-        "callPhantom": true,
-        "describe": true,
-        "it": true,
-        "before": true,
-        "after": true
+        "$": true
     },
     "env": {
         "es6": true,
