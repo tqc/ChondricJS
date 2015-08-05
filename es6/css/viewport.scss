@@ -1,13 +1,28 @@
+/*    
+ * native - everything static. popups are full screen with no animation or chrome
+ * i.e. most options are turned off
+ *
+ * expanding iframe - mostly static display, but viewport has absolute positioning
+ * and overflow hidden to prevent giant iframes on iOS. only valid for simple in-page
+ * apps. If new header works without position absolute, no need for complex page
+ * padding etc.
+ *
+ * expanding - all static.
+ *
+ * fixed - block pages get absolute positioning. 
+ */
 $viewportType: "fixed" !default;
-
 $pageMargins: () !default;
 
-/*    
-    * native - everything static. popups are full screen with no animation or chrome - i.e. most options turned off
-    * expanding iframe - mostly static display, but viewport has absolute positioning and overflow hidden to prevent giant iframes on iOS. only valid for simple in-page apps. If new header works without position absolute, no need for complex page padding etc.
-    * expanding - all static.
-    * fixed - block pages get absolute positioning. 
-*/
+/* 
+ * padding - Fixed header and footer elements may be transparent, so they sit over the
+ * content, which has padding to compensate.  
+ *
+ * margin - Margins are added, with header and footer appearing
+ * outside of the scroll areas. Exists mostly to deal with ugly scrollbars on windows.
+ */
+
+$pageMarginType: "padding" !default;
 
 .chondric-viewport {
     // default styling - don't need much, but make sure we have a stacking context and that anything animated from
@@ -45,8 +60,15 @@ $pageMargins: () !default;
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             @each $sel, $val in $pageMargins {
-                &#{$sel} > .page-content {
-                    padding: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+                @if $pageMarginType == "margin" {
+                    &#{$sel} {
+                        margin: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+                    }
+                }
+                @if $pageMarginType == "padding" {
+                    &#{$sel} > .page-content {
+                        padding: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+                    }
                 }
             }
         }
@@ -63,13 +85,20 @@ $pageMargins: () !default;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
         > .page-content {
-            box-sizing:border-box;
+            box-sizing: border-box;
             min-height: 100%;
             position: relative;
         }
         @each $sel, $val in $pageMargins {
-            &#{$sel} > .page-content {
-                padding: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+            @if $pageMarginType == "margin" {
+                &#{$sel} {
+                    margin: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+                }
+            }
+            @if $pageMarginType == "padding" {
+                &#{$sel} > .page-content {
+                    padding: nth($val, 1) nth($val, 2) nth($val, 3) nth($val, 4);
+                }
             }
         }
     }
@@ -102,9 +131,8 @@ $pageMargins: () !default;
 
 */
 
-
 .chondric-page.popup-page {
- position: absolute;
+    position: absolute;
     background-color: #fff;
     width: 630px;
     height: 630px;
@@ -113,7 +141,6 @@ $pageMargins: () !default;
     margin-left: -315px;
     margin-top: -315px;
     z-index: 1100;
-    
 }
 
 .chondric-page.active-popup {
@@ -121,4 +148,3 @@ $pageMargins: () !default;
     opacity: 1;
     z-index: 100;
 }
-
