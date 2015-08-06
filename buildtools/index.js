@@ -309,10 +309,22 @@
                 globs.push(imgf + "/**");
             }
 
+
+            var imagemin = require('gulp-imagemin');
+              
             console.log(globs);
             gulp.src(globs)
                 .pipe(flatten())
-                .pipe(gulp.dest(varFolder + "/images"));
+                .pipe(imagemin({
+                    progressive: true,
+                    svgoPlugins: [{
+                        removeViewBox: false
+                    }],
+//                    use: [pngquant()]
+                }))
+
+            .pipe(gulp.dest(varFolder + "/images"));
+
 
 
         }
