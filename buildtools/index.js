@@ -308,22 +308,26 @@
                 var imgf = options.imageFolders[i];
                 globs.push(imgf + "/**");
             }
-
-
-            var imagemin = require('gulp-imagemin');
-
             console.log(globs);
-            gulp.src(globs)
-                .pipe(flatten())
-                .pipe(imagemin({
-                    progressive: true,
-                    svgoPlugins: [{
-                        removeViewBox: false
-                    }],
-//                    use: [pngquant()]
-                }))
+            try {
+                var imagemin = require('gulp-imagemin');
+                gulp.src(globs)
+                    .pipe(flatten())
+                    .pipe(imagemin({
+                        progressive: true,
+                        svgoPlugins: [{
+                            removeViewBox: false
+                        }]
+                    }))
+                    .pipe(gulp.dest(varFolder + "/images"));
+            } catch (ex) {
+                // probably just imagemin not being installed - fall back to regular file copy
+                console.log("Image optimization failed - copying images unmodified.");
+                gulp.src(globs)
+                    .pipe(flatten())
+                    .pipe(gulp.dest(varFolder + "/images"));
+            }
 
-            .pipe(gulp.dest(varFolder + "/images"));
 
 
 
@@ -392,7 +396,9 @@
                     var ieCssFile = path.resolve(tempFolder, "index-" + v.key + ".scss");
                     fs.writeFileSync(ieCssFile, iesrc);
                     buildCssFile(ieCssFile, "app-" + v.key + ".css", next);
-                }, function() {buildPreloadCss(onCssBuilt)});
+                }, function() {
+                    buildPreloadCss(onCssBuilt);
+                });
 
 
                 // preloader
