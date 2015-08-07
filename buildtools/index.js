@@ -311,7 +311,7 @@
 
 
             var imagemin = require('gulp-imagemin');
-              
+
             console.log(globs);
             gulp.src(globs)
                 .pipe(flatten())
@@ -362,6 +362,16 @@
 
         }
 
+        function buildPreloadCss(onCssBuilt) {
+            var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
+            var preloadCssPath = path.resolve(cssEntryPoint, "../inline.scss");
+            console.log(preloadCssPath);
+            if (!fs.existsSync(preloadCssPath)) return onCssBuilt && onCssBuilt();
+
+            buildCssFile(preloadCssPath, "inline.css", onCssBuilt);
+
+        }
+
         function buildCss(onCssBuilt) {
             var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
 
@@ -382,11 +392,12 @@
                     var ieCssFile = path.resolve(tempFolder, "index-" + v.key + ".scss");
                     fs.writeFileSync(ieCssFile, iesrc);
                     buildCssFile(ieCssFile, "app-" + v.key + ".css", next);
-                }, onCssBuilt);
+                }, function() {buildPreloadCss(onCssBuilt)});
 
+
+                // preloader
 
             });
-
 
         }
 
