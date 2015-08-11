@@ -84,11 +84,18 @@ export default {
 
                     var parentRect = element[0].offsetParent.getBoundingClientRect();
 
-                    var sw = angular.element(window).width();
-                    var sh = angular.element(window).height();
+                    var br = (element.closest(".chondric-page")[0] || document.body).getBoundingClientRect();                   
+                    var pageRect = {
+                        top: Math.max(0, br.top),
+                        bottom: Math.min(angular.element(window).height(), br.bottom),
+                        left: Math.max(0, br.left),
+                        right: Math.min(angular.element(window).width(), br.right)
+                    };
+                    pageRect.width = pageRect.right - pageRect.left;
+                    pageRect.height = pageRect.bottom - pageRect.top;
 
-                    var horizontalCutoff = sw / 2;
-                    var verticalCutoff = sh / 2;
+                    var horizontalCutoff = pageRect.left + pageRect.width / 2;
+                    var verticalCutoff = pageRect.top +  pageRect.height / 2;
                     var idealX = 0;
                     var idealY = 0;
 
@@ -130,11 +137,11 @@ export default {
                     var actualY = idealY;
                     // adjust position to ensure menu remains onscreen
                     if (horizontal) {
-                        if (idealY - 10 - menuheight / 2 < 0) actualY = menuheight / 2 + 10;
-                        if ((idealY + 10 + menuheight / 2) > sh) actualY = sh - menuheight / 2 - 10;
+                        if (idealY - 10 - menuheight / 2 < pageRect.top) actualY = pageRect.top + menuheight / 2 + 10;
+                        if ((idealY + 10 + menuheight / 2) > pageRect.bottom) actualY = pageRect.bottom - menuheight / 2 - 10;
                     } else {
-                        if (idealX - 10 - menuwidth / 2 < 0) actualX = menuwidth / 2 + 10;
-                        if ((idealX + 10 + menuwidth / 2) > sw) actualX = sw - menuwidth / 2 - 10;
+                        if (idealX - 10 - menuwidth / 2 < pageRect.left) actualX = pageRect.left + menuwidth / 2 + 10;
+                        if ((idealX + 10 + menuwidth / 2) > pageRect.right) actualX = pageRect.right - menuwidth / 2 - 10;
                     }
 
                     if (horizontal) {
