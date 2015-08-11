@@ -84,7 +84,7 @@ export default {
 
                     var parentRect = element[0].offsetParent.getBoundingClientRect();
 
-                    var br = (element.closest(".chondric-page")[0] || document.body).getBoundingClientRect();                   
+                    var br = (element.closest(".chondric-page")[0] || document.body).getBoundingClientRect();
                     var pageRect = {
                         top: Math.max(0, br.top),
                         bottom: Math.min(angular.element(window).height(), br.bottom),
@@ -95,7 +95,7 @@ export default {
                     pageRect.height = pageRect.bottom - pageRect.top;
 
                     var horizontalCutoff = pageRect.left + pageRect.width / 2;
-                    var verticalCutoff = pageRect.top +  pageRect.height / 2;
+                    var verticalCutoff = pageRect.top + pageRect.height / 2;
                     var idealX = 0;
                     var idealY = 0;
 
