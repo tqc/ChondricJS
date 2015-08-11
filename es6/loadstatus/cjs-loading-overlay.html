@@ -1,12 +1,16 @@
 <div class="cjs-loading-overlay cjs-loading-overlay-full">
-    <div ng-show="!error" class="progress large">
+    <div ng-if="!error">
+    <div class="progress large">
         <div></div>
     </div>
-    <div class="title" ng-show="title && !error">{{title}}</div>
-     <div class="message" ng-show="!error">{{message || "Loading"}}</div>
-   <div class="error" ng-show="error">{{error}}</div>
+    <div class="title" ng-if="title">{{title}}</div>
+    <div class="message">{{message || "Loading"}}</div>
+    </div>
+    <div ng-if="error">
+    <div class="error">{{error}}</div>
+    </div>
     <div class="buttons">
-        <button ng-show="retry && error" ng-tap="retry()">Retry</button>
-        <button ng-show="cancel" ng-tap="cancel()">Cancel</button>
+        <button ng-if="retry && error" ng-tap="retry()">Retry</button>
+        <button ng-if="cancel" ng-tap="cancel()">Cancel</button>
     </div>
 </div>
