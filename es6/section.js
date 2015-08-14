@@ -6,8 +6,11 @@ export class Section extends Page {
         this.isSection = true;
         this.subsections = {};
         this.isBlockPage = false;
-
-        this.template = require("./section.html");
+        console.log(options);
+        console.log(this.template);
+        if (!options.template) {
+            this.template = require("./section.html");
+        }
     }
     controller($scope) {
 
