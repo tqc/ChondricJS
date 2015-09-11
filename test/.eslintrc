@@ -15,5 +15,8 @@
         "after": true,
         "setStep": true,
         "checkScreenshot": true
+    },
+    "env": {
+        "mocha": true
     }
 }
