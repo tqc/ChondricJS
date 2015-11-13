@@ -19,6 +19,7 @@
         no-warning-comments: 1,
         // warnings that should really be errors but would require more complex code fixes
         "no-extend-native": 1,
+        "comma-dangle": 1,
         "no-labels": 1
     },
     "globals": {
