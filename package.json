@@ -2,7 +2,7 @@
     "author": "Tom Clarkson",
     "name": "chondric",
     "description": "ChondricJS App Framework",
-    "version": "2.0.26",
+    "version": "2.0.27",
     "repository": {
         "url": "http://github.com/tqc/ChondricJS"
     },
@@ -32,7 +32,7 @@
     "devDependencies": {
         "babel-eslint": "*",
         "eslint": "^1.0.0",
-        "eslint-config-defaults": "^3.1.0",
+        "eslint-config-defaults": "^7.1.1",
         "gulp-jscs": "^1.6.0",
         "gulp-jshint": "^1.10.0",
         "chai": "*",
