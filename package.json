@@ -2,13 +2,16 @@
   "author": "Tom Clarkson ",
   "name": "chondric-tools",
   "description": "Tools for setting up a ChondricJS client app",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "repository": {
     "url": "http://github.com/tqc/ChondricJS"
   },
   "main": "./chondric-tools",
   "bin": {
     "chondric": "chondric-bin.js"
+  },
+  "scripts": {
+    "test": "echo 'legacy code not tested'"
   },
   "dependencies": {
     "authstarter": "*",
@@ -29,7 +32,6 @@
     "html-minifier": "^0.7.2",
     "minifyify": "^4.4.0",
     "mkdirp": "*",
-    "node-sass": "~0.9.3",
     "remapify": "^2.0.0",
     "serve-static": "^1.0.4",
     "stringify": "^3.0.0",
