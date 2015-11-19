@@ -97,12 +97,12 @@
             moduleMappings.push({
                 src: './**/*.html',
                 expose: k,
-                cwd: options.moduleMappings[k],
+                cwd: options.moduleMappings[k]
             });
             moduleMappings.push({
                 src: './**/*.js',
                 expose: k,
-                cwd: options.moduleMappings[k],
+                cwd: options.moduleMappings[k]
             });
         }
 
@@ -154,10 +154,10 @@
             var jsBuildError = null;
 
 
-            var b = browserify({
+            var b = browserify(
+                {
                     debug: debugMode,
-                    extensions: [".txt", ".html"],
-                    //paths: [path.resolve(__dirname,"../es6")]
+                    extensions: [".txt", ".html"]
                 })
                 .add(es6ify.runtime, {
                     entry: true
@@ -422,11 +422,7 @@
 
         if (watch) {
 
-            var paths = [
-                    path.resolve(__dirname, "../es6"),
-                    sourceFolder
-                ]
-                .concat(options.additionalWatchPaths);
+            var paths = [path.resolve(__dirname, "../es6"), sourceFolder].concat(options.additionalWatchPaths);
 
             // watch the css folder if it isn't already watched as part of the source folder
             var cssFolder = path.dirname(path.resolve(cwd, options.cssEntryPoint));
