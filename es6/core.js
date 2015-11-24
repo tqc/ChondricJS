@@ -779,7 +779,7 @@ export class App {
         // default from this.defaultStartPage
 
         if (route) return route;
-        if (this.options.useLocationHash && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
+        if ((this.hostSettings.useLocationHash !== undefined ? this.hostSettings.useLocationHash : this.options.useLocationHash) && location.hash.length > 1 && location.hash.indexOf("access_token=") < 0) {
             var allpaths = location.hash.substr(2).split(";");
             var parts = allpaths[0].split("/");
             for (var i = 0; i < parts.length; i++) {
