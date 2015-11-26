@@ -2,7 +2,7 @@
     "author": "Tom Clarkson",
     "name": "chondric",
     "description": "ChondricJS App Framework",
-    "version": "2.0.31",
+    "version": "2.0.32",
     "repository": {
         "url": "http://github.com/tqc/ChondricJS"
     },

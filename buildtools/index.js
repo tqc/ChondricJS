@@ -295,7 +295,7 @@
         }
 
         function copyLib() {
-            gulp.src(libFolder + '/*.js')
+            gulp.src(libFolder + '/*.*')
                 .pipe(gulp.dest(varFolder + "/lib"));
         }
 
