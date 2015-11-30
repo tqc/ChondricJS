@@ -151,9 +151,6 @@
 
 
         function buildClientJs(onComplete) {
-            var jsBuildError = null;
-
-
             var b = browserify(
                 {
                     debug: debugMode,
@@ -200,81 +197,25 @@
                 entry: true
             });
 
-            function reportError(title, msg, source, detail) {
-                var errorReporter = fs.readFileSync(path.resolve(__dirname, "./reporterror.js"), "utf-8");
+            var statusReporter = require("browserify-build-status");
 
-                errorReporter = errorReporter.replace("\"[TITLE]\"", JSON.stringify(title || "Error"));
-                errorReporter = errorReporter.replace("\"[MESSAGE]\"", JSON.stringify(msg || "Something went wrong"));
-                errorReporter = errorReporter.replace("\"[SOURCE]\"", JSON.stringify(source || ""));
-                errorReporter = errorReporter.replace("\"[DETAIL]\"", JSON.stringify(detail || ""));
-                return errorReporter;
-            }
-
-
+            b.plugin(statusReporter, {selector: ".chondric-viewport,[chondric-viewport]"});
             b = b.bundle()
-                .once('error', function(err) {
-                    console.log("Browserify error");
-                    console.log(err.message);
-                    var msg = err.message;
-                    var source = "";
-                    var detail = "";
-
-                    var m = /(.*):(\d+):(\d+): (.*)/.exec(msg);
-                    if (m && m.length >= 5) {
-                        msg = m[4];
-                        var fn = m[1];
-                        var errorLine = parseInt(m[2]);
-                        source = m[1] + ":" + m[2] + ":" + m[3];
-                        detail = "";
-
-                        var sc = fs.readFileSync(fn, "utf-8").split("\n");
-                        for (var i2 = errorLine - 4; i2 < errorLine + 3; i2++) {
-                            var l = sc[i2];
-                            if (l === undefined) continue;
-                            detail += l + "\n";
-                        }
-
-                    }
-
-                    jsBuildError = {
-                        message: msg,
-                        source: source,
-                        detail: detail
-                    };
-                    var errorReporter = reportError("BuildError", msg, source, detail);
-                    fs.writeFileSync(path.resolve(varFolder, "app.js"), errorReporter);
-                    if (onComplete) onComplete(jsBuildError);
-                    this.emit("end");
-                });
-            b.on('error', function(err) {
-                // Ignore any errors after the first so onComplete is only called once
-            });
-            b.on("end", function() {
-                if (!jsBuildError) {
-                    console.log("Done browserify");
-                    if (onComplete) onComplete();
-                }
-            });
-
-            var appFile = path.resolve(varFolder, "app.js");
-            var appFileTemp = path.resolve(varFolder, "app (building).js");
-            var appFileEs3 = path.resolve(varFolder, "app-es3.js");
 
             // For use with <script>$.getScript(window.atob ? "app.js" : "app-es3.js");</script>
-            fs.writeFileSync(appFileEs3, reportError(options.legacyBrowserError.title, options.legacyBrowserError.message));
+            fs.writeFileSync(path.resolve(varFolder, "app-es3.js"), statusReporter.getErrorScript(options.legacyBrowserError.title, options.legacyBrowserError.message));
 
+            b.once("error", function(err) {
+                console.log(err);
+                if (onComplete) onComplete(err);
+            });
+            b.on("end", function() {
+                console.log("Done browserify");
+                if (onComplete) onComplete();
+            });            
 
             if (debugMode) {
-                fs.writeFileSync(appFile, reportError("Build Incomplete", "Browserify build in progress - try again in a few seconds."));
-
-                b.on("end", function() {
-                    if (!jsBuildError && fs.existsSync(appFileTemp)) {
-                        if (fs.existsSync(appFile)) fs.unlinkSync(appFile);
-                        fs.renameSync(appFileTemp, appFile);
-                    }
-                });
-
-                b = b.pipe(fs.createWriteStream(appFileTemp));
+                b.pipe(statusReporter.writeFile(path.resolve(varFolder, "app.js")));
             } else {
                 b = b
                     .pipe(vinylSourceStream('app.js')) // gives streaming vinyl file object
@@ -285,7 +226,6 @@
                     }))
                     .pipe(gulp.dest(varFolder));
             }
-
 
         }
 
