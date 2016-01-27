@@ -66,7 +66,7 @@
     };
 
     tools.buildVariation = function(variation, env, watch, destFolder, onBuildComplete) {
-        console.log(options);
+        onBuildComplete = onBuildComplete || function() {};
         var debugMode = env != "prod"; //true;
         if (options.debug !== undefined) debugMode = options.debug;
         if (options[env] && options[env].debug !== undefined) debugMode = options[env].debug;
@@ -229,18 +229,20 @@
 
         }
 
-        function copyHtml() {
+        function copyHtml(callback) {
             gulp.src(sourceFolder + '/*.html')
-                .pipe(gulp.dest(varFolder));
+                .pipe(gulp.dest(varFolder))
+                .on("end", callback);
         }
 
-        function copyLib() {
+        function copyLib(callback) {
             gulp.src(libFolder + '/*.*')
-                .pipe(gulp.dest(varFolder + "/lib"));
+                .pipe(gulp.dest(varFolder + "/lib"))
+                .on("end", callback);
         }
 
 
-        function copyImages() {
+        function copyImages(callback) {
             var flatten = require('gulp-flatten');
             console.log("Copying images");
             var globs = [];
@@ -259,13 +261,16 @@
                             removeViewBox: false
                         }]
                     }))
-                    .pipe(gulp.dest(varFolder + "/images"));
+                    .pipe(gulp.dest(varFolder + "/images"))
+                    .on("end", callback)
             } catch (ex) {
                 // probably just imagemin not being installed - fall back to regular file copy
                 console.log("Image optimization failed - copying images unmodified.");
                 gulp.src(globs)
                     .pipe(flatten())
-                    .pipe(gulp.dest(varFolder + "/images"));
+                    .pipe(gulp.dest(varFolder + "/images"))
+                    .on("end", callback)
+
             }
 
 
@@ -347,18 +352,15 @@
 
         }
 
-        buildClientJs(function(err) {
-            if (err) return onBuildComplete && onBuildComplete(err);
-            buildCss(function(err2) {
-                if (err2) return onBuildComplete && onBuildComplete(err2);
-                copyHtml();
-                copyImages();
-                copyLib();
-                if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
-                console.log("Build completed successfully");
-                return onBuildComplete && onBuildComplete(err);
-            });
-        });
+        function afterBuild(callback) {
+            if (options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
+            console.log("Build completed successfully");           
+            callback();
+        }
+
+        var fullBuild = [buildClientJs, buildCss, copyHtml, copyImages, copyLib, afterBuild];
+
+        async.series(fullBuild, onBuildComplete)
 
         if (watch) {
 
@@ -390,28 +392,22 @@
                 var ext = path.extname(file);
                 if (ext == ".scss") {
                     console.log("CSS needs rebuild");
-                    buildCss();
+                    async.series([buildCss], function() {})
                 } else if (ext == ".js" || ext == ".html") {
+                    // if the changed file is .js or .html, need to run browserify
                     console.log("Browserify package needs rebuild");
-                    buildClientJs(function(err) {
-                        if (!err && options.afterBrowserify) options.afterBrowserify(varFolder, env, variation);
-                    });
+                    async.series([buildClientJs, afterBuild], function() {})
                 } else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif") {
+                    // src/images just needs to be copied if anything changes, and it can't contain anything used by browserify
                     console.log("Updating images");
-                    copyImages();
-
+                    async.series([copyImages], function() {})
                 }
-                // if the changed file is .js or .html, need to run browserify
-                // copy html only copies a single file, so maybe just include that in the browserify process
-
-                // src/images just needs to be copied if anything changes, and it can't contain anything used by browserify
-
             });
 
         }
     };
 
-    tools.buildTask = function() {
+    tools.buildTask = function(cb) {
         var args = process.argv.slice(3);
         if (args.length != 2 || args[0].indexOf("--") !== 0 || args[1].indexOf("--") !== 0) {
             console.log("Invalid arguments for build task");
@@ -422,7 +418,7 @@
         var env = args[1].substr(2);
 
 
-        tools.buildVariation(variation, env);
+        tools.buildVariation(variation, env, false, null, cb);
     };
 
 })();
