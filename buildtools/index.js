@@ -74,7 +74,7 @@
         console.log("building " + variation + " for " + env);
         var buildfolder = path.resolve(cwd, options.buildfolder);
         if (!fs.existsSync(buildfolder)) fs.mkdirSync(buildfolder);
-        var tempFolder = path.resolve(buildfolder, "temp");
+        var tempFolder = path.resolve(buildfolder, "temp-" + variation + "-" + env);
         if (!fs.existsSync(tempFolder)) fs.mkdirSync(tempFolder);
         var envFolder = path.resolve(buildfolder, env);
         if (!fs.existsSync(envFolder)) fs.mkdirSync(envFolder);
