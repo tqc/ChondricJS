@@ -93,7 +93,7 @@
             expose: 'build',
             cwd: tempFolder
         }];
-        for (var k in options.moduleMappings) {
+        for (let k in options.moduleMappings) {
             moduleMappings.push({
                 src: './**/*.html',
                 expose: k,
@@ -105,8 +105,12 @@
                 cwd: options.moduleMappings[k]
             });
         }
-
-        console.log(moduleMappings);
+        console.log("Mapping modules")
+        for (let i = 0; i < moduleMappings.length; i++) {
+            var m = moduleMappings[i];
+            if (i > 0 && m.expose == moduleMappings[i-1].expose) continue;
+            console.log(m.expose + " => " + m.cwd);
+        }
 
         var sourceFolder = path.resolve(cwd, options.sourceFolder);
         var libFolder = path.resolve(cwd, options.libFolder);
@@ -127,7 +131,7 @@
                 if (file.indexOf("node_modules") >= 0) {
                     // files under node_modules are only compiled as es6 if they are included in
                     // moduleMappings - i.e. if chondric was loaded with npm install rather than npm link
-                    for (var i = 0; i < moduleMappings.length; i++) {
+                    for (let i = 0; i < moduleMappings.length; i++) {
                         var pn = moduleMappings[i].cwd.toLowerCase();
                         if (file.toLowerCase().indexOf(pn) === 0 && file.lastIndexOf("node_modules") < pn.length) {
                             return path.extname(file) === '.js';
@@ -168,7 +172,7 @@
                 });
 
 
-            for (var i = 0; i < options.customBrowserifyTransforms.length; i++) {
+            for (let i = 0; i < options.customBrowserifyTransforms.length; i++) {
                 b = b.transform(options.customBrowserifyTransforms[i]());
             }
 
@@ -246,7 +250,7 @@
             var flatten = require('gulp-flatten');
             console.log("Copying images");
             var globs = [];
-            for (var i = 0; i < options.imageFolders.length; i++) {
+            for (let i = 0; i < options.imageFolders.length; i++) {
                 var imgf = options.imageFolders[i];
                 globs.push(imgf + "/**");
             }
@@ -329,7 +333,7 @@
                 if (err) return onCssBuilt && onCssBuilt();
 
                 var variations = [];
-                for (var k2 in options.cssVariations) {
+                for (let k2 in options.cssVariations) {
                     variations.push({
                         key: k2,
                         settings: options.cssVariations[k2]
@@ -371,7 +375,7 @@
             if (cssFolder.indexOf(sourceFolder) !== 0) paths.push(cssFolder);
 
             // watch image folders
-            for (var i = 0; i < options.imageFolders.length; i++) {
+            for (let i = 0; i < options.imageFolders.length; i++) {
                 var imgf = options.imageFolders[i];
                 if (imgf.indexOf(sourceFolder) !== 0) paths.push(imgf);
             }
