@@ -203,20 +203,18 @@
 
             var statusReporter = require("browserify-build-status");
 
-            b.plugin(statusReporter, {selector: ".chondric-viewport,[chondric-viewport]"});
+            b.plugin(
+                statusReporter, 
+                {
+                    selector: ".chondric-viewport,[chondric-viewport]",
+                    onComplete: onComplete
+                }
+            );
             b = b.bundle()
 
             // For use with <script>$.getScript(window.atob ? "app.js" : "app-es3.js");</script>
             fs.writeFileSync(path.resolve(varFolder, "app-es3.js"), statusReporter.getErrorScript(options.legacyBrowserError.title, options.legacyBrowserError.message));
-
-            b.once("error", function(err) {
-                console.log(err);
-                if (onComplete) onComplete(err);
-            });
-            b.on("end", function() {
-                console.log("Done browserify");
-                if (onComplete) onComplete();
-            });            
+     
 
             if (debugMode) {
                 b.pipe(statusReporter.writeFile(path.resolve(varFolder, "app.js")));
