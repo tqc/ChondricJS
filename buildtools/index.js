@@ -26,7 +26,7 @@
     var tools = module.exports;
     var cwd = process.cwd();
 
-    var sassPath = process.platform === "win32" ? "sass.bat" : "sass";
+    var sass = require('node-sass');
 
     var options = {
         globals: {
@@ -291,26 +291,20 @@
         //        }
 
         function buildCssFile(inputFile, outputFile, fileBuilt) {
-            var params = (debugMode ? ["--style", "nested"] : ["--style", "compressed"])
-                .concat(["-I", ".", inputFile, varFolder + "/" + outputFile]);
-            // using spawn because libsass sourcemaps are buggy
-
-            var spawn = require("child_process").spawn;
-            var p = spawn(sassPath, params, {
-                cwd: cwd
+            sass.render({
+                file: inputFile,
+                outFile: varFolder + "/" + outputFile,
+                sourceMap: true,
+                outputStyle: debugMode ? "nested" : "compressed",
+                // importer: function(url, prev, done) {},
+                includePaths: ["."]
+            }, function(err, result) { 
+                if (!err) {
+                    fs.writeFileSync(varFolder + "/" + outputFile, result.css);
+                    console.log("Completed sass build of " + inputFile);
+                }
+                if (fileBuilt) fileBuilt(err, result);
             });
-            p.stdout.on('data', function(data) {
-                console.log("" + data);
-            });
-
-            p.stderr.on('data', function(data) {
-                console.log("" + data);
-            });
-            p.on("close", function(code) {
-                console.log("Done sass build of " + inputFile + " with code " + code);
-                if (fileBuilt) fileBuilt(code === 0 ? null : ("SASS Error " + code));
-            });
-
         }
 
         function buildPreloadCss(onCssBuilt) {
