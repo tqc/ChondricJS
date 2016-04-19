@@ -1,5 +1,3 @@
-var angular = require('angular');
-
 import {SharedUiComponent} from "./shareduicomponent";
 
 export default class cjsSharedPopup extends SharedUiComponent {

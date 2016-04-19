@@ -127,3 +127,5 @@ export var chondricPage = ["$compile", "$injector", function($compile, $injector
         }
     };
 }];
+
+export default chondricPage;

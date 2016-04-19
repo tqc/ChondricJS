@@ -66,6 +66,12 @@
     };
 
     tools.buildVariation = function(variation, env, watch, destFolder, onBuildComplete) {
+        if (options.useRollup) {
+            console.log("Building with Rollup");
+        } else {
+            console.log("Building with Browserify");
+        }
+
         onBuildComplete = onBuildComplete || function() {};
         var debugMode = env != "prod"; //true;
         if (options.debug !== undefined) debugMode = options.debug;
@@ -88,28 +94,45 @@
         extend(hostSettings, options[env]);
         fs.writeFileSync(path.resolve(tempFolder, "hostsettings.js"), "module.exports=" + JSON.stringify(hostSettings), "utf-8");
 
-        var moduleMappings = [{
-            src: 'hostsettings.js',
-            expose: 'build',
-            cwd: tempFolder
-        }];
-        for (let k in options.moduleMappings) {
-            moduleMappings.push({
-                src: './**/*.html',
-                expose: k,
-                cwd: options.moduleMappings[k]
-            });
-            moduleMappings.push({
-                src: './**/*.js',
-                expose: k,
-                cwd: options.moduleMappings[k]
-            });
-        }
-        console.log("Mapping modules")
-        for (let i = 0; i < moduleMappings.length; i++) {
-            var m = moduleMappings[i];
-            if (i > 0 && m.expose == moduleMappings[i-1].expose) continue;
-            console.log(m.expose + " => " + m.cwd);
+        var moduleMappings
+
+        if (options.useRollup) {
+            moduleMappings = {
+                build: tempFolder
+            };
+            for (let k in options.moduleMappings) {
+                moduleMappings[k] = options.moduleMappings[k];
+            }
+            console.log("Mapping modules")
+            for (let k in moduleMappings) {
+                console.log(k + " => " + moduleMappings[k]);
+            }
+        } else {
+
+            moduleMappings = [{
+                src: 'hostsettings.js',
+                expose: 'build',
+                cwd: tempFolder
+            }];
+            for (let k in options.moduleMappings) {
+                moduleMappings.push({
+                    src: './**/*.html',
+                    expose: k,
+                    cwd: options.moduleMappings[k]
+                });
+                moduleMappings.push({
+                    src: './**/*.js',
+                    expose: k,
+                    cwd: options.moduleMappings[k]
+                });
+            }
+            console.log("Mapping modules")
+            for (let i = 0; i < moduleMappings.length; i++) {
+                var m = moduleMappings[i];
+                if (i > 0 && m.expose == moduleMappings[i-1].expose) continue;
+                console.log(m.expose + " => " + m.cwd);
+            }
+
         }
 
         var sourceFolder = path.resolve(cwd, options.sourceFolder);
@@ -153,8 +176,56 @@
             require('browserify-global-shim').configure(options.globals)
         );
 
+        function buildClientJsRollup(onComplete) {
+            var rollup = require('rollup').rollup;
+            var nodeResolve = require('rollup-plugin-node-resolve');
+            var babel = require('rollup-plugin-babel');
+            var alias = require('./rollup-plugin-alias');
+            var string = require('rollup-plugin-string');
+            var commonjs = require('./rollup-plugin-commonjs');
+            var builtins = require('rollup-plugin-node-builtins');
+            rollup({
+                entry: path.resolve(sourceFolder, variation + ".js"),
+                plugins: [
+                    alias(moduleMappings),
+                    builtins(),
+                    nodeResolve({ jsnext: true }),
+                    commonjs(),
+                    string({
+                        extensions: ['.html']
+                    }),
+                    babel({
+                        babelrc: false,
+                        plugins: [  
+                            path.resolve(__dirname, "../node_modules/babel-plugin-transform-decorators-legacy"),
+                        ],
+                        presets: [  
+                            path.resolve(__dirname, "../node_modules/babel-preset-es2015-rollup"),
+                        ],
+                    }),
+                ]
+            }).then(function (bundle) {
+                console.log("got bundle");
+                console.log("writing to " + path.resolve(varFolder, "app.js"));
+                try {
+                    bundle.write({
+                        moduleName: "bundle",
+                        format: 'iife',
+                        dest: path.resolve(varFolder, "app.js"),
+                        sourceMap: true
+                    });
+                    onComplete();
+                } catch (e) {
+                    onComplete(e);
+                }
+            }, function(err) {
+                // build error
+                console.log(err);
+                if (onComplete) onComplete(err);
+            });
+        }
 
-        function buildClientJs(onComplete) {
+        function buildClientJsBrowserify(onComplete) {
             var b = browserify(
                 {
                     debug: debugMode,
@@ -230,6 +301,8 @@
             }
 
         }
+
+        var buildClientJs = options.useRollup ? buildClientJsRollup : buildClientJsBrowserify;
 
         function copyHtml(callback) {
             gulp.src(sourceFolder + '/*.html')

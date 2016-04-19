@@ -1,4 +1,4 @@
-class Directive {
+class Directive_Traceur {
     constructor(options) {
         this.template = options.template;
         this.selector = options.selector;
@@ -6,7 +6,7 @@ class Directive {
     }
 }
 
-class Route {
+class Route_Traceur {
     constructor(options) {
         this.scopeName = options.scopeName;
         this.route = options.route;
@@ -25,11 +25,49 @@ class Route {
     }
 }
 
-class TestAnnotation {
-    constructor(options) { }
+
+function Directive(options) {
+    return function(target) {
+        target.annotations = [options];
+        target.template = options.template;
+        target.selector = options.selector;
+        target.injections = options.injections || [];
+
+        return target;
+    }
 }
 
-// make annotations global so we don't need to import in every single file.
-window.Directive = Directive;
-window.Route = Route;
-window.TestAnnotation = TestAnnotation;
+
+function Route(options) {
+    return function(target) {
+        target.annotations = [options];
+        target.scopeName = options.scopeName;
+        target.route = options.route;
+        target.params = options.params || [];
+        target.parameterNames = [];
+        // todo: parse route to extract parameters
+        target.routeArray = options.routeArray =  options.route.split("/");
+        for (let i = 0; i < target.routeArray.length; i++) {
+            var n = target.routeArray[i];
+            if (n[0] == "$") {
+                target.parameterNames.push(n.substr(1));
+            } else {
+                target.parameterNames.push(undefined);
+            }
+        }
+    }
+}
+
+
+export function globalify() {
+    // make annotations global so we don't need to import in every single file.
+    if (typeof $traceurRuntime !== "undefined") {
+        window.Directive = Directive_Traceur;
+        window.Route = Route_Traceur;       
+    } else {
+        window.Directive = Directive;
+        window.Route = Route;       
+    }
+
+}
+globalify();

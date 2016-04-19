@@ -40,6 +40,7 @@ export default class cjsNavigationBar extends MultistateComponent {
         }
     }
     controller($scope) {
+        console.log("Navbar controller")
         super.controller($scope);
         var self = $scope.componentDefinition;
         self.scope = $scope;

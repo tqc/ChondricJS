@@ -1,11 +1,10 @@
-var $ = require("jquery");
-
+import template from "./viewport2.html";
 @Directive({
-    template: require("./viewport2.html"),
+    template: template,
     selector: "viewport",
     injections: ["$compile", "$injector"]
 })
-export default class Viewport2 {
+class Viewport2 {
     constructor(scope, element, attrs, $compile, $injector) {
         this.$compile = $compile;
         this.$injector = $injector;
@@ -82,3 +81,5 @@ export default class Viewport2 {
 
     }
 }
+
+export default Viewport2;

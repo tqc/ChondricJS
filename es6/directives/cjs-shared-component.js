@@ -1,5 +1,3 @@
-var angular = require('angular');
-
 export var cjsSharedComponent = ["$compile", function($compile) {
     return {
         scope: true,
@@ -28,3 +26,5 @@ export var cjsSharedComponent = ["$compile", function($compile) {
         }
     };
 }];
+
+export default cjsSharedComponent;

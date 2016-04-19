@@ -3,7 +3,7 @@
     selector: "chondricViewport",
     injections: ["$compile"]
 })
-export default class Viewport {
+class Viewport {
     constructor(scope, element, attrs, $compile) {
         // clean up the generated html a little
         element.removeAttr("chondric-viewport");
@@ -17,3 +17,5 @@ export default class Viewport {
 
     }
 }
+
+export default Viewport

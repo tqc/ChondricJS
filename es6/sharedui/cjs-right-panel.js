@@ -1,5 +1,3 @@
-var angular = require('angular');
-
 import {SharedUiComponent} from "./shareduicomponent";
 
 export class cjsRightPanel extends SharedUiComponent {

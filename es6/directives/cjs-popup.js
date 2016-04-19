@@ -1,5 +1,3 @@
-var angular = require('angular');
-
 export default {
     name: "cjsPopup",
     injections: [],

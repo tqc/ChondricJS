@@ -1,5 +1,3 @@
-var angular = require('angular');
-
 export function ngTap() {
     var lastTapLocation;
     console.log("init tap");
@@ -228,3 +226,4 @@ export function ngTap() {
 
     };
 }
+export default ngTap;

@@ -1,6 +1,9 @@
 import {SharedUiComponent} from "./shareduicomponent";
 
 export class MultistateComponent extends SharedUiComponent {
+    constructor() {
+        super();
+    }
     updateTransitionSettings(self, thisState, otherState, position, isActivating) {
         // set fields for individual components
         // position will be 0 for active, -1 or +1 for inactive depending on transition direction
@@ -21,6 +24,8 @@ export class MultistateComponent extends SharedUiComponent {
         }
     }
     controller($scope) {
+        console.log("Multistate controller")
+
         var self = $scope.componentDefinition;
         self.scope = $scope;
         self.states = [{

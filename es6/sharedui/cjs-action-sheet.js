@@ -1,10 +1,11 @@
 import {SharedUiComponent} from "./shareduicomponent";
+import template from "./cjs-action-sheet.html";
 
 export default class cjsActionSheet extends SharedUiComponent {
     constructor() {
         super();
         this.componentId = "cjsActionSheet";
-        this.template = require("./cjs-action-sheet.html");
+        this.template = template;
     }
     isNative() {
         return window.NativeNav;
