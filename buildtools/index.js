@@ -374,6 +374,7 @@
             }, function(err, result) { 
                 if (!err) {
                     fs.writeFileSync(varFolder + "/" + outputFile, result.css);
+                    fs.writeFileSync(varFolder + "/" + outputFile+".map", result.map);
                     console.log("Completed sass build of " + inputFile);
                 }
                 if (fileBuilt) fileBuilt(err, result);
