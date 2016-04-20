@@ -352,7 +352,7 @@ export class App {
     changePageInternal(lastPageRoute, currentPageRoute, popups, transition, originElement) {
 
         if (lastPageRoute) {
-            var path = require("path");
+            var path = require("./path");
             currentPageRoute = path.resolve(lastPageRoute, currentPageRoute);
             for (let i = 0; i < popups.length; i++) {
                 if (!popups[i]) continue;

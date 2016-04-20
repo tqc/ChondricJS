@@ -184,7 +184,6 @@
             var alias = require('./rollup-plugin-alias');
             var htmlmin = require('./rollup-plugin-htmlmin');
             var commonjs = require('./rollup-plugin-commonjs');
-            var builtins = require('rollup-plugin-node-builtins');
 
             var babelPlugins = [
                 path.resolve(__dirname, "../node_modules/babel-plugin-transform-decorators-legacy")
@@ -202,7 +201,6 @@
                 entry: path.resolve(sourceFolder, variation + ".js"),
                 plugins: [
                     alias(moduleMappings),
-                    builtins(),
                     nodeResolve({ jsnext: true }),
                     commonjs(),
                     htmlmin({
