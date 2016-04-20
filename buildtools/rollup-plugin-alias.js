@@ -35,7 +35,7 @@ function alias() {
 
       var updatedId = importee.replace(filteredAlias, entry);
 
-      if (updatedId.indexOf('./') === 0 || updatedId.indexOf('/') === 1 || updatedId.indexOf(':') === 1) {
+      if (updatedId.indexOf('./') === 0 || updatedId.indexOf('/') === 0 || updatedId.indexOf(':') === 1) {
         var basename = path.basename(importer);
         var directory = importer.split(basename)[0];
 
