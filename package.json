@@ -2,7 +2,7 @@
   "author": "Tom Clarkson",
   "name": "chondric",
   "description": "ChondricJS App Framework",
-  "version": "2.2.42",
+  "version": "2.2.43",
   "repository": {
     "url": "http://github.com/tqc/ChondricJS"
   },
@@ -40,6 +40,7 @@
     "rollup-plugin-alias": "^1.0.2",
     "rollup-plugin-babel": "^2.4.0",
     "rollup-plugin-commonjs": "^2.2.1",
+    "rollup-plugin-node-builtins": "^1.0.4",
     "rollup-plugin-node-resolve": "^1.5.0",
     "rollup-plugin-string": "^1.0.1",
     "rollup-plugin-uglify": "^0.3.1",

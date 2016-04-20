@@ -16,7 +16,7 @@
         "eol-last": 0,
         "new-cap": 0,
         // Warn about todo comments so they don't get forgotten
-        no-warning-comments: 1,
+        "no-warning-comments": 1,
         // warnings that should really be errors but would require more complex code fixes
         "no-extend-native": 1,
         "comma-dangle": 1,
