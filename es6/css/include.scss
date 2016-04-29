@@ -18,7 +18,7 @@ $supportMobile: true !global;
 
 $requireIos7: false !default;
 
-@import "../../bourbon/bourbon";
+@import "bourbon/app/assets/stylesheets/_bourbon.scss";
 
 @import "./mixins.scss";
 

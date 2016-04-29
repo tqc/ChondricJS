@@ -28,6 +28,8 @@
 
     var sass = require('node-sass');
 
+    var resolve = require('resolve');
+
     var options = {
         globals: {
             angular: "angular",
@@ -416,8 +418,33 @@
                 outFile: varFolder + "/" + outputFile,
                 sourceMap: true,
                 outputStyle: debugMode ? "nested" : "compressed",
-                // importer: function(url, prev, done) {},
-                includePaths: ["."]
+                importer: [function(url, prev) {
+                    
+                    // first check if the file exists as specified
+                    var f = path.resolve(path.dirname(prev), url);
+                    if (fs.existsSync(f)) return { file: f };
+
+                    // or with .scss added
+                    var f2 = path.dirname(f) + "/" + path.basename(f, ".scss") + ".scss"
+                    if (fs.existsSync(f2)) return { file: f2 };
+
+                    // or with an underscore
+                    var f3 = path.dirname(f) + "/_" + path.basename(f, ".scss") + ".scss"
+                    if (fs.existsSync(f3)) return { file: f3 };
+
+                    // if it includes node_modules, remove it
+                    if (url.indexOf("node_modules/") >= 0) {
+                        url = url.substr(url.lastIndexOf("node_modules/") + 13);
+                    }
+
+                    // resolve with require("resolve")
+                    var f4 = resolve.sync(url, {
+                        basedir: path.dirname(prev),
+                        extensions: [".scss"]
+                    })
+                    return {file : f4 };
+                }]
+                // includePaths: ["."]
             }, function(err, result) { 
                 if (!err) {
                     fs.writeFileSync(varFolder + "/" + outputFile, result.css);
