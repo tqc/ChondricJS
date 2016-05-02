@@ -432,17 +432,26 @@
                     var f3 = path.dirname(f) + "/_" + path.basename(f, ".scss") + ".scss"
                     if (fs.existsSync(f3)) return { file: f3 };
 
-                    // if it includes node_modules, remove it
-                    if (url.indexOf("node_modules/") >= 0) {
-                        url = url.substr(url.lastIndexOf("node_modules/") + 13);
+                    // try using node resolve
+                    var f4 = url;
+                    // if it includes node_modules, remove it                    
+                    if (f4.indexOf("node_modules/") >= 0) {
+                        f4 = f4.substr(f4.lastIndexOf("node_modules/") + 13);
                     }
 
                     // resolve with require("resolve")
-                    var f4 = resolve.sync(url, {
-                        basedir: path.dirname(prev),
-                        extensions: [".scss"]
-                    })
-                    return {file : f4 };
+                    try {
+                        f4 = resolve.sync(f4, {
+                            basedir: path.dirname(prev),
+                            extensions: [".scss"]
+                        })
+                        return {file : f4 };
+                    }
+                    catch(e) {
+                        console.log(e);
+                        // couldn't resolve it this way - ignore error and fall back to the default
+                    }
+                    return null;
                 }]
                 // includePaths: ["."]
             }, function(err, result) { 
