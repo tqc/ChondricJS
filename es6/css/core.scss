@@ -22,10 +22,10 @@ input, textarea, [contenteditable=true] {
  .debugonly {
     display:none !important;
 }
-body.debugmode .debugonly {
+.chondric-viewport.debugmode .debugonly {
     display:block !important;
 }
-body.debugmode::after {
+.chondric-viewport.debugmode::after {
     content:"Debug mode - do not release";
     display:block !important;
     position:fixed;

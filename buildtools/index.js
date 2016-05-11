@@ -317,6 +317,13 @@
                     entry: true
                 });
             }
+            if (debugMode) {
+                // set debug mode in client script
+                b.require(require.resolve(path.resolve(__dirname, "setdebugmode.js")), {
+                    expose: "debug",
+                    entry: true
+                });
+            }           
             b.require(require.resolve(path.resolve(sourceFolder, variation + ".js")), {
                 entry: true
             });

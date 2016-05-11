@@ -12,6 +12,11 @@ class Viewport {
         element.removeClass("viewport-preload");
         element.addClass("chondric-viewport");
 
+        scope.debugMode = window.debugMode || false;
+
+        if (window.debugMode) {
+            element.addClass("debugmode");
+        }
 
         scope.go = scope.changePage;
 

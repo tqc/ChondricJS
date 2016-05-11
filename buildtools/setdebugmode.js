@@ -1,0 +1,1 @@
+window.debugMode=true;

@@ -16,6 +16,8 @@ export class App {
         this.module = angular.module(this.moduleName, deps);
 
 
+        this.debugMode = window.debugMode || false;
+
         this.registerOptionalDirective(require("./directives/ng-tap"), "ngTap");
         this.registerOptionalDirective(require("./directives/ng-style-prefixer"), "ngStylePrefixer");
         this.registerOptionalDirective(require("./directives/cjs-shared-component"), "cjsSharedComponent");
