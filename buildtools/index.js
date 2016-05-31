@@ -74,7 +74,13 @@
             console.log("Building with Browserify");
         }
 
-        onBuildComplete = onBuildComplete || function() {};
+        onBuildComplete = onBuildComplete || function(err) {
+            if (!err) {
+                console.log("Build completed successfully");
+            } else {
+                console.log(err);
+            }
+        };
         var debugMode = env != "prod"; //true;
         if (options.debug !== undefined) debugMode = options.debug;
         if (options[env] && options[env].debug !== undefined) debugMode = options[env].debug;
@@ -482,11 +488,14 @@
         }
 
         function buildCss(onCssBuilt) {
+            console.log("Building CSS")
             var cssEntryPoint = path.resolve(cwd, options.cssEntryPoint);
 
 
             buildCssFile(cssEntryPoint, "app.css", function(err) {
-                if (err) return onCssBuilt && onCssBuilt();
+                if (err) {
+                    return onCssBuilt && onCssBuilt(err);
+                }
 
                 var variations = [];
                 for (let k2 in options.cssVariations) {
@@ -501,7 +510,10 @@
                     var ieCssFile = path.resolve(tempFolder, "index-" + v.key + ".scss");
                     fs.writeFileSync(ieCssFile, iesrc);
                     buildCssFile(ieCssFile, "app-" + v.key + ".css", next);
-                }, function() {
+                }, function(err2) {
+                    if (err2) {
+                        return onCssBuilt && onCssBuilt(err2);
+                    }
                     buildPreloadCss(onCssBuilt);
                 });
 
@@ -552,7 +564,11 @@
                 var ext = path.extname(file);
                 if (ext == ".scss") {
                     console.log("CSS needs rebuild");
-                    async.series([buildCss], function() {})
+                    async.series([buildCss], function(err) {
+                        if (err) {
+                            console.log(err);
+                        }                        
+                    })
                 } else if (ext == ".js" || ext == ".html") {
                     // if the changed file is .js or .html, need to run browserify
                     console.log("Browserify package needs rebuild");
