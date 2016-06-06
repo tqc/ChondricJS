@@ -2,6 +2,3 @@ node_modules
 built
 templates/section.js
 templates/page.js
-buildtools/rollup-plugin-alias.js
-buildtools/rollup-plugin-commonjs.js
-buildtools/estree-walker.js

@@ -1,7 +1,0 @@
-{
-	"esnext": true,
-	"requireSemicolons": true,
-	"disallowMixedSpacesAndTabs": true,
-	"validateIndentation": 4,
-	"excludeFiles": ["node_modules"]
-}
