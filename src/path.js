@@ -1,3 +1,4 @@
+/* eslint-disable */
 // path shim from browserify - needed when building with rollup
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -217,7 +218,7 @@ function filter(xs, f) {
 
 // String.prototype.substr - negative index don't work in IE8
 var substr = 'ab'.substr(-1) === 'b' ? function(str, start, len) {
-    return str.substr(start, len) } : function(str, start, len) {
+    return str.substr(start, len); } : function(str, start, len) {
         if (start < 0) start = str.length + start;
         return str.substr(start, len);
     };

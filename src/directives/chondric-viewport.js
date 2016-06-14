@@ -23,4 +23,4 @@ class Viewport {
     }
 }
 
-export default Viewport
+export default Viewport;

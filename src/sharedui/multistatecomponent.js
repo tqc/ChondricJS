@@ -24,7 +24,7 @@ export class MultistateComponent extends SharedUiComponent {
         }
     }
     controller($scope) {
-        console.log("Multistate controller")
+        console.log("Multistate controller");
 
         var self = $scope.componentDefinition;
         self.scope = $scope;

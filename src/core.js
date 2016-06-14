@@ -25,6 +25,6 @@ if (!(function f() { }).name) {
 import {App} from "./coreapp.js";
 import {Page} from "./page.js";
 
-export {Page, App}; 
+export {Page, App};
 
 

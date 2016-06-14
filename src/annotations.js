@@ -34,7 +34,7 @@ function Directive(options) {
         target.injections = options.injections || [];
 
         return target;
-    }
+    };
 }
 
 
@@ -46,7 +46,7 @@ function Route(options) {
         target.params = options.params || [];
         target.parameterNames = [];
         // todo: parse route to extract parameters
-        target.routeArray = options.routeArray =  options.route.split("/");
+        target.routeArray = options.routeArray = options.route.split("/");
         for (let i = 0; i < target.routeArray.length; i++) {
             var n = target.routeArray[i];
             if (n[0] == "$") {
@@ -55,7 +55,7 @@ function Route(options) {
                 target.parameterNames.push(undefined);
             }
         }
-    }
+    };
 }
 
 
@@ -63,10 +63,10 @@ export function globalify() {
     // make annotations global so we don't need to import in every single file.
     if (typeof $traceurRuntime !== "undefined") {
         window.Directive = Directive_Traceur;
-        window.Route = Route_Traceur;       
+        window.Route = Route_Traceur;
     } else {
         window.Directive = Directive;
-        window.Route = Route;       
+        window.Route = Route;
     }
 
 }
