@@ -2,11 +2,12 @@
   "author": "Tom Clarkson",
   "name": "chondric",
   "description": "ChondricJS App Framework",
-  "version": "3.0.49",
+  "version": "3.0.50",
   "repository": {
     "url": "http://github.com/tqc/ChondricJS"
   },
   "main": "./src",
+  "esnext:main": "./src",
   "scripts": {
     "test": "eslint ."
   },

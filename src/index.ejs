@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <script>
+        // redirect ie < 10
+        if (!window.atob) window.document.location.replace(window.document.location.href.replace(/\.html/, "-ie.html"));
+    </script>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Language" content="en-AU">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, minimal-ui" />
+
+    <link rel="shortcut icon" href="images/icon.png">
+    <link rel="icon" href="images/icon.png">
+    <link rel="apple-touch-icon" href="images/icon.png">
+
+    <title>
+        Chondric App
+    </title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="images/icon72.png" />
+
+    <style>
+
+    </style>
+
+
+</head>
+
+<body role="application" data-ng-controller="appCtrl" data-start-page="/calculator/smod/start">
+
+    <div data-chondric-viewport class="chondric-viewport viewport-preload"></div>
+
+    <div class="preloader"></div>
+
+</body>
+
+    <script defer src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script defer src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
+    <script defer src="app.js"></script>
+</html>
+
+<!-- twcalculators-tw 1.0.4-5f55b666-3.1.107-fatal: N-2.3.48-bed1fa2c -->
