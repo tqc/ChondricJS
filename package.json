@@ -2,7 +2,7 @@
   "author": "Tom Clarkson",
   "name": "chondric",
   "description": "ChondricJS App Framework",
-  "version": "3.0.50",
+  "version": "3.0.51",
   "repository": {
     "url": "http://github.com/tqc/ChondricJS"
   },
@@ -21,7 +21,6 @@
   },
   "license": "MIT",
   "engines": {
-    "node": "^4.2.2",
-    "npm": "2"
+    "node": ">=4 < 7"
   }
 }
