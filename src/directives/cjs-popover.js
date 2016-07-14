@@ -11,19 +11,29 @@ export default {
 
             element.addClass("modal");
             element.addClass("popover");
+            var removeEventHandlers;
 
             function clickOutsidePopup(e) {
+                removeEventHandlers();
                 var r = element[0].getBoundingClientRect();
                 var x = e.changedTouches ? e.changedTouches[0].clientX : e.touches ? e.touches[0].clientX : e.clientX;
                 var y = e.changedTouches ? e.changedTouches[0].clientY : e.touches ? e.touches[0].clientY : e.clientY;
                 if (x > r.left && x < r.right && y > r.top && y < r.bottom) return;
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
+                removeEventHandlers();
             }
 
             function closeWithKey(e) {
                 e.preventDefault();
                 clickOutsidePopup(e);
             }
+
+            removeEventHandlers = function() {
+                window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                window.document.body.removeEventListener('keydown', closeWithKey, true);
+            };
+
+            scope.$on('$destroy', removeEventHandlers);
 
             function ensureOverlay() {
                 var parentPageElement = element.closest(".chondric-page");
@@ -58,8 +68,7 @@ export default {
                         overlay.removeClass("active");
                     }
                     element.removeClass("active");
-                    window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
-                    window.document.body.removeEventListener('keydown', closeWithKey, true);
+                    removeEventHandlers();
                 } else {
                     if (window.useMouse) {
                         // giving the popup focus doesn't really work on iOS, so leace focus where it is

@@ -5,7 +5,7 @@ export default {
         //        restrict: "E",
         link: function(scope, element, attrs) {
             var previousAdditionalClasses;
-
+            var removeEventHandlers;
 
             function clickOutsidePopup(e) {
                 var r = element[0].getBoundingClientRect();
@@ -13,6 +13,7 @@ export default {
                 var y = e.changedTouches ? e.changedTouches[0].clientY : e.touches ? e.touches[0].clientY : e.clientY;
                 if (x > r.left && x < r.right && y > r.top && y < r.bottom) return;
                 scope.$apply("hideModal('" + attrs.cjsSidepanel + "')");
+                removeEventHandlers();
             }
 
 
@@ -42,6 +43,14 @@ export default {
                     }
                 }
             }
+
+            removeEventHandlers = function() {
+                window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
+                window.document.body.removeEventListener('keydown', closeWithKey, true);
+            };
+
+            scope.$on('$destroy', removeEventHandlers);
+
 
             element.addClass("modal");
             element.addClass("popup");
@@ -79,8 +88,7 @@ export default {
 
                         overlay.removeClass("active");
                         element.removeClass("active");
-                        window.document.body.removeEventListener(window.useMouse ? 'mousedown' : "touchstart", clickOutsidePopup, true);
-                        window.document.body.removeEventListener('keydown', closeWithKey, true);
+                        removeEventHandlers();
                     } else {
 
                         if (document.activeElement && !window.NativeNav && document.activeElement.tagName != "BODY") {
