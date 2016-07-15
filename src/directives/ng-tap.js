@@ -54,7 +54,8 @@ window.document.addEventListener('click', function(event) {
 
 @Directive({
     selector: "ngTap",
-    injections: []
+    injections: [],
+    scope: false
 })
 class NgTap {
     constructor(scope, element, attrs) {

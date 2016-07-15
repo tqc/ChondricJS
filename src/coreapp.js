@@ -127,7 +127,7 @@ export class App {
                     console.log("vp2 init");
                     return {
                         template: annotation.template,
-                        scope: true,
+                        scope: annotation.scope === false ? false : annotation.scope || true,
                         link: function(scope, element, attrs) {
                             console.log("vp2 link");
                             var obj = new options(scope, element, attrs, a, b, c, d, e, f, g);

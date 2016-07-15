@@ -3,6 +3,7 @@ class Directive_Traceur {
         this.template = options.template;
         this.selector = options.selector;
         this.injections = options.injections || [];
+        this.scope = options.scope;
     }
 }
 
@@ -32,6 +33,7 @@ function Directive(options) {
         target.template = options.template;
         target.selector = options.selector;
         target.injections = options.injections || [];
+        target.scope = options.scope;
 
         return target;
     };
