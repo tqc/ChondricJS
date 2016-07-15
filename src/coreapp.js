@@ -18,7 +18,7 @@ export class App {
 
         this.debugMode = window.debugMode || false;
 
-        this.registerOptionalDirective(require("./directives/ng-tap"), "ngTap");
+        this.registerOptionalDirective(require("./directives/ng-tap"));
         this.registerOptionalDirective(require("./directives/ng-style-prefixer"), "ngStylePrefixer");
         this.registerOptionalDirective(require("./directives/cjs-shared-component"), "cjsSharedComponent");
         this.registerOptionalDirective(require("./directives/chondric-page"), "chondricPage");
@@ -109,16 +109,20 @@ export class App {
 
         var name, injections, fn, arr;
         if (name2) {
+            // old syntax - name and a function
             name = name2;
             arr = options;
         }
         else {
             if (typeof options == "function") {
+                console.log("vp2 load");
                 // annotated class
                 // todo: find annotation with type Directive properly
                 var annotation = options.annotations[0];
+                console.log(annotation);
                 name = annotation.selector;
                 injections = annotation.injections;
+                console.log(injections);
                 fn = function(a, b, c, d, e, f, g) {
                     console.log("vp2 init");
                     return {

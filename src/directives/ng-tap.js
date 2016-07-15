@@ -1,64 +1,64 @@
-export function ngTap() {
-    var lastTapLocation;
-    console.log("init tap");
+var lastTapLocation;
+console.log("init tap");
 
 
-    //    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
+//    var iOS = (navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false);
 
-    // set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
-    // triggers ng-tap on the button behind it.
-    window.useMouse = true;
-
-    if (window.document.addEventListener) {
-        // no addEventListener means IE8, so definitely no touch or ghost click issues
-
-        var ghostClickCatcher = angular.element('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
-        angular.element(document.body).append(ghostClickCatcher);
-        var ghostClickTimer = 0;
-
-        var hideGhostClickCatcher = function() {
-            ghostClickCatcher.css("display", "none");
-        };
-
-        var showGhostClickCatcher = function() {
-            // hide the ghost click catcher after half a second, since ios 8 only sometimes sends ghost clicks.
-            // note that this isn't ideal in native mode - a heavy transition can delay simulated clicks for almost a second.
-            if (ghostClickTimer) window.clearTimeout(ghostClickTimer);
-            ghostClickTimer = window.setTimeout(hideGhostClickCatcher, 400);
-            // todo: probably should also adjust position to align with tap location
-            // otherwise tapping elsewhere on the page is disabled unnecessarily.
-            ghostClickCatcher.css("display", "block");
-        };
+// set mouse/touch flag globally. This way a tap that hides the button won't cause a click that
+// triggers ng-tap on the button behind it.
+window.useMouse = true;
 
 
-        ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
-        ghostClickCatcher.on("mouseup", hideGhostClickCatcher);
-        ghostClickCatcher.on("mouseenter", hideGhostClickCatcher);
-        ghostClickCatcher.on("mouseleave", hideGhostClickCatcher);
-        ghostClickCatcher.on("mousemove", hideGhostClickCatcher);
+var ghostClickCatcher = angular.element('<div style="background-color:rgba(0,0,0,0); position:absolute; top:0; bottom:0; left:0; right:0; z-index:12000; display:none;"></div>');
+angular.element(document.body).append(ghostClickCatcher);
+var ghostClickTimer = 0;
 
-        // todo: turn useMouse back on if a genuine mouse event shows up
-        window.document.addEventListener('touchstart', function(event) {
-            window.useMouse = false;
-        }, true);
+var hideGhostClickCatcher = function() {
+    ghostClickCatcher.css("display", "none");
+};
 
-        window.document.addEventListener('mouseup', function(event) {
-            hideGhostClickCatcher();
-        }, true);
-        window.document.addEventListener('mousedown', function(event) {
-            hideGhostClickCatcher();
-        }, true);
-        window.document.addEventListener('click', function(event) {
-            hideGhostClickCatcher();
-            if (window.jstimer) window.jstimer.finish("ghostclick");
-        }, true);
+var showGhostClickCatcher = function() {
+    // hide the ghost click catcher after half a second, since ios 8 only sometimes sends ghost clicks.
+    // note that this isn't ideal in native mode - a heavy transition can delay simulated clicks for almost a second.
+    if (ghostClickTimer) window.clearTimeout(ghostClickTimer);
+    ghostClickTimer = window.setTimeout(hideGhostClickCatcher, 400);
+    // todo: probably should also adjust position to align with tap location
+    // otherwise tapping elsewhere on the page is disabled unnecessarily.
+    ghostClickCatcher.css("display", "block");
+};
+
+
+ghostClickCatcher.on("mousedown", hideGhostClickCatcher);
+ghostClickCatcher.on("mouseup", hideGhostClickCatcher);
+ghostClickCatcher.on("mouseenter", hideGhostClickCatcher);
+ghostClickCatcher.on("mouseleave", hideGhostClickCatcher);
+ghostClickCatcher.on("mousemove", hideGhostClickCatcher);
+
+// todo: turn useMouse back on if a genuine mouse event shows up
+window.document.addEventListener('touchstart', function(event) {
+    window.useMouse = false;
+}, true);
+
+window.document.addEventListener('mouseup', function(event) {
+    hideGhostClickCatcher();
+}, true);
+window.document.addEventListener('mousedown', function(event) {
+    hideGhostClickCatcher();
+}, true);
+window.document.addEventListener('click', function(event) {
+    hideGhostClickCatcher();
+    if (window.jstimer) window.jstimer.finish("ghostclick");
+}, true);
 
 
 
+@Directive({
+    selector: "ngTap",
+    injections: ["$parse"]
+})
+class NgTap {
+    constructor(scope, element, attrs, $parse) {
 
-    }
-
-    return function(scope, element, attrs) {
         element.addClass('tappable');
 
         var active = false;
@@ -119,24 +119,7 @@ export function ngTap() {
                 x: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientX : e.clientX,
                 y: e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0].clientY : e.clientY
             };
-            /*
 
-                        // ie8 fix
-                        if (!e.originalEvent.stopPropagation) {
-                            e.originalEvent.stopPropagation = function() {
-                                e.originalEvent.cancelBubble = true; //ie
-                            };
-                        }
-
-                        if (!e.originalEvent.preventDefault) {
-                            e.originalEvent.preventDefault = function() {
-                                e.originalEvent.returnValue = false; //ie
-                            };
-                        }
-
-                        e.originalEvent.stopPropagation();
-                        e.originalEvent.preventDefault();
-*/
             if (!window.useMouse) {
                 element.unbind('touchmove', move);
                 element.unbind('touchend', action);
@@ -223,7 +206,7 @@ export function ngTap() {
         element.bind('keypress', function(e) {
             action(e);
         });
-
-    };
+    }
 }
-export default ngTap;
+
+export default NgTap;
