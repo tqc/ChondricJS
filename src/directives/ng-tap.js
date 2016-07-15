@@ -54,10 +54,10 @@ window.document.addEventListener('click', function(event) {
 
 @Directive({
     selector: "ngTap",
-    injections: ["$parse"]
+    injections: []
 })
 class NgTap {
-    constructor(scope, element, attrs, $parse) {
+    constructor(scope, element, attrs) {
 
         element.addClass('tappable');
 
@@ -134,11 +134,10 @@ class NgTap {
             element.removeClass('active');
             element.addClass('deactivated');
 
-            window.setTimeout(function() {
-                // add a final check for disabled elements in case we have a race condition
-                if (element.hasClass('disabled')) return;
-                scope.$apply(attrs.ngTap, element);
-            }, 0);
+
+            // add a final check for disabled elements in case we have a race condition
+            if (element.hasClass('disabled')) return;
+            scope.$apply(attrs.ngTap, element);
         };
 
         function start(e) {
