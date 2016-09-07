@@ -1,5 +1,14 @@
-<div ng-repeat="page in openViewArray track by page.route" chondric-page>
-Page here
+<div subview="header" class="subview-header">
+	Header
 </div>
-<div ng-repeat="(ck, componentDefinition) in sharedUiComponents track by ck" cjs-shared-component testattr='{{componentDefinition.componentId}}'>
+<div subview="main" class="subview-main">
+	<div ng-repeat="page in openViewArray track by page.route" chondric-page>
+		Page here
+	</div>
 </div>
+<div subview="footer" class="subview-footer">Footer</div>
+<div class="components">
+	<div ng-repeat="(ck, componentDefinition) in sharedUiComponents track by ck" cjs-shared-component testattr='{{componentDefinition.componentId}}'>
+	</div>
+</div>
+

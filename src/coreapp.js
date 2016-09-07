@@ -29,6 +29,7 @@ export class App {
 
 
         this.registerOptionalDirective(require("./directives/chondric-viewport"));
+        this.registerOptionalDirective(require("./directives/target-view"));
 
         this.registerOptionalDirective(require("./directives/viewport2"));
 
