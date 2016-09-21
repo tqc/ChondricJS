@@ -678,7 +678,9 @@ export class App {
                 $scope.activeRoutes = url.split(";");
                 $scope.activePageRoute = $scope.activeRoutes[0];
                 app.loadView($scope.activeRoutes[0]);
-                viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute].concat($scope.activePopups).concat(app.preloadedRoutes || []));
+                window.setTimeout(function() {
+                    viewCleanup($scope.openViews, [$scope.route, $scope.nextRoute, $scope.lastRoute].concat($scope.activePopups).concat(app.preloadedRoutes || []));
+                }, 300);
                 if (window.NativeNav) {
                     window.NativeNav.setValidGestures(app.swipeNavForRoutes[url] || {});
                 }

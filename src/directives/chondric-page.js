@@ -112,13 +112,17 @@ export var chondricPage = ["$compile", "$injector", function($compile, $injector
                     });
                 } else if (scope.activePopups[scope.activePopups.length - 1] && scope.activePopups[scope.activePopups.length - 1] == page.route) {
                     element.removeClass("prev-popup");
-                    element.addClass("active-popup");
+                    $animate.addClass(element, "active-popup").then(function() {
+                    });
+
                 } else if (scope.activePopups[scope.activePopups.length - 2] && scope.activePopups[scope.activePopups.length - 2] == page.route) {
-                    element.removeClass("active-popup");
                     element.addClass("prev-popup");
+                    $animate.removeClass(element, "active-popup").then(function() {
+                    });
                 } else {
-                    element.removeClass("active-popup");
                     element.removeClass("prev-popup");
+                    $animate.removeClass(element, "active-popup").then(function() {
+                    });
                 }
 
 
